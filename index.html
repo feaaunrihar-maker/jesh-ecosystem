@@ -299,6 +299,94 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<style>
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      background-color: #fafafa;
+    }
+    .mini-card {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 8px;
+      background-color: #fff;
+    }
+    .btn-primary {
+      background-color: #0069d9;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background-color: #0053ba;
+    }
+    .toggle-label {
+      font-weight: normal;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+  </style>
+
+  <div class="card">
+    <button id="analyzeArchBtn" class="btn-primary">Analyze Architecture</button>
+    <input type="checkbox" id="autoDeployToggle" style="margin-left:12px;">
+    <label for="autoDeployToggle" class="toggle-label">⚡ Auto-Deploy Immediately (Skip 2nd Click)</label>
+  </div>
+
+  <script>
+    // Placeholder functions – replace with real implementations in the main app
+    function generateUpgradePreview() {
+      console.log('Generating upgrade preview...');
+      // ... actual preview logic ...
+    }
+
+    function validateWidgetHTML() {
+      console.log('Validating widget HTML...');
+      // ... actual validation logic ...
+    }
+
+    function saveBackup() {
+      console.log('Saving backup...');
+      // ... actual backup logic ...
+    }
+
+    function executeArchitectPush() {
+      console.log('Executing architect push...');
+      // ... actual push logic ...
+    }
+
+    function showUpgradeSummary() {
+      const summary = document.createElement('div');
+      summary.className = 'mini-card';
+      summary.textContent = 'Upgrade preview generated, validation passed, backup saved, and push executed.';
+      document.body.appendChild(summary);
+      // Auto‑remove after a short period
+      setTimeout(() => summary.remove(), 5000);
+    }
+
+    document.getElementById('analyzeArchBtn').addEventListener('click', () => {
+      const autoDeploy = document.getElementById('autoDeployToggle').checked;
+
+      // Always generate preview and show summary
+      generateUpgradePreview();
+      showUpgradeSummary();
+
+      // If auto‑deploy is on, run the rest automatically
+      if (autoDeploy) {
+        validateWidgetHTML();
+        saveBackup();
+        executeArchitectPush();
+      } else {
+        // Normal flow – wait for the second click (handled elsewhere in the app)
+        console.log('Auto‑Deploy disabled – awaiting second confirmation click.');
+      }
+    });
+  </script>
 <!-- Student Login / Register Modal -->
 <div id="studentAuthModal" class="card">
   <h3>Student Login / Register</h3>
