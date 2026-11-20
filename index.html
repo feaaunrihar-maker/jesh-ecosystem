@@ -303,6 +303,82 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Student Login</title>
+<style>
+  html, body { margin:0; height:100%; font-family:Arial,Helvetica,sans-serif; background:#f5f5f5; }
+  .hidden { display:none; }
+  .modal-bg {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.4);
+  }
+  .card {
+    background:#fff; padding:2rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    width:90%; max-width:360px;
+  }
+  .card h2 { margin-top:0; text-align:center; }
+  .card input {
+    width:100%; padding:0.6rem; margin:0.5rem 0; border:1px solid #ccc; border-radius:4px;
+    font-size:1rem;
+  }
+  .btn-primary {
+    width:100%; padding:0.7rem; background:#0069d9; color:#fff; border:none;
+    border-radius:4px; font-size:1rem; cursor:pointer;
+  }
+  .btn-primary:hover { background:#0053b3; }
+  .mini-card { font-size:0.85rem; color:#666; text-align:center; margin-top:1rem; }
+  @media (max-width:480px){
+    .card { padding:1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mock existing UI elements (to be hidden) -->
+<header id="site-header" class="hidden">Header</header>
+<nav id="site-nav" class="hidden">Navigation</nav>
+<aside id="site-sidebar" class="hidden">Sidebar</aside>
+<footer id="site-footer" class="hidden">Footer</footer>
+
+<div id="login-modal" class="modal-bg">
+  <div class="card">
+    <h2>Student Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button class="btn-primary" id="loginBtn">Login</button>
+    <div class="mini-card">Don't have an account? <a href="#">Register</a></div>
+  </div>
+</div>
+
+<script>
+  // Simple mock authentication (replace with real logic)
+  document.getElementById('loginBtn').addEventListener('click', function(){
+    const email = document.getElementById('email').value.trim();
+    const pwd   = document.getElementById('password').value;
+    if(email && pwd){
+      // Simulate successful login
+      document.getElementById('login-modal').style.display = 'none';
+      // Reveal main UI elements (if any)
+      // In this upgrade we keep them hidden permanently after login,
+      // so we simply do NOT unhide them.
+      // Example: document.getElementById('site-header').classList.remove('hidden');
+    } else {
+      alert('Please enter email and password.');
+    }
+  });
+
+  // Ensure the modal stays full‑screen on resize
+  window.addEventListener('resize', function(){
+    const modal = document.getElementById('login-modal');
+    modal.style.height = window.innerHeight + 'px';
+  });
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <title>Learner Dashboard Upgrade</title>
 <style>
   body {font-family: Arial, sans-serif; margin:0; padding:20px; background:#f5f5f5;}
