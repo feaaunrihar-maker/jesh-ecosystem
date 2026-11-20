@@ -1,3371 +1,957 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Jesh AI Ecosystem</title>
-  <meta name="theme-color" content="#4f46e5" />
+  <meta name="theme-color" content="#4F46E5" />
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-dark: #3730a3;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --dark: #0f172a;
+      --primary: #4F46E5;
+      --primary-dark: #3730A3;
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --text: #0F172A;
+      --muted: #475569;
+      --border: #E2E8F0;
+      --dark: #0F172A;
+      --emerald: #059669;
+      --rose: #E11D48;
+      --amber: #D97706;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    html, body {
+      height: 100%; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); overflow-x: hidden;
+    }
     .hidden { display: none !important; }
 
-    /* COMPACT TOP APP BAR (NO ADMIN CLUTTER!) */
-    header {
-      height: 58px; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border); padding: 0 14px;
-      display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    /* TOUCH-FRIENDLY 48PX BUTTONS & INPUTS */
+    button, .btn {
+      cursor: pointer; border: none; border-radius: 12px; font-weight: 700; font-size: 14px;
+      min-height: 48px; padding: 10px 16px; transition: 0.15s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .brand { display: flex; align-items: center; gap: 9px; }
+    button:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #FFFFFF; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-dark { background: var(--dark); color: #FFFFFF; }
+    .btn-emerald { background: var(--emerald); color: #FFFFFF; }
+    .btn-rose { background: var(--rose); color: #FFFFFF; }
+    .btn-amber { background: var(--amber); color: #FFFFFF; }
+    .btn-outline { background: #FFFFFF; color: var(--text); border: 1.5px solid #CBD5E1; }
+
+    input[type="text"], input[type="password"], input[type="number"], input[type="tel"], select, textarea {
+      width: 100%; min-height: 48px; padding: 11px 14px; border-radius: 12px;
+      border: 1.5px solid #CBD5E1; font-size: 15px; font-family: inherit;
+      outline: none; background: #FFFFFF; color: var(--text);
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+
+    /* FULL-SCREEN AUTH & ONBOARDING GATE */
+    .auth-gate {
+      position: fixed; inset: 0; background: var(--bg); z-index: 90;
+      display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;
+    }
+    .auth-card {
+      background: #FFFFFF; border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px; max-width: 410px; width: 100%; box-shadow: 0 12px 32px rgba(15,23,42,0.08);
+    }
+    .tab-switch {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #F1F5F9;
+      padding: 5px; border-radius: 12px; margin-bottom: 16px;
+    }
+    .tab-switch button {
+      min-height: 42px; background: transparent; color: var(--muted); border-radius: 9px; font-size: 13px;
+    }
+    .tab-switch button.active { background: #FFFFFF; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
+    /* TOP HEADER (HIDDEN UNTIL LOGGED IN) */
+    header {
+      height: 60px; background: #FFFFFF; border-bottom: 1px solid var(--border); padding: 0 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
     .logo {
-      width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), #ec4899);
-      color: #fff; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, var(--primary), #EC4899);
+      color: #FFFFFF; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center;
       cursor: pointer; user-select: none;
     }
-    .brand h1 { font-size: 15px; font-weight: 800; line-height: 1.1; }
-    .brand p { font-size: 11px; color: var(--muted); }
-    .header-right { display: flex; align-items: center; gap: 6px; }
+    .brand h1 { font-size: 15px; font-weight: 800; color: var(--text); }
+    .brand p { font-size: 11px; color: var(--muted); font-weight: 600; }
 
-    button {
-      cursor: pointer; border: none; border-radius: 10px; font-weight: 600; font-size: 13px;
-      padding: 9px 14px; transition: 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-dark { background: var(--dark); color: #fff; }
-    .btn-emerald { background: #059669; color: #fff; }
-    .btn-rose { background: #e11d48; color: #fff; }
-    .btn-amber { background: #f59e0b; color: #fff; }
-    .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
-
-    /* FULL-SCREEN APP WORKSPACE */
+    /* WORKSPACE & LOCKED 48PX FOOTER */
     .app-workspace {
-      position: fixed; top: 58px; bottom: 64px; left: 0; right: 0;
+      position: fixed; top: 60px; bottom: 54px; left: 0; right: 0;
       overflow-y: auto; padding: 14px; background: var(--bg);
     }
-    .screen-inner { max-width: 960px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+    .screen-inner { max-width: 900px; margin: 0 auto; }
+    .bottom-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 54px;
+      background: #FFFFFF; border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr); z-index: 45;
+      box-shadow: 0 -2px 10px rgba(15,23,42,0.05);
+    }
+    .footer-btn {
+      min-height: 48px; background: none; border-radius: 0; flex-direction: column;
+      gap: 2px; padding: 4px; font-size: 11px; font-weight: 700; color: var(--muted);
+    }
+    .footer-btn.active { color: var(--primary); background: #EEF2FF; border-top: 3px solid var(--primary); }
 
-    /* FIXED BOTTOM NAVIGATION BAR (ALWAYS ACCESSIBLE) */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
-      background: #ffffff; border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(5, 1fr); z-index: 45;
-      box-shadow: 0 -4px 16px rgba(15,23,42,0.06);
+    /* CARDS & GRIDS */
+    .card {
+      background: #FFFFFF; border-radius: 16px; border: 1px solid var(--border);
+      padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.03);
     }
-    .bnav-btn {
-      background: none; border-radius: 0; flex-direction: column; justify-content: center;
-      gap: 2px; padding: 4px 2px; font-size: 10px; font-weight: 700; color: var(--muted);
+    .mini-card {
+      background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 14px;
     }
-    .bnav-btn span.ico { font-size: 19px; line-height: 1.1; }
-    .bnav-active { color: var(--primary); background: #eef2ff; border-top: 3px solid var(--primary); }
-
-    /* CARDS & INPUTS */
-    .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-    .mini-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-    input[type="text"], input[type="password"], input[type="tel"], select, textarea {
-      width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #cbd5e1;
-      font-size: 15px; font-family: inherit; outline: none; background: #fff;
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .module-card {
+      background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 16px; padding: 16px;
+      cursor: pointer; transition: 0.15s; text-align: left; display: flex; flex-direction: column; gap: 6px;
     }
+    .module-card:hover { border-color: var(--primary); background: #EEF2FF; }
     .input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .input-row input { flex: 1; min-width: 180px; }
+    .input-row input { flex: 1; min-width: 170px; }
 
-    /* FULL-SCREEN CHAT & SPEAKING FEEDS */
-    .full-chat-wrap { flex: 1; display: flex; flex-direction: column; min-height: calc(100vh - 155px); background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-    .chat-header-bar { padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-    .msg-ai { background: #f1f5f9; color: #0f172a; padding: 11px 14px; border-radius: 14px; max-width: 86%; align-self: flex-start; font-size: 14px; white-space: pre-line; line-height: 1.5; }
-    .msg-user { background: var(--primary); color: #fff; padding: 11px 14px; border-radius: 14px; max-width: 86%; align-self: flex-end; font-size: 14px; }
-    .chat-composer { padding: 10px; border-top: 1px solid var(--border); background: #fff; display: flex; gap: 8px; align-items: center; }
+    /* CHAT & SPEAKING */
+    .chat-messages {
+      height: 270px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+      background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px;
+    }
+    .msg-ai { background: #FFFFFF; border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-start; font-size: 14px; line-height: 1.5; white-space: pre-line; }
+    .msg-user { background: var(--primary); color: #FFFFFF; padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-end; font-size: 14px; }
 
-    .dark-studio { background: #0f172a; color: #f8fafc; border-radius: 16px; padding: 16px; }
-    .mic-btn { width: 44px; height: 44px; border-radius: 50%; background: #e11d48; color: #fff; font-size: 18px; justify-content: center; flex-shrink: 0; }
-    .mic-active { animation: pulse 1s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(225,29,72,0.7); } 70% { box-shadow: 0 0 0 12px rgba(225,29,72,0); } 100% { box-shadow: 0 0 0 0 rgba(225,29,72,0); } }
-
+    /* 2-WAY VIDEO CALL STAGE */
+    .dark-studio { background: #0F172A; color: #F8FAFC; border-radius: 18px; padding: 16px; position: relative; }
+    .video-stage {
+      position: relative; background: #1E293B; border-radius: 16px; padding: 20px 14px;
+      text-align: center; border: 1px solid #334155; margin-bottom: 12px; min-height: 250px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .call-timer-pill {
+      position: absolute; top: 12px; left: 12px; background: rgba(15,23,42,0.85);
+      color: #34D399; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700;
+    }
+    .pip-box {
+      position: absolute; top: 12px; right: 12px; width: 84px; height: 108px; border-radius: 12px;
+      overflow: hidden; border: 2px solid #4F46E5; background: #0F172A;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: #FFFFFF;
+    }
+    .pip-box video { width: 100%; height: 100%; object-fit: cover; }
     .avatar-stage {
-      width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 10px; overflow: hidden;
-      border: 4px solid #10b981; background: #1e293b; display: flex; align-items: center; justify-content: center;
+      width: 124px; height: 124px; border-radius: 50%; overflow: hidden;
+      border: 4px solid #10B981; background: #0F172A; margin-bottom: 10px;
     }
     .avatar-stage img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-speaking { animation: speakBounce 0.35s infinite alternate; box-shadow: 0 0 25px rgba(16,185,129,0.7); }
-    @keyframes speakBounce { from { transform: scale(1); } to { transform: scale(1.06); } }
-
-    .ad-strip {
-      background: linear-gradient(90deg, #fef3c7, #fde68a); border: 1px solid #f59e0b;
-      color: #92400e; padding: 8px 12px; border-radius: 12px; margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
+    .avatar-speaking { animation: speakPulse 0.4s infinite alternate; box-shadow: 0 0 28px rgba(16,185,129,0.8); }
+    @keyframes speakPulse { from { transform: scale(1); } to { transform: scale(1.06); } }
+    .subtitle-bar {
+      background: rgba(2,6,23,0.85); color: #F8FAFC; padding: 8px 12px; border-radius: 10px;
+      font-size: 13px; max-width: 92%; line-height: 1.4;
     }
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.78); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-    .modal-box { background: #fff; border-radius: 18px; padding: 22px; max-width: 410px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
-    .terminal { background: #020617; color: #34d399; font-family: Consolas, monospace; font-size: 12px; padding: 12px; border-radius: 10px; margin-top: 10px; white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.75); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .modal-box { background: #FFFFFF; border-radius: 18px; padding: 22px; max-width: 420px; width: 100%; }
+    .terminal { background: #020617; color: #34D399; font-family: monospace; font-size: 12px; padding: 12px; border-radius: 10px; margin-top: 10px; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
   </style>
 </head>
 <body>
 
-  <!-- TOP HEADER (COMPACT, STUDENT-ONLY, SECRET 5-TAP LOGO FOR ADMIN) -->
-  <header>
-    <div class="brand">
-      <div class="logo" id="secretAdminLogo" onclick="handleLogoTap()" title="Jesh AI">J</div>
-      <div>
-        <h1 id="uiBrandName">Jesh AI Ecosystem</h1>
-        <p>👋 <span id="hdrStudentName">Guest</span> • 🔥 <span id="userStreak">1</span>d • ⚡ <span id="userXpCount">0</span> XP</p>
+  <!-- ==================== 1. FULL-SCREEN LOGIN & CREATE ACCOUNT GATE ==================== -->
+  <section id="authGate" class="auth-gate">
+    <div class="auth-card">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div class="logo" style="margin:0 auto 8px;width:46px;height:46px;font-size:22px;" onclick="handleLogoTap()">J</div>
+        <h2 style="font-size:20px;font-weight:800;color:var(--text);">Jesh AI Ecosystem</h2>
+        <p style="font-size:13px;color:var(--muted);">आसान और पर्सनल AI लर्निंग प्लेटफ़ॉर्म</p>
+      </div>
+
+      <!-- Role Switch: Student vs Admin -->
+      <div class="tab-switch">
+        <button id="roleBtnStudent" class="active" onclick="switchAuthRole('student')">🎓 Student</button>
+        <button id="roleBtnAdmin" onclick="switchAuthRole('admin')">🔐 Admin</button>
+      </div>
+
+      <!-- Student Login / Create Account Form -->
+      <div id="studentAuthForm">
+        <div class="tab-switch" style="background:#EEF2FF;">
+          <button id="modeBtnLogin" class="active" onclick="switchStudentMode('login')">Login करें</button>
+          <button id="modeBtnRegister" onclick="switchStudentMode('register')">Create Account (नया)</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Phone Number या Email ID</label>
+            <input id="authContactInput" type="text" placeholder="उदा. 9876543210 या name@gmail.com" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">6 अंकों का पासवर्ड (6-Digit PIN)</label>
+            <input id="authPinInput" type="password" maxlength="6" inputmode="numeric" placeholder="••••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)" onkeydown="if(event.key==='Enter') handleStudentAuthSubmit()" />
+          </div>
+          <button id="studentAuthSubmitBtn" class="btn-primary" style="width:100%;font-size:16px;" onclick="handleStudentAuthSubmit()">Login →</button>
+          <button type="button" class="btn-outline" style="width:100%;font-size:13px;" onclick="openForgotModal()">❓ पासवर्ड भूल गए? (Forgot Password)</button>
+        </div>
+      </div>
+
+      <!-- Admin Login Form (Hidden until Admin tab clicked) -->
+      <div id="adminAuthForm" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Admin Master Password</label>
+          <input id="gateAdminPass" type="password" placeholder="Enter Admin Password" onkeydown="if(event.key==='Enter') verifyAdminFromGate()" />
+        </div>
+        <button class="btn-dark" style="width:100%;" onclick="verifyAdminFromGate()">Unlock Admin Command Center</button>
       </div>
     </div>
-    <div class="header-right">
-      <select id="globalStudentLevel" onchange="saveStudentLevel()" style="width:auto;padding:6px 8px;font-size:11px;font-weight:700;background:#eef2ff;color:var(--primary);border-color:var(--primary);">
-        <option value="A1 Beginner">🌱 A1</option>
-        <option value="B1 Intermediate">🚀 B1</option>
-        <option value="C1 Advanced">🏆 C1</option>
-      </select>
-      <button class="btn-amber" style="padding:7px 10px;font-size:11px;" onclick="shareAndInvite()">🚀 Invite</button>
-      <button class="btn-outline" style="padding:7px 9px;font-size:11px;" onclick="openStudentAuthModal()">👤</button>
+  </section>
+
+  <!-- ==================== 2. FIRST-TIME PROFILE SETUP (NAME -> AGE) ==================== -->
+  <section id="profileSetupGate" class="auth-gate hidden">
+    <div class="auth-card">
+      <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px;">✨ स्वागत है! बस 2 आसान सवाल</div>
+
+      <!-- Step A: Name -->
+      <div id="setupStepName" style="display:flex;flex-direction:column;gap:12px;">
+        <h3 style="font-size:20px;">आपका पूरा नाम क्या है?</h3>
+        <p style="font-size:13px;color:var(--muted);">Enter your full name (यह आपके सर्टिफिकेट और AI ट्यूटर के लिए है)</p>
+        <input id="setupNameInput" type="text" placeholder="अपना नाम लिखें..." onkeydown="if(event.key==='Enter') goToAgeStep()" />
+        <button class="btn-primary" style="width:100%;" onclick="goToAgeStep()">Next (आगे बढ़ें) →</button>
+      </div>
+
+      <!-- Step B: Age -->
+      <div id="setupStepAge" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
+        <h3 style="font-size:20px;">आपकी उम्र (Age) क्या है?</h3>
+        <p style="font-size:13px;color:var(--muted);">ताकि AI आपकी उम्र और समझ के हिसाब से सिखा सके</p>
+        <input id="setupAgeInput" type="number" min="5" max="99" placeholder="उम्र लिखें (जैसे: 18)" onkeydown="if(event.key==='Enter') finishProfileSetup()" />
+        <button id="finishSetupBtn" class="btn-emerald" style="width:100%;font-size:16px;" onclick="finishProfileSetup()">🚀 Start Learning / शुरू करें</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. TOP HEADER (ONLY SHOWN AFTER LOGIN) ==================== -->
+  <header id="mainAppHeader" class="hidden">
+    <div class="brand">
+      <div class="logo" onclick="handleLogoTap()">J</div>
+      <div>
+        <h1 id="uiBrandName">Jesh AI Ecosystem</h1>
+        <p>👋 <span id="hdrStudentName">Student</span> • 🔥 <span id="userStreak">1</span>d • ⚡ <span id="userXpCount">0</span> XP</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button class="btn-rose" style="min-height:38px;padding:6px 12px;font-size:12px;" onclick="logoutStudent()">Logout</button>
     </div>
   </header>
 
-  <!-- ==================== FULL-SCREEN LEARNER APP WORKSPACE ==================== -->
-  <main id="viewLearner" class="app-workspace">
+  <!-- ==================== 4. STUDENT WORKSPACE ==================== -->
+  <main id="viewLearner" class="app-workspace hidden">
     <div class="screen-inner">
 
-      <!-- SCREEN 1: DAILY REELS FEED -->
-      <section id="scr-feed" class="app-screen">
-        <div id="adBannerSlot" class="ad-strip">
-          <span id="adBannerText">📢 Free Digital India, Python & Spoken English Mastery!</span>
-          <button class="btn-amber" style="padding:4px 10px;font-size:11px;" onclick="openFullScreen('lingo')">Start →</button>
-        </div>
-        <div class="card" style="background:linear-gradient(135deg,#eef2ff,#ffffff);border-left:4px solid var(--primary);">
-          <div style="font-size:11px;font-weight:700;color:var(--primary);">📌 YOUR PERSONALIZED LEARNING MEMORY</div>
-          <p id="studentProgressBanner" style="font-size:13px;color:#334155;margin-top:4px;">Welcome! Tap any reel below or open AI Tutor to continue your personalized journey.</p>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <strong style="font-size:14px;">🔥 Daily Bite-Sized Reels</strong>
-          <button class="btn-primary" style="padding:6px 12px;font-size:12px;" onclick="loadFreshFeedCards()">✨ New Reels (+10 XP)</button>
-        </div>
-        <div id="socialFeedContainer"></div>
-      </section>
-
-      <!-- SCREEN 2: FULL-SCREEN AI TUTOR (CHATGPT + CLAUDE + VISION) -->
-      <section id="scr-chat" class="app-screen hidden" style="flex:1;display:flex;flex-direction:column;">
-        <div class="full-chat-wrap">
-          <div class="chat-header-bar">
-            <strong style="font-size:14px;">💬 Personal AI Tutor (Remembers Your Progress)</strong>
-            <label style="font-size:12px;display:flex;align-items:center;gap:4px;">
-              <input type="checkbox" id="learnerWebToggle" /> 🌐 Web Search
-            </label>
+      <!-- HOME DASHBOARD -->
+      <section id="scr-home" class="app-screen">
+        <div class="card" style="background:linear-gradient(135deg,#EEF2FF,#FFFFFF);border-left:5px solid var(--primary);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <span style="font-size:11px;font-weight:800;color:var(--primary);">🧠 360° ADAPTIVE AI MEMORY</span>
+              <h2 style="font-size:18px;margin-top:2px;">नमस्ते, <span id="dashGreetingName">Learner</span>!</h2>
+              <p id="adaptiveSkillBadge" style="font-size:12px;color:var(--muted);margin-top:4px;">Mindset: Curious Learner • Grammar: A1 | Math: L1 | Logic: L1</p>
+            </div>
+            <button class="btn-primary" onclick="openFullScreen('studio')">📹 शुरू करें / Start Lesson</button>
           </div>
+        </div>
+
+        <!-- 4 CORE LEARNING MODULES -->
+        <div class="grid-2" style="margin-bottom:14px;">
+          <div class="module-card" onclick="openFullScreen('lingo')">
+            <span style="font-size:26px;">🌍</span>
+            <strong style="font-size:16px;">JeshLingo</strong>
+            <span style="font-size:12px;color:var(--muted);">20+ भाषाएँ और बोलचाल के आसान कार्ड्स</span>
+          </div>
+          <div class="module-card" onclick="openFullScreen('read')">
+            <span style="font-size:26px;">📖</span>
+            <strong style="font-size:16px;">JeshRead Studio</strong>
+            <span style="font-size:12px;color:var(--muted);">बोलकर पढ़ें और रियल-टाइम उच्चारण सुधारें</span>
+          </div>
+          <div class="module-card" onclick="openFullScreen('academy')">
+            <span style="font-size:26px;">🎓</span>
+            <strong style="font-size:16px;">Jesh Academy</strong>
+            <span style="font-size:12px;color:var(--muted);">Python, HTML, CCC कोर्स और QR सर्टिफिकेट</span>
+          </div>
+          <div class="module-card" style="border-color:#10B981;background:#ECFDF5;" onclick="openFullScreen('studio')">
+            <span style="font-size:26px;">📹</span>
+            <strong style="font-size:16px;">JeshLive Video Tutor</strong>
+            <span style="font-size:12px;color:#065F46;">2-Way AI वीडियो कॉल और बेस्ट-फ्रेंड ट्रेनर</span>
+          </div>
+        </div>
+
+        <!-- PERSONAL AI DOUBT SOLVER -->
+        <div class="card">
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">💬 Personal AI Tutor (आपके स्तर के अनुसार सिखाता है)</strong>
           <div id="tutorChatFeed" class="chat-messages">
-            <div class="msg-ai">👋 Namaste! I remember your learning level and progress. Ask me any doubt, paste code, or upload a photo of a question!</div>
-          </div>
-          <div id="visionBadge" class="hidden" style="padding:4px 12px;background:#eef2ff;font-size:11px;color:var(--primary);font-weight:700;">🖼️ Question photo attached!</div>
-          <div class="chat-composer">
-            <label class="btn-outline" style="padding:9px 10px;" title="Scan Question Photo">
-              📷 <input type="file" accept="image/*" class="hidden" onchange="previewVisionImage(event)" />
-            </label>
-            <input id="learnerPrompt" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
-            <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">Send</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- SCREEN 3: FULL-SCREEN VOICE SPEAKING & READALONG -->
-      <section id="scr-speak" class="app-screen hidden">
-        <div class="dark-studio" style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-            <strong style="font-size:15px;">🎙️ Live AI Speaking Practice</strong>
-            <select id="speakingMode" style="width:auto;background:#1e293b;color:#fff;border-color:#334155;font-size:12px;padding:6px 10px;">
-              <option value="Daily English Conversation">🗣️ Daily English</option>
-              <option value="Job Interview">💼 Job Interview</option>
-              <option value="Hindi/Bhojpuri to English">🇮🇳 Hindi → English</option>
-            </select>
-          </div>
-          <div id="speakingChatHistory" class="chat-messages" style="height:260px;background:#020617;border-radius:12px;margin-bottom:10px;">
-            <div class="msg-ai" style="background:#1e293b;color:#f1f5f9;">👋 Tap the red Mic, speak in English or Hindi, and press Send!</div>
+            <div class="msg-ai">👋 नमस्ते! आप मुझसे English Grammar, Math, Logic या Computer का कोई भी सवाल पूछ सकते हैं।</div>
           </div>
           <div class="input-row">
-            <button id="micRecordBtn" class="mic-btn" onclick="toggleVoiceMic()">🎤</button>
-            <input id="speakingTranscriptInput" type="text" style="background:#1e293b;color:#fff;border-color:#334155;" placeholder="Speak or type..." onkeydown="if(event.key==='Enter') sendSpeakingTurn()" />
-            <button class="btn-primary" onclick="sendSpeakingTurn()">Send 🔊</button>
+            <input id="learnerPrompt" type="text" placeholder="अपना सवाल लिखें..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
+            <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">पूछें</button>
           </div>
-          <p id="micStatusText" style="font-size:11px;color:#94a3b8;margin-top:6px;">Mic Ready</p>
         </div>
 
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <strong>📖 ReadAlong Pronunciation Check</strong>
-            <button class="btn-outline" style="padding:5px 10px;font-size:11px;" onclick="generateNewReadAlongPassage()">🔄 New Text</button>
-          </div>
-          <p id="readAlongTargetText" style="font-size:15px;font-weight:600;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);margin-bottom:10px;">
-            Consistent practice every single day turns beginners into confident leaders.
-          </p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-rose" onclick="startReadAlongCheck()">🎤 Read Aloud</button>
-            <button class="btn-outline" onclick="speakTextAloud(document.getElementById('readAlongTargetText').textContent)">🔊 Listen</button>
-          </div>
-          <div id="readAlongResult" style="margin-top:10px;font-size:13px;font-weight:600;"></div>
-        </div>
+        <!-- DYNAMIC EXTENSIONS SLOT (RESERVED FOR FUTURE ADMIN PROMPTS) -->
+        <div id="dynamicExtensionsZone"></div>
       </section>
 
-      <!-- SCREEN 4: FULL-SCREEN JESHLINGO, COURSES & QR CERTIFICATE -->
+      <!-- JESHLINGO SCREEN -->
       <section id="scr-lingo" class="app-screen hidden">
         <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">🌍 JeshLingo (20+ Languages Flashcards)</strong>
+          <strong style="font-size:16px;display:block;margin-bottom:8px;">🌍 JeshLingo (भाषा सीखें)</strong>
           <div class="input-row" style="margin-bottom:12px;">
-            <select id="lingoLangSelect" style="max-width:220px;">
+            <select id="lingoLangSelect" style="max-width:240px;">
               <option>English (Global)</option><option>Hindi (हिन्दी)</option><option>Bhojpuri (भोजपुरी)</option>
-              <option>Sanskrit (संस्कृत)</option><option>Mandarin Chinese (中文)</option><option>Japanese (日本語)</option>
-              <option>Swahili (Africa)</option><option>Arabic (العربية)</option><option>French (Français)</option><option>Spanish (Español)</option>
+              <option>Sanskrit (संस्कृत)</option><option>Japanese (日本語)</option><option>French (Français)</option>
             </select>
-            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 Load Cards</button>
+            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 नए कार्ड्स लोड करें</button>
           </div>
           <div id="lingoCardsGrid" class="grid-2"></div>
         </div>
+      </section>
 
+      <!-- JESHREAD STUDIO SCREEN -->
+      <section id="scr-read" class="app-screen hidden">
         <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">🎓 Skill Micro-Courses & QR Certificate</strong>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-            <button class="btn-outline" onclick="launchCourse('Python Programming')">🐍 Python</button>
-            <button class="btn-outline" onclick="launchCourse('NIELIT CCC & CSC')">💻 CCC & CSC</button>
-            <button class="btn-outline" onclick="launchCourse('HTML & Web Design')">🌐 HTML/CSS</button>
-            <button class="btn-outline" onclick="launchCourse('Personal Finance')">💰 Finance</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <strong style="font-size:16px;">📖 JeshRead Pronunciation Studio</strong>
+            <button class="btn-outline" onclick="generateNewReadAlongPassage()">🔄 नया वाक्य</button>
           </div>
-          <div class="mini-card">
-            <div style="font-size:13px;font-weight:700;margin-bottom:8px;">🏅 Generate Verified QR Certificate</div>
-            <div class="input-row">
-              <input id="certStudentName" type="text" placeholder="Student Full Name" />
-              <select id="certCourseSelect" style="max-width:210px;">
-                <option>Python & AI Basics</option>
-                <option>NIELIT CCC Digital Literacy</option>
-                <option>Spoken English Fluency</option>
-              </select>
-              <button class="btn-emerald" onclick="generateQRCertificate()">Get Certificate</button>
-            </div>
-            <div id="certPreviewArea"></div>
+          <p id="readAlongTargetText" style="font-size:16px;font-weight:700;padding:14px;background:#F8FAFC;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;">
+            Consistent practice every day turns beginners into confident leaders.
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-rose" onclick="startReadAlongCheck()">🎤 बोलकर पढ़ें</button>
+            <button class="btn-outline" onclick="speakTextAloud(document.getElementById('readAlongTargetText').textContent)">🔊 पहले सुनें</button>
           </div>
+          <div id="readAlongResult" style="margin-top:12px;font-size:14px;font-weight:700;"></div>
         </div>
       </section>
 
-      <!-- SCREEN 5: FULL-SCREEN VIDEO-CALL AVATAR, IMAGE & VIDEO STUDIO -->
-      <section id="scr-studio" class="app-screen hidden">
-        <div class="dark-studio" style="margin-bottom:14px;text-align:center;">
-          <strong style="font-size:16px;display:block;margin-bottom:4px;">📹 JeshLive Video-Call Tutor (Cartoon & Custom Face)</strong>
-          <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Choose a cartoon teacher or upload your photo + voice tone, and start a live talking session!</p>
+      <!-- JESH ACADEMY & QR CERTIFICATE SCREEN -->
+      <section id="scr-academy" class="app-screen hidden">
+        <div class="card">
+          <strong style="font-size:16px;display:block;margin-bottom:8px;">💻 Jesh Academy Live Code Sandbox</strong>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+            <button class="btn-outline" onclick="loadCodeSample('python')">🐍 Python</button>
+            <button class="btn-outline" onclick="loadCodeSample('html')">🌐 HTML/CSS</button>
+            <button class="btn-outline" onclick="loadCodeSample('math')">🧮 Math & Logic</button>
+          </div>
+          <textarea id="academyCodeEditor" rows="4" style="font-family:monospace;margin-bottom:8px;">print("Namaste Jesh Academy!")</textarea>
+          <button class="btn-primary" onclick="runAcademySandbox()">▶️ Run Code</button>
+          <div id="academyCodeOutput" class="mini-card" style="margin-top:8px;font-family:monospace;">Output यहाँ दिखेगा...</div>
+        </div>
 
-          <div id="avatarStage" class="avatar-stage">
-            <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru" alt="Teacher Avatar" />
+        <div class="card">
+          <strong style="font-size:16px;display:block;margin-bottom:8px;">🏅 Verified QR Certificate</strong>
+          <div class="input-row">
+            <select id="certCourseSelect">
+              <option>Spoken English & Confidence</option>
+              <option>Python & AI Foundations</option>
+              <option>NIELIT CCC & Digital Literacy</option>
+            </select>
+            <button class="btn-emerald" onclick="generateQRCertificate()">सर्टिफिकेट बनाएं</button>
+          </div>
+          <div id="certPreviewArea"></div>
+        </div>
+      </section>
+
+      <!-- JESHLIVE 2-WAY AI VIDEO-CALL TUTOR -->
+      <section id="scr-studio" class="app-screen hidden">
+        <div class="dark-studio" style="margin-bottom:14px;">
+          <div class="video-stage">
+            <span class="call-timer-pill" id="callTimer">00:00</span>
+            <div class="pip-box" id="pipContainer">
+              <video id="selfCameraVideo" autoplay muted playsinline class="hidden"></video>
+              <span id="pipInitials">YOU</span>
+            </div>
+
+            <div id="avatarStage" class="avatar-stage">
+              <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor" alt="AI Best Friend" />
+            </div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;" id="activeAvatarTitle">Didi-Mentor (Your Best-Friend AI)</div>
+            <div class="subtitle-bar" id="avatarReplyCaption">👋 Namaste! "Start Call" दबाएं या नीचे बोलें—मैं आपका बेस्ट-फ्रेंड ट्यूटर हूँ!</div>
           </div>
 
-          <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
-            <button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', 1.0)">🤖 Robo-Guru</button>
-            <button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', 1.25)">👩‍🏫 Didi-Mentor</button>
-            <button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/adventurer/svg?seed=CaptainCode', 0.85)">🦸 Captain-Code</button>
-            <label class="btn-amber" style="padding:5px 9px;font-size:11px;">
-              📸 My Photo <input type="file" accept="image/*" class="hidden" onchange="uploadAvatarPhoto(event)" />
+          <!-- 48PX VIDEO CALL CONTROLS -->
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">
+            <button class="btn-emerald" id="startVideoCallBtn" onclick="startLiveVideoCall()">📞 Start Call</button>
+            <button class="btn-outline" id="muteCallBtn" onclick="toggleCallMic()">🎤 Mute</button>
+            <button class="btn-primary" id="autoLoopBtn" onclick="toggleAutoLoop()">🔁 Auto-Loop: ON</button>
+            <button class="btn-rose" onclick="endLiveVideoCall()">📵 End Call</button>
+          </div>
+
+          <!-- SPEAK OR TYPE INPUT -->
+          <div class="input-row">
+            <button class="btn-amber" onclick="listenToStudentVoice()">🎙️ बोलें</button>
+            <input id="avatarDiscussTopic" type="text" style="background:#1E293B;color:#FFFFFF;border-color:#475569;" placeholder="अंग्रेजी या हिंदी में बात करें..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
+            <button class="btn-primary" onclick="talkWithVideoAvatar()">Send</button>
+          </div>
+        </div>
+
+        <!-- PERSISTENT PHOTO & VOICE CLONE STUDIO -->
+        <div class="card">
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">📸 Photo & Voice Clone Studio (Saved Locally)</strong>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+            <button class="btn-outline" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', 'Didi-Mentor', 1.15)">👩‍🏫 Didi-Mentor</button>
+            <button class="btn-outline" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', 'Robo-Guru', 1.0)">🤖 Robo-Guru</button>
+            <label class="btn-amber">
+              📷 अपनी फोटो लगाएं <input type="file" accept="image/*" class="hidden" onchange="uploadCustomAvatar(event)" />
             </label>
           </div>
-
-          <div style="display:flex;gap:8px;justify-content:center;align-items:center;font-size:11px;margin-bottom:10px;">
-            <span>Voice Pitch:</span>
-            <input id="avatarPitch" type="range" min="0.7" max="1.4" step="0.1" value="1.0" style="width:100px;" />
-            <button class="btn-rose" style="padding:4px 8px;font-size:11px;" onclick="alert('🎙️ Voice sample saved!')">🎙️ Clone Voice</button>
-          </div>
-
           <div class="input-row">
-            <button class="mic-btn" style="width:40px;height:40px;font-size:16px;" onclick="voiceToAvatarPrompt()">🎤</button>
-            <input id="avatarDiscussTopic" type="text" style="background:#1e293b;color:#fff;border-color:#334155;" placeholder="Ask your Video-Call Avatar any topic..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
-            <button class="btn-emerald" onclick="talkWithVideoAvatar()">📞 Talk Live</button>
+            <input id="customAvatarNameInput" type="text" placeholder="अपने अवतार का नाम लिखें..." />
+            <button class="btn-primary" onclick="saveCustomAvatarToLocal()">💾 Save Avatar</button>
           </div>
-          <div id="avatarReplyCaption" style="margin-top:10px;font-size:13px;color:#a7f3d0;min-height:20px;"></div>
-        </div>
-
-        <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">🎨 AI Image & Video Storyboard Creator</strong>
-          <div class="input-row" style="margin-bottom:10px;">
-            <input id="mediaPromptInput" type="text" placeholder="Describe an image or video topic..." />
-            <button class="btn-primary" onclick="generateAIImage()">🖼️ Image</button>
-            <button class="btn-dark" onclick="generateVideoScript()">🎬 Video Script</button>
-          </div>
-          <div id="mediaOutputZone"></div>
         </div>
       </section>
 
-      <!-- DYNAMIC EXTENSIONS SLOT -->
-      <div id="dynamicExtensionsZone">
-<div class="card"><h3>✨ Upgrade</h3><p>**UPGRADE SUMMARY:**
-- Rebuilt the entire login flow, profile setup, and 48‑hour session persistence with a clean, mobile‑friendly UI.  
-- Added a student‑only dashboard, module cards, and a locked footer plus a fully functional 2‑way AI video‑call tutor using Web Speech API and webcam access.  
-- Implemented strict admin isolation so admin tools are hidden from students, and all data actions are mocked for Google Sheets integration via `google.script.run` placeholders.  
+      <!-- HELP & LEAVE REQUEST SCREEN -->
+      <section id="scr-help" class="app-screen hidden">
+        <div class="card">
+          <strong style="font-size:16px;display:block;margin-bottom:6px;">🆘 छुट्टी (Leave) या एडमिन सहायता</strong>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">यदि आप आज बीमार हैं या बाहर हैं, तो छुट्टी भेजें ताकि आपकी 🔥 Streak सुरक्षित रहे।</p>
+          <textarea id="leaveReasonInput" rows="3" placeholder="अपना कारण लिखें..."></textarea>
+          <button class="btn-primary" style="margin-top:10px;width:100%;" onclick="submitLeaveRequest()">📩 एडमिन को भेजें</button>
+        </div>
+      </section>
 
-<widget>
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="UTF-8">
-<title>Jesh Ecosystem</title>
-<style>
-  body{margin:0;font-family:Arial,sans-serif;background:#F8FAFC;color:#111;}
-  .hidden{display:none;}
-  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
-  .card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);padding:24px;width:90%;max-width:400px;margin:12px;}
-  .btn-primary{background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:18px;cursor:pointer;width:100%;margin-top:12px;}
-  .btn-primary:hover{background:#4338CA;}
-  .toggle-group{display:flex;gap:8px;margin:12px 0;}
-  .toggle{flex:1;padding:8px;background:#e5e7eb;border-radius:6px;text-align:center;cursor:pointer;}
-  .toggle.active{background:#4F46E5;color:#fff;}
-  .top-bar{background:#fff;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.1);display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;left:0;right:0;z-index:10;}
-  .footer{background:#fff;padding:8px 0;box-shadow:0 -1px 4px rgba(0,0,0,.1);position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;z-index:10;}
-  .footer button{background:none;border:none;color:#4F46E5;font-size:14px;cursor:pointer;}
-  .module-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:80px 12px 80px;}
-  .mini-card{background:#fff;border-radius:8px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.1);cursor:pointer;}
-  .mini-card img{max-width:48px;margin-bottom:8px;}
-  /* Video Call UI */
-  #call-ui{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:20;}
-  #call-ui video{width:100%;max-width:480px;border-radius:8px;}
-  #call-controls{margin-top:12px;display:flex;gap:12px;}
-  #call-controls button{background:#4F46E5;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;}
-  #call-controls button.end{background:#e53935;}
-</style>
-</head>
-<body>
-
-<!-- Header (hidden until logged in) -->
-<div id="header" class="top-bar hidden">
-  <span id="user-name"></span>
-  <div>
-    <span id="streak">🔥0</span>
-    <span id="xp">⚡0 XP</span>
-    <button id="logoutBtn" class="btn-primary" style="background:#e53935;padding:6px 12px;font-size:14px;">Logout</button>
-  </div>
-</div>
-
-<!-- Login / Account Creation Card -->
-<div id="login-screen" class="center">
-  <div class="card">
-    <div class="toggle-group">
-      <div id="roleStudent" class="toggle active">Student</div>
-      <div id="roleAdmin" class="toggle">Admin</div>
-    </div>
-    <div id="modeToggle" class="toggle-group">
-      <div id="modeLogin" class="toggle active">Login</div>
-      <div id="modeCreate" class="toggle">Create Account (नया अकाउंट)</div>
-    </div>
-    <input id="inputId" type="text" placeholder="Phone Number या Email ID" style="width:100%;padding:8px;margin:8px 0;border:1px solid #ccc;border-radius:4px;">
-    <input id="inputPin" type="password" maxlength="6" placeholder="6 अंकों का पासवर्ड" style="width:100%;padding:8px;margin:8px 0;border:1px solid #ccc;border-radius:4px;">
-    <button id="primaryBtn" class="btn-primary" style="font-size:20px;height:56px;">Login</button>
-    <a href="#" id="forgotLink" style="display:block;margin-top:12px;text-align:center;color:#4F46E5;">Forgot Password? (पासवर्ड भूल गए?)</a>
-  </div>
-</div>
-
-<!-- Profile Setup Card -->
-<div id="profile-screen" class="center hidden">
-  <div class="card">
-    <div id="step1">
-      <label>आपका नाम क्या है? (Enter Your Name)</label>
-      <input id="inputName" type="text" placeholder="नाम" style="width:100%;padding:8px;margin:8px 0;border:1px solid #ccc;border-radius:4px;">
-      <button id="nextToAge" class="btn-primary">Next</button>
-    </div>
-    <div id="step2" class="hidden">
-      <label>आपकी उम्र क्या है? (Enter Your Age)</label>
-      <input id="inputAge" type="number" placeholder="उम्र" style="width:100%;padding:8px;margin:8px 0;border:1px solid #ccc;border-radius:4px;">
-      <button id="startLearning" class="btn-primary">Start Learning / शुरू करें</button>
-    </div>
-  </div>
-</div>
-
-<!-- Student Dashboard -->
-<div id="dashboard" class="hidden">
-  <div class="module-grid">
-    <div class="mini-card" id="cardLingo"><img src="https://via.placeholder.com/48" alt="Lingo">JeshLingo</div>
-    <div class="mini-card" id="cardRead"><img src="https://via.placeholder.com/48" alt="Read">JeshRead Studio</div>
-    <div class="mini-card" id="cardAcademy"><img src="https://via.placeholder.com/48" alt="Academy">Jesh Academy (QR Certificate)</div>
-    <div class="mini-card" id="cardLive"><img src="https://via.placeholder.com/48" alt="Live">JeshLive Video-Call Tutor</div>
-  </div>
-</div>
-
-<!-- Footer (locked) -->
-<div id="footer" class="footer hidden">
-  <button data-page="home">Home</button>
-  <button data-page="qr">QR Certificate</button>
-  <button data-page="lang">भाषा बदलें</button>
-  <button data-page="help">Leave/Help</button>
-</div>
-
-<!-- Video Call UI (hidden) -->
-<div id="call-ui" class="hidden">
-  <video id="remoteVideo" autoplay playsinline></video>
-  <div id="call-controls">
-    <button id="muteBtn">Mute Mic</button>
-    <button id="endBtn" class="end">End Call</button>
-  </div>
-  <div id="timer">00:00</div>
-  <div id="subtitles" style="margin-top:8px;"></div>
-</div>
-
-<script>
-/* ---------- Utility ---------- */
-function $(id){return document.getElementById(id);}
-function setVisible(id,show){$(id).classList.toggle('hidden',!show);}
-function saveToSheet(data,callback){
-  // Placeholder for google.script.run
-  if (typeof google!=='undefined' && google.script && google.script.run){
-    google.script.run.withSuccessHandler(callback).saveStudentData(data);
-  }else{
-    // Mock: store in localStorage sheet simulation
-    let sheet = JSON.parse(localStorage.getItem('sheet')||'{}');
-    sheet[data.id]=data;
-    localStorage.setItem('sheet',JSON.stringify(sheet));
-    callback && callback();
-  }
-}
-function loadFromSheet(id,callback){
-  if (typeof google!=='undefined' && google.script && google.script.run){
-    google.script.run.withSuccessHandler(callback).loadStudentData(id);
-  }else{
-    let sheet = JSON.parse(localStorage.getItem('sheet')||'{}');
-    callback(sheet[id]||null);
-  }
-}
-
-/* ---------- State ---------- */
-let currentUser=null; // {id, role, name, age, pin}
-
-/* ---------- Role & Mode Toggles ---------- */
-['roleStudent','roleAdmin'].forEach(id=>{
-  $(id).addEventListener('click',()=>{toggleRole(id);});
-});
-function toggleRole(activeId){
-  ['roleStudent','roleAdmin'].forEach(id=>{
-    $(id).classList.toggle('active',id===activeId);
-  });
-  // hide mode toggle for admin (admin uses only login)
-  setVisible('modeToggle',activeId==='roleStudent');
-}
-['modeLogin','modeCreate'].forEach(id=>{
-  $(id).addEventListener('click',()=>{toggleMode(id);});
-});
-function toggleMode(activeId){
-  ['modeLogin','modeCreate'].forEach(id=>{
-    $(id).classList.toggle('active',id===activeId);
-  });
-  $('primaryBtn').textContent = activeId==='modeLogin'?'Login':'Create Account';
-}
-
-/* ---------- Primary Button ---------- */
-$('primaryBtn').addEventListener('click',()=>{
-  const role = $('roleStudent').classList.contains('active')?'student':'admin';
-  const mode = $('modeLogin').classList.contains('active')?'login':'create';
-  const id = $('inputId').value.trim();
-  const pin = $('inputPin').value.trim();
-  if(!id||pin.length!==6){alert('Please fill ID and 6‑digit PIN');return;}
-  if(role==='admin'){
-    // Simple admin mock login
-    currentUser={id, role:'admin', name:'Admin'};
-    afterLogin();
-    return;
-  }
-  if(mode==='login'){
-    loadFromSheet(id, data=>{
-      if(data && data.pin===pin){
-        currentUser={...data, role:'student'};
-        afterLogin();
-      }else{
-        alert('Invalid credentials');
-      }
-    });
-  }else{
-    // create account
-    const newRec={id, pin, name:'', age:'', role:'student'};
-    saveToSheet(newRec,()=>{currentUser=newRec; afterLogin();});
-  }
-});
-
-/* ---------- After Login ---------- */
-function afterLogin(){
-  // hide login UI
-  setVisible('login-screen',false);
-  // show header/footer
-  setVisible('header',true);
-  setVisible('footer',true);
-  // set top bar name
-  $('user-name').textContent = currentUser.name || currentUser.id;
-  // check profile completeness
-  if(!currentUser.name || !currentUser.age){
-    setVisible('profile-screen',true);
-  }else{
-    showDashboard();
-  }
-}
-
-/* ---------- Profile Steps ---------- */
-$('nextToAge').addEventListener('click',()=>{
-  const name=$('inputName').value.trim();
-  if(!name){alert('Enter name');return;}
-  currentUser.name=name;
-  $('step1').classList.add('hidden');
-  $('step2').classList.remove('hidden');
-});
-$('startLearning').addEventListener('click',()=>{
-  const age=$('inputAge').value.trim();
-  if(!age){alert('Enter age');return;}
-  currentUser.age=age;
-  // persist to sheet
-  saveToSheet(currentUser,()=>{setVisible('profile-screen',false);showDashboard();});
-});
-
-/* ---------- Dashboard ---------- */
-function showDashboard(){
-  setVisible('dashboard',true);
-  // mock streak & xp
-  $('streak').textContent='🔥5';
-  $('xp').textContent='⚡120 XP';
-}
-
-/* ---------- Logout ---------- */
-$('logoutBtn').addEventListener('click',()=>{
-  localStorage.removeItem('session');
-  location.reload();
-});
-
-/* ---------- Session Persistence (48h) ---------- */
-function initSession(){
-  const sess = JSON.parse(localStorage.getItem('session')||'null');
-  if(sess && Date.now()<sess.expires){
-    currentUser=sess.user;
-    afterLogin();
-  }
-}
-function storeSession(){
-  const sess={user:currentUser, expires:Date.now()+48*60*60*1000};
-  localStorage.setItem('session',JSON.stringify(sess));
-}
-window.addEventListener('beforeunload',storeSession);
-initSession();
-
-/* ---------- Module</p></div>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Session Persistence & Adaptive Learner Card</title>
-<style>
-  body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
-  .top-bar {display:flex; justify-content:space-between; align-items:center; background:#2c3e50; color:#fff; padding:10px 20px;}
-  .top-bar h1 {margin:0; font-size:1.2rem;}
-  .btn-primary {background:#3498db; color:#fff; border:none; padding:10px 20px; font-size:1rem; cursor:pointer; border-radius:4px;}
-  .btn-primary:hover {background:#2980b9;}
-  .card {background:#fff; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin:20px; padding:20px;}
-  .mini-card {background:#e8f4fd; border-left:4px solid #3498db; padding:10px; margin-top:10px;}
-</style>
-</head>
-<body>
-
-<div class="top-bar">
-  <h1>Jesh Learner Dashboard</h1>
-  <button id="logoutBtn" class="btn-primary" style="font-size:48px; line-height:1;">⎋</button>
-</div>
-
-<div class="card" id="welcomeCard">
-  <h2 id="greeting">Welcome, Student!</h2>
-  <p id="streakInfo">Streak: -- | XP: --</p>
-  <div class="mini-card" id="profileSummary">
-    <strong>Profile:</strong> <span id="profileDetails">Loading...</span>
-  </div>
-</div>
-
-<script>
-// ---------- Session Management ----------
-const SESSION_KEY = 'jesh_session';
-const TOKEN_KEY = 'jesh_token';
-const EXPIRY_HOURS = 48;
-
-// Simulated login (replace with real auth flow)
-function mockLogin() {
-  const token = 'demo-token-' + Date.now();
-  const session = {
-    token,
-    loginTime: Date.now()
-  };
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-}
-
-// Check session validity
-function isSessionValid() {
-  const sessionStr = localStorage.getItem(SESSION_KEY);
-  if (!sessionStr) return false;
-  try {
-    const session = JSON.parse(sessionStr);
-    const ageMs = Date.now() - session.loginTime;
-    return ageMs < EXPIRY_HOURS * 60 * 60 * 1000;
-  } catch {
-    return false;
-  }
-}
-
-// Logout handler
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(SESSION_KEY);
-  location.reload();
-});
-
-// Auto-login on page load
-if (!isSessionValid()) {
-  // No valid session – simulate a fresh login for demo purposes
-  mockLogin();
-}
-
-// ---------- Profile Loading ----------
-async function loadStudentProfile() {
-  // Placeholder: Replace with actual Google Sheets API call
-  // Expected response format:
-  // { name: 'Anita', age: 14, streak: 5, xp: 1200,
-  //   mindsetTag: 'Growth', skillMatrix: 'Grammar:A1|Math:L1|Logic:L2',
-  //   oneLineSummary: 'Strong in grammar, needs math practice' }
-
-  // Demo static data
-  const profile = {
-    name: 'Anita',
-    age: 14,
-    streak: 5,
-    xp: 1200,
-    mindsetTag: 'Growth',
-    skillMatrix: 'Grammar:A1 | Math:L1 | Logic:L2',
-    oneLineSummary: 'Strong in grammar, needs math practice'
-  };
-
-  // Update UI
-  document.getElementById('greeting').textContent = `Welcome, ${profile.name}!`;
-  document.getElementById('streakInfo').textContent = `Streak: ${profile.streak} | XP: ${profile.xp}`;
-  document.getElementById('profileDetails').innerHTML = `
-    Age: ${profile.age}<br>
-    Mindset: ${profile.mindsetTag}<br>
-    Skills: ${profile.skillMatrix}<br>
-    Note: ${profile.oneLineSummary}
-  `;
-
-  // Store profile for later AI module calls
-  window.currentStudentProfile = profile;
-}
-
-// ---------- Initialization ----------
-window.addEventListener('DOMContentLoaded', () => {
-  loadStudentProfile();
-});
-</script>
-
-</body>
-</html>
-<style>
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 1rem;
-      margin: 1rem 0;
-    }
-    .mini-card {
-      background: #f9f9f9;
-      border-left: 4px solid #0066ff;
-      padding: 0.75rem;
-      margin-top: 0.5rem;
-    }
-    .btn-primary {
-      background: #0066ff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-    }
-    .btn-primary:hover {
-      background: #0052cc;
-    }
-    .high-contrast {
-      color: #000;
-      background: #fff;
-    }
-    .admin-section {
-      max-width: 600px;
-      margin: auto;
-    }
-    .search-input {
-      width: calc(100% - 110px);
-      padding: 0.5rem;
-      margin-right: 0.5rem;
-    }
-  </style>
-
-  <div class="admin-section card high-contrast" id="adminAuthTool">
-    <h2>🔍 Search Help for Credentials</h2>
-    <div>
-      <input type="text" id="searchQuery" class="search-input" placeholder="Enter Name, Email or StudentID">
-      <button class="btn-primary" onclick="searchStudent()">Search</button>
-    </div>
-    <div id="searchResults"></div>
-  </div>
-
-  <script>
-    // Ensure only admins can see the tool (backend will also enforce)
-    function checkAdminAccess() {
-      google.script.run.withSuccessHandler(function(isAdmin){
-        if (!isAdmin) {
-          document.getElementById('adminAuthTool').style.display = 'none';
-        }
-      }).authAdmin();
-    }
-
-    function searchStudent() {
-      const query = document.getElementById('searchQuery').value.trim();
-      if (!query) return alert('Please enter a search term.');
-      google.script.run
-        .withSuccessHandler(renderResults)
-        .withFailureHandler(err => alert('Search failed: ' + err.message))
-        .searchStudent(query);
-    }
-
-    function renderResults(students) {
-      const container = document.getElementById('searchResults');
-      container.innerHTML = '';
-      if (!students || students.length === 0) {
-        container.innerHTML = '<p>No matching student found.</p>';
-        return;
-      }
-      students.forEach(s => {
-        const card = document.createElement('div');
-        card.className = 'card mini-card';
-        card.innerHTML = `
-          <p><strong>StudentID:</strong> ${s.studentId}</p>
-          <p><strong>Name:</strong> ${s.name}</p>
-          <p><strong>Email:</strong> ${s.email}</p>
-          <p><strong>Status:</strong> ${s.accountStatus}</p>
-          <button class="btn-primary" onclick="generateTempPin('${s.studentId}', this)">Generate Temporary PIN & Unlock</button>
-          <div class="temp-pin-display" style="margin-top:0.5rem;"></div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function generateTempPin(studentId, btn) {
-      btn.disabled = true;
-      google.script.run
-        .withSuccessHandler(pin => {
-          const display = btn.parentElement.querySelector('.temp-pin-display');
-          display.innerHTML = `<strong>Temporary PIN:</strong> ${pin} (share with student)`;
-          btn.disabled = false;
-        })
-        .withFailureHandler(err => {
-          alert('Failed to generate PIN: ' + err.message);
-          btn.disabled = false;
-        })
-        .createTempPinAndUnlock(studentId);
-    }
-
-    // Initial admin check
-    checkAdminAccess();
-  </script>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Jesh Ecosystem – Secure UI</title>
-<style>
-  :root {
-    --bg-login: #F8FAFC;
-    --text-primary: #0F172A;      /* Deep Navy */
-    --card-bg: #FFFFFF;           /* Pure White */
-    --btn-primary-bg: #4F46E5;    /* Vibrant Indigo */
-    --footer-height: 48px;
-    --footer-bg: #F1F5F9;
-  }
-  body, html {
-    margin:0; padding:0; height:100%; font-family:Arial,Helvetica,sans-serif;
-    background:#fff;
-  }
-  /* Full‑screen login gate */
-  #login-gate {
-    position:fixed; inset:0; background:var(--bg-login);
-    display:flex; align-items:center; justify-content:center;
-    z-index:1000;
-  }
-  .login-card {
-    background:var(--card-bg);
-    padding:2rem;
-    border-radius:8px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
-    width:320px;
-    text-align:center;
-  }
-  .login-card h2 {
-    color:var(--text-primary);
-    margin-bottom:1rem;
-  }
-  .btn-primary {
-    background:var(--btn-primary-bg);
-    color:#fff;
-    border:none;
-    padding:0.5rem 1rem;
-    border-radius:4px;
-    cursor:pointer;
-    font-size:1rem;
-  }
-  .btn-primary:hover { opacity:0.9; }
-  .toggle-group {
-    margin:1rem 0;
-    display:flex; justify-content:center; gap:0.5rem;
-  }
-  .toggle-group button {
-    background:#e2e8f0;
-    border:none;
-    padding:0.4rem 0.8rem;
-    border-radius:4px;
-    cursor:pointer;
-  }
-  .toggle-group button.active {
-    background:var(--btn-primary-bg);
-    color:#fff;
-  }
-  .forgot-link {
-    display:block; margin-top:0.5rem; font-size:0.9rem;
-    color:#2563eb; text-decoration:none;
-  }
-  .forgot-link:hover { text-decoration:underline; }
-
-  /* Main dashboard (hidden until login) */
-  #dashboard { display:none; min-height:100vh; padding-bottom:var(--footer-height); }
-  .hero { padding:2rem; text-align:center; }
-  .hero button {
-    background:var(--btn-primary-bg);
-    color:#fff; border:none; padding:0.8rem 1.5rem;
-    border-radius:4px; font-size:1.1rem; cursor:pointer;
-  }
-  .grid {
-    display:grid; gap:1rem; padding:1rem;
-    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
-  }
-  .card {
-    background:var(--card-bg);
-    border-radius:8px; padding:1rem;
-    box-shadow:0 1px 4px rgba(0,0,0,0.08);
-    display:flex; flex-direction:column; justify-content:space-between;
-  }
-  .card h3 { color:var(--text-primary); margin:0 0 0.5rem; }
-  .card p { flex-grow:1; margin:0 0 0.5rem; color:#334155; }
-  .mini-card {
-    background:#f1f5f9; border-radius:4px;
-    padding:0.5rem; margin-top:0.5rem; text-align:center;
-    font-size:0.9rem; color:#1e293b;
-  }
-
-  /* Footer */
-  .footer {
-    position:fixed; bottom:0; left:0; right:0;
-    height:var(--footer-height);
-    background:var(--footer-bg);
-    display:flex; align-items:center; justify-content:space-around;
-    font-size:0.9rem; color:#1e293b;
-    border-top:1px solid #cbd5e1;
-  }
-  .footer a { color:inherit; text-decoration:none; }
-  .footer a:hover { text-decoration:underline; }
-
-  /* Admin only sections */
-  .admin-only { display:none; }
-</style>
-</head>
-<body>
-
-<!-- Login Gate -->
-<div id="login-gate">
-  <div class="login-card">
-    <h2 id="login-title">Student Login</h2>
-    <div class="toggle-group">
-      <button id="btn-student" class="active">Student Login</button>
-      <button id="btn-admin">Admin Login</button>
-    </div>
-    <input type="password" id="pin-input" placeholder="Enter PIN" style="width:100%; padding:0.5rem; margin-bottom:1rem;">
-    <button class="btn-primary" id="login-btn">Login</button>
-    <a href="#" class="forgot-link">Forgot PIN?</a>
-  </div>
-</div>
-
-<!-- Main Dashboard -->
-<div id="dashboard">
-  <section class="hero">
-    <h1>Welcome to Jesh Ecosystem</h1>
-    <button class="btn-primary" id="start-lesson">शुरू करें / Start Lesson</button>
-  </section>
-
-  <section class="grid" id="student-modules">
-    <div class="card">
-      <h3>JeshLingo</h3>
-      <p>Learn languages with AI‑powered lessons.</p>
-    </div>
-    <div class="card">
-      <h3>JeshRead Studio</h3>
-      <p>Read and comprehend texts across subjects.</p>
-    </div>
-    <div class="card">
-      <h3>Jesh Academy</h3>
-      <p>Micro‑courses in coding, finance, and more.</p>
-    </div>
-    <div class="card">
-      <h3>JeshLive Avatar</h3>
-      <p>Live AI tutor with avatar interaction.</p>
-    </div>
-  </section>
-
-  <!-- Admin Command Center (hidden by default) -->
-  <section class="admin-only" id="admin-panel">
-    <h2 style="color:var(--text-primary); margin:1rem;">Admin Command Center - Priority 3 Upgrades</h2>
-    <div class="grid" id="admin-rd">
-      <div class="card">
-        <h3>Awesome-GitHub Repo</h3>
-        <p>Explore curated repositories for learning.</p>
-        <button class="btn-primary">Integrate</button>
-      </div>
-      <div class="card">
-        <h3>MCP‑Skill‑Chat</h3>
-        <p>Chat interface for skill‑building exercises.</p>
-        <button class="btn-primary">Integrate</button>
-      </div>
-      <div class="card">
-        <h3>Integrate</h3>
-        <p>Connect new tools and services securely.</p>
-        <button class="btn-primary">Integrate</button>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- Persistent Footer -->
-<div class="footer">
-  <a href="#">Home</a>
-  <a href="#">QR Certificate</a>
-  <a href="#">भाषा बदलें</a>
-  <a href="#">Leave/Help</a>
-</div>
-
-<script>
-  // Mock authentication – replace with real auth logic
-  function authAdmin(pin) {
-    // Example: admin PIN is "1234"
-    return pin === '1234';
-  }
-
-  const loginGate = document.getElementById('login-gate');
-  const dashboard = document.getElementById('dashboard');
-  const loginTitle = document.getElementById('login-title');
-  const btnStudent = document.getElementById('btn-student');
-  const btnAdmin = document.getElementById('btn-admin');
-  const loginBtn = document.getElementById('login-btn');
-  const pinInput = document.getElementById('pin-input');
-  const adminPanel = document.getElementById('admin-panel');
-
-  // Role toggle UI
-  btnStudent.addEventListener('click', () => {
-    btnStudent.classList.add('active');
-    btnAdmin.classList.remove('active');
-    loginTitle.textContent = 'Student Login';
-  });
-  btnAdmin.addEventListener('click', () => {
-    btnAdmin.classList.add('active');
-    btnStudent.classList.remove('active');
-    loginTitle.textContent = 'Admin Login';
-  });
-
-  // Login handler
-  loginBtn.addEventListener('click', () => {
-    const pin = pinInput.value.trim();
-    const isAdmin = btnAdmin.classList.contains('active');
-
-    if (isAdmin) {
-      if (authAdmin(pin)) {
-        // Show admin UI
-        adminPanel.style.display = 'block';
-        loginGate.style.display = 'none';
-        dashboard.style.display = 'block';
-      } else {
-        alert('Invalid admin PIN.');
-      }
-    } else {
-      // Simple student login (no PIN check)
-      loginGate.style.display = 'none';
-      dashboard.style.display = 'block';
-    }
-    pinInput.value = '';
-  });
-</script>
-</body>
-</html>
-<style>
-    .admin-panel { max-width: 900px; margin: 20px auto; font-family: Arial, sans-serif; }
-    .card { background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
-    .mini-card { background:#fff; border:1px solid #ccc; border-radius:6px; padding:12px; margin:8px 0; }
-    .btn-primary { background:#0066cc; color:#fff; border:none; border-radius:4px; padding:8px 16px; cursor:pointer; }
-    .btn-primary:hover { background:#0055aa; }
-    .hidden { display:none; }
-    .router-output { margin-top:10px; font-style:italic; color:#555; }
-  </style>
-
-  <div class="admin-panel">
-    <!-- Header -->
-    <div class="card">
-      <h2>🛠️ Admin Command Center – Priority 3 Upgrades</h2>
-      <p>All features below are visible **only** to the authorized admin.</p>
-    </div>
-
-    <!-- Smart Prompt Router -->
-    <div class="card">
-      <h3>Smart Prompt Router</h3>
-      <input type="text" id="adminPrompt" placeholder="Enter your instruction…" style="width:100%;padding:8px;">
-      <button class="btn-primary" onclick="routePrompt()">Route</button>
-      <div id="routerMsg" class="router-output"></div>
-    </div>
-
-    <!-- R&D Discovery List -->
-    <div class="card" id="discoveriesCard">
-      <h3>R&D Discoveries (Admin‑Only)</h3>
-      <div id="discoveriesContainer">
-        <!-- Example discovery (will be populated by JS) -->
-      </div>
-    </div>
-
-    <!-- Integration Section -->
-    <div class="card hidden" id="integrationCard">
-      <h3>Integrate / Add to Vault</h3>
-      <p id="selectedInfo"></p>
-      <button class="btn-primary" onclick="integrateResource()">Integrate</button>
-    </div>
-  </div>
-
-  <script>
-    // Mock admin authentication – replace with real auth in Code.gs
-    function authAdmin() {
-      // In production this would call google.script.run with authAdmin()
-      return true; // assume admin is logged in for demo
-    }
-
-    // Sample data – in real use this comes from the R&D_Discoveries sheet
-    const discoveries = [
-      { name: "Awesome-Repo", category: "GitHub Repo", summary: "AI‑based quiz generator (हिंदी/English)", safety: "Checked", url: "https://github.com/example/awesome-repo" },
-      { name: "FreeWeatherAPI", category: "Free API", summary: "Real‑time weather data (मौसम जानकारी)", safety: "Pending", url: "https://api.weather.com/v1" },
-      { name: "MCP‑Skill‑Chat", category: "Skill", summary: "Context‑aware chat module (संदेश)", safety: "Checked", url: "https://mcp.example.com/skill/chat" }
-    ];
-
-    // Render discovery cards
-    function renderDiscoveries() {
-      if (!authAdmin()) return;
-      const container = document.getElementById('discoveriesContainer');
-      container.innerHTML = '';
-      discoveries.forEach((d, i) => {
-        const card = document.createElement('div');
-        card.className = 'mini-card';
-        card.innerHTML = `
-          <strong>${d.name}</strong> <em>(${d.category})</em><br>
-          ${d.summary}<br>
-          Safety: ${d.safety}<br>
-          <a href="${d.url}" target="_blank">View</a> |
-          <button class="btn-primary" style="margin-top:4px;" onclick="selectForIntegration(${i})">Integrate</button>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // Smart Prompt Router logic
-    function routePrompt() {
-      const txt = document.getElementById('adminPrompt').value.trim().toLowerCase();
-      const msg = document.getElementById('routerMsg');
-      if (!txt) { msg.textContent = 'Please type an instruction.'; return; }
-
-      if (txt.includes('scan') || txt.includes('harvest')) {
-        msg.textContent = '✅ Use the "R&D Harvester" section to start a scan.';
-      } else if (txt.includes('integrate') || txt.includes('add')) {
-        msg.textContent = '🔧 Select a discovery card and click “Integrate”.';
-      } else if (txt.includes('prompt') || txt.includes('router')) {
-        msg.textContent = '🤖 You are already in the Smart Prompt Router.';
-      } else {
-        msg.textContent = '⚠️ Unrecognized command – try “scan”, “integrate”, or “prompt”.';
-      }
-    }
-
-    // Integration flow
-    let selectedIdx = null;
-    function selectForIntegration(idx) {
-      selectedIdx = idx;
-      const d = discoveries[idx];
-      document.getElementById('selectedInfo').innerHTML = `
-        <strong>${d.name}</strong> (${d.category})<br>
-        ${d.summary}<br>
-        URL: <a href="${d.url}" target="_blank">${d.url}</a>
-      `;
-      document.getElementById('integrationCard').classList.remove('hidden');
-    }
-
-    function integrateResource() {
-      if (selectedIdx === null) return alert('No resource selected.');
-      const d = discoveries[selectedIdx];
-      // Placeholder for safe 2‑step upgrade workflow
-      alert(`Integrating "${d.name}" into ActiveConfig…\n(Implement safe push via Code.gs)`);
-      // Reset UI
-      document.getElementById('integrationCard').classList.add('hidden');
-      selectedIdx = null;
-    }
-
-    // Initial render
-    if (authAdmin()) renderDiscoveries();
-  </script>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Jesh Academy Mini‑Widget</title>
-<link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
-<style>
-  body{font-family:'Roboto',sans-serif;background:#F8FAFC;margin:0;padding:0;color:#111;}
-  .container{max-width:960px;margin:auto;padding:16px;}
-  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-  .tab{padding:12px 24px;background:#fff;border:2px solid #ddd;border-radius:8px;cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;}
-  .tab.active{border-color:#007bff;color:#007bff;font-weight:500;}
-  .card{background:#fff;border-radius:12px;padding:20px;margin-bottom:24px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-  .mini-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin:8px 0;}
-  .btn-primary{background:#007bff;color:#fff;border:none;border-radius:8px;padding:12px 24px;cursor:pointer;min-height:48px;display:inline-flex;align-items:center;justify-content:center;}
-  .btn-primary:hover{background:#0056b3;}
-  textarea{width:100%;height:180px;font-family:monospace;font-size:14px;padding:8px;border:1px solid #ccc;border-radius:6px;resize:vertical;}
-  .output{background:#f5f5f5;border:1px solid #ccc;border-radius:6px;padding:8px;margin-top:8px;min-height:60px;white-space:pre-wrap;}
-  .footer{position:fixed;bottom:0;left:0;width:100%;height:48px;background:#fff;border-top:1px solid #ddd;display:flex;align-items:center;justify-content:center;}
-  .footer button{height:40px;padding:0 16px;}
-</style>
-</head>
-<body>
-<div class="container">
-  <h2>Jesh Academy – Interactive Micro‑Courses</h2>
-  <div class="tabs" id="courseTabs">
-    <div class="tab active" data-course="python">Python</div>
-    <div class="tab" data-course="html">HTML/CSS</div>
-    <div class="tab" data-course="cpp">C++</div>
-    <div class="tab" data-course="ccc">CCC Exam</div>
-    <div class="tab" data-course="csc">CSC Practical</div>
-    <div class="tab" data-course="finance">Finance Role‑Play</div>
-  </div>
-
-  <!-- Course Cards -->
-  <div id="courseContent"></div>
-</div>
-
-<div class="footer">
-  <button class="btn-primary" id="certBtn">QR Certificate</button>
-</div>
-
-<!-- QRCode.js CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-/* ---------- Data & Helpers ---------- */
-const sampleCode = {
-  python: `print("Hello, Jesh Academy!")`,
-  html: `<!DOCTYPE html>
-<html>
-  <body>
-    <h1>Hello, World!</h1>
-  </body>
-</html>`,
-  cpp: `#include <iostream>
-int main(){ std::cout << "Hello, Jesh!"; return 0; }`,
-  ccc: `// CCC Sample Question\n// (Simulation only)`,
-  csc: `// CSC Practical Steps\n// (Simulation only)`,
-  finance: `// Finance Scenario\n// (Simulation only)`
-};
-
-function generateID(){ return 'CERT-' + Date.now() + '-' + Math.random().toString(36).substr(2,5).toUpperCase(); }
-
-/* ---------- UI Rendering ---------- */
-function renderCourse(course){
-  const container = document.getElementById('courseContent');
-  container.innerHTML = '';
-  const card = document.createElement('div');
-  card.className='card';
-  const title = document.createElement('h3');
-  title.textContent = `Learn ${course.toUpperCase()}`;
-  const editor = document.createElement('textarea');
-  editor.value = sampleCode[course]||'// Write your code here';
-  const runBtn = document.createElement('button');
-  runBtn.className='btn-primary';
-  runBtn.textContent='Run Code';
-  const output = document.createElement('div');
-  output.className='output';
-  runBtn.onclick = () => runCode(course, editor.value, output);
-  card.appendChild(title);
-  card.appendChild(editor);
-  card.appendChild(runBtn);
-  card.appendChild(output);
-  container.appendChild(card);
-}
-
-/* ---------- Simple Sandbox (JS only) ---------- */
-function runCode(course, code, outDiv){
-  // For demo we only execute JS/HTML; other languages show placeholder
-  if(course==='html'){
-    const w = window.open('', '_blank');
-    w.document.write(code);
-    w.document.close();
-    outDiv.textContent='HTML rendered in new tab.';
-  } else if(course==='python'){
-    outDiv.textContent='Python execution simulated. Output:\n' + code.replace(/print\((.*)\)/, '$1');
-  } else if(course==='cpp'){
-    outDiv.textContent='C++ execution simulated. (Compile not available in browser)';
-  } else {
-    outDiv.textContent='Simulator placeholder – no live execution.';
-  }
-}
-
-/* ---------- Tab Switching ---------- */
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    renderCourse(t.dataset.course);
-  });
-});
-renderCourse('python'); // default view
-
-/* ---------- Certificate Generator ---------- */
-document.getElementById('certBtn').addEventListener('click',()=>{
-  const certID = generateID();
-  const certWin = window.open('', '_blank','width=600,height=400');
-  certWin.document.write(`
-    <html><head><title>Certificate</title></head>
-    <body style="font-family:Arial,Helvetica,sans-serif; text-align:center; background:#FFF;">
-      <h2>Certificate of Completion</h2>
-      <p>This certifies that <strong>Student Name</strong> has successfully completed the selected Jesh Academy module.</p>
-      <p><strong>Certificate ID:</strong> ${certID}</p>
-      <div id="qrcode"></div>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-      <script>
-        new QRCode(document.getElementById("qrcode"), {
-          text: "https://example.com/verify/${certID}",
-          width: 128,
-          height: 128
-        });
-      </script>
-    </body></html>
-  `);
-  // Save compact progress & backup
-  const payload = {
-    MindsetTag: 'JeshAcademy',
-    LearnedKeywords: ['certificate','qr','module'],
-    OneLineSummary: 'Generated QR‑verified certificate',
-    CertificateID: certID
-  };
-  fetch('https://example.com/SystemBackups?safe=1', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  }).catch(()=>{/* ignore errors in demo */});
-});
-</script>
-</body>
-</html>
-<style>
-    .card {
-      background: #222;
-      color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: 20px auto;
-      font-family: Arial, sans-serif;
-    }
-    .card h2 {
-      margin-top: 0;
-      color: #ffeb3b;
-    }
-    .mini-card {
-      background: #333;
-      padding: 15px;
-      border-radius: 6px;
-      margin-top: 15px;
-    }
-    .mini-card h3 {
-      margin: 0 0 8px;
-      color: #4caf50;
-    }
-    .btn-primary {
-      background: #ff9800;
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      height: 48px;
-      line-height: 48px;
-      padding: 0 20px;
-      font-size: 16px;
-      cursor: pointer;
-      display: inline-block;
-      margin-top: 20px;
-    }
-    .input-group {
-      margin-top: 10px;
-    }
-    .input-group label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-    .input-group input,
-    .input-group textarea {
-      width: 100%;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #555;
-      background: #444;
-      color: #fff;
-      font-size: 14px;
-    }
-  </style>
-
-  <div class="card">
-    <h2>Priority 1: JeshLingo + JeshRead Studio</h2>
-
-    <div class="mini-card">
-      <h3>JeshLingo</h3>
-      <p>20+ global languages, interactive beginner‑to‑advanced paths.</p>
-    </div>
-
-    <div class="mini-card">
-      <h3>JeshRead Studio</h3>
-      <p>Live voice reading, real‑time pronunciation feedback, word meanings, custom interest‑based stories.</p>
-    </div>
-
-    <div class="input-group">
-      <label for="mindset">MindsetTag</label>
-      <input type="text" id="mindset" placeholder="e.g., multilingual‑boost">
-    </div>
-
-    <div class="input-group">
-      <label for="summary">OneLineSummary</label>
-      <textarea id="summary" rows="2" placeholder="Brief impact summary..."></textarea>
-    </div>
-
-    <button class="btn-primary" onclick="submitImpact()">Save Impact Summary</button>
-  </div>
-
-  <script>
-    function submitImpact() {
-      const mindset = document.getElementById('mindset').value.trim();
-      const summary = document.getElementById('summary').value.trim();
-
-      if (!mindset || !summary) {
-        alert('Please fill both fields.');
-        return;
-      }
-
-      const payload = {
-        MindsetTag: mindset,
-        OneLineSummary: summary
-      };
-
-      // Replace with your actual Google Apps Script endpoint
-      const endpoint = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-
-      fetch(endpoint, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(() => alert('Impact summary saved!'))
-      .catch(() => alert('Error saving data.'));
-    }
-  </script>
-<style>
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      margin: 12px 0;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      font-family: Arial, sans-serif;
-    }
-    .mini-card {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 8px;
-      margin: 8px 0;
-      background-color: #f9f9f9;
-    }
-    .btn-primary {
-      background-color: #0069d9;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .btn-primary:hover {
-      background-color: #0053b3;
-    }
-    .log-output {
-      font-size: 13px;
-      color: #333;
-      white-space: pre-wrap;
-      background: #eef;
-      padding: 8px;
-      border-radius: 4px;
-      margin-top: 8px;
-    }
-  </style>
-
-  <div class="card">
-    <h3>🚀 Upgrade Workflow</h3>
-    <div class="mini-card">
-      <strong>Step 1:</strong> Snapshot current version (SystemBackups) with <code>?safe=1</code>
-    </div>
-    <div class="mini-card">
-      <strong>Step 2:</strong> Log timestamp, snapshot ID, and repo URL in MasterBlueprint
-    </div>
-    <div class="mini-card">
-      <strong>Step 3:</strong> Push changes to <code>feaaunrihar-maker/jesh-ecosystem</code> (main branch)
-    </div>
-    <button class="btn-primary" id="runUpgradeBtn">Run Upgrade</button>
-    <div id="log" class="log-output"></div>
-  </div>
-
-  <script>
-    class UpgradeManager {
-      constructor() {
-        this.logEl = document.getElementById('log');
-      }
-
-      log(message) {
-        const time = new Date().toISOString();
-        this.logEl.textContent += `[${time}] ${message}\n`;
-      }
-
-      async createSnapshot() {
-        // Simulated snapshot creation
-        const snapshotId = 'snap_' + Math.random().toString(36).substr(2, 9);
-        this.log(`✅ Snapshot created with ID: ${snapshotId}`);
-        return snapshotId;
-      }
-
-      async logToMasterBlueprint(snapshotId) {
-        const timestamp = new Date().toISOString();
-        const repoUrl = 'https://github.com/feaaunrihar-maker/jesh-ecosystem';
-        // Simulated logging
-        this.log(`✅ Logged to MasterBlueprint → Timestamp: ${timestamp}, Snapshot ID: ${snapshotId}, Repo: ${repoUrl}`);
-      }
-
-      async pushChanges() {
-        // Simulated push
-        await new Promise(res => setTimeout(res, 1000));
-        this.log('✅ Changes pushed to GitHub repository (main branch).');
-      }
-
-      async run() {
-        this.log('🔧 Starting upgrade process...');
-        const snapshotId = await this.createSnapshot();
-        await this.logToMasterBlueprint(snapshotId);
-        await this.pushChanges();
-        this.log('🎉 Upgrade complete. All safety checks passed.');
-      }
-    }
-
-    document.getElementById('runUpgradeBtn').addEventListener('click', () => {
-      const manager = new UpgradeManager();
-      manager.run();
-    });
-  </script>
-```html
-<!-- Student Dashboard UI Adjustments -->
-<div class="dashboard">
-
-  <!-- GitHub Repository Panel (to be hidden for students) -->
-  <div class="card github-panel">
-    <h3>GitHub Repository</h3>
-    <p>Access your project repositories here.</p>
-  </div>
-
-  <!-- Upgrade Forms / Buttons (to be removed for students) -->
-  <div class="mini-card upgrade-form">
-    <h4>Upgrade Your Plan</h4>
-    <button class="btn-primary">Upgrade Now</button>
-  </div>
-
-  <div class="mini-card upgrade-form">
-    <h4>Feature Toggles</h4>
-    <button class="btn-primary">Enable Premium Feature</button>
-  </div>
-
-  <!-- Ad Banner (must stay visible) -->
-  <div class="card ad-banner">
-    <h3>Sponsored Ad</h3>
-    <p>Stay tuned for great offers!</p>
-  </div>
-
-</div>
-
-<script>
-  (function() {
-    // Assume a global variable or data attribute defines the current role.
-    // For demonstration, we read from a data attribute on <body>.
-    const role = document.body.getAttribute('data-user-role') || 'student';
-
-    if (role.toLowerCase() === 'student') {
-      // Hide GitHub Repository panel
-      const githubPanel = document.querySelector('.github-panel');
-      if (githubPanel) githubPanel.style.display = 'none';
-
-      // Remove all upgrade forms and primary buttons within them
-      const upgradeForms = document.querySelectorAll('.upgrade-form');
-      upgradeForms.forEach(form => form.style.display = 'none');
-
-      // Ensure the ad banner stays visible (optional explicit show)
-      const adBanner = document.querySelector('.ad-banner');
-      if (adBanner) adBanner.style.display = '';
-    }
-    // Admin view remains untouched
-  })();
-</script>
-```
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Student Login</title>
-<style>
-  html, body { margin:0; height:100%; font-family:Arial,Helvetica,sans-serif; background:#f5f5f5; }
-  .hidden { display:none; }
-  .modal-bg {
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(0,0,0,0.4);
-  }
-  .card {
-    background:#fff; padding:2rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);
-    width:90%; max-width:360px;
-  }
-  .card h2 { margin-top:0; text-align:center; }
-  .card input {
-    width:100%; padding:0.6rem; margin:0.5rem 0; border:1px solid #ccc; border-radius:4px;
-    font-size:1rem;
-  }
-  .btn-primary {
-    width:100%; padding:0.7rem; background:#0069d9; color:#fff; border:none;
-    border-radius:4px; font-size:1rem; cursor:pointer;
-  }
-  .btn-primary:hover { background:#0053b3; }
-  .mini-card { font-size:0.85rem; color:#666; text-align:center; margin-top:1rem; }
-  @media (max-width:480px){
-    .card { padding:1.5rem; }
-  }
-</style>
-</head>
-<body>
-
-<!-- Mock existing UI elements (to be hidden) -->
-<header id="site-header" class="hidden">Header</header>
-<nav id="site-nav" class="hidden">Navigation</nav>
-<aside id="site-sidebar" class="hidden">Sidebar</aside>
-<footer id="site-footer" class="hidden">Footer</footer>
-
-<div id="login-modal" class="modal-bg">
-  <div class="card">
-    <h2>Student Login</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button class="btn-primary" id="loginBtn">Login</button>
-    <div class="mini-card">Don't have an account? <a href="#">Register</a></div>
-  </div>
-</div>
-
-<script>
-  // Simple mock authentication (replace with real logic)
-  document.getElementById('loginBtn').addEventListener('click', function(){
-    const email = document.getElementById('email').value.trim();
-    const pwd   = document.getElementById('password').value;
-    if(email && pwd){
-      // Simulate successful login
-      document.getElementById('login-modal').style.display = 'none';
-      // Reveal main UI elements (if any)
-      // In this upgrade we keep them hidden permanently after login,
-      // so we simply do NOT unhide them.
-      // Example: document.getElementById('site-header').classList.remove('hidden');
-    } else {
-      alert('Please enter email and password.');
-    }
-  });
-
-  // Ensure the modal stays full‑screen on resize
-  window.addEventListener('resize', function(){
-    const modal = document.getElementById('login-modal');
-    modal.style.height = window.innerHeight + 'px';
-  });
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Learner Dashboard Upgrade</title>
-<style>
-  body {font-family: Arial, sans-serif; margin:0; padding:20px; background:#f5f5f5;}
-  .card {background:#fff; border-radius:8px; padding:20px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-  .mini-card {background:#e9ecef; border-radius:6px; padding:10px; margin:5px 0;}
-  .btn-primary {background:#007bff; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;}
-  .btn-primary:hover {background:#0056b3;}
-  .toggle-group {display:flex; align-items:center; gap:10px; margin-bottom:15px;}
-  .hidden {display:none;}
-</style>
-</head>
-<body>
-
-<div class="card">
-  <h2>👤 Student Login</h2>
-  <div class="toggle-group">
-    <label for="loginToggle">Logged in as Student?</label>
-    <input type="checkbox" id="loginToggle">
-  </div>
-</div>
-
-<div class="card" id="adminTools" class="hidden">
-  <h3>Admin‑Only Tools</h3>
-  <button class="btn-primary">Vault</button>
-  <button class="btn-primary">GitHub Push</button>
-</div>
-
-<div class="card">
-  <h3>Smart Prompt Router</h3>
-  <label for="languageSelect">Select Language:</label>
-  <select id="languageSelect">
-    <option value="en">English</option>
-    <option value="hi">Hindi</option>
-    <option value="es">Spanish</option>
-  </select>
-</div>
-
-<div class="card">
-  <h3>View Options</h3>
-  <div class="toggle-group">
-    <label for="relevantToggle">Relevant‑Only View</label>
-    <input type="checkbox" id="relevantToggle" checked>
-  </div>
-</div>
-
-<div class="card" id="contentArea">
-  <h3>Available Modules</h3>
-  <div class="mini-card" data-role="student" data-lang="en" data-relevant="true">
-    English Micro‑Course: Basics
-  </div>
-  <div class="mini-card" data-role="student" data-lang="hi" data-relevant="true">
-    Hindi Micro‑Course: Introduction
-  </div>
-  <div class="mini-card" data-role="admin" data-lang="en" data-relevant="false">
-    Admin Dashboard Overview
-  </div>
-  <div class="mini-card" data-role="student" data-lang="es" data-relevant="false">
-    Spanish Advanced Grammar (Irrelevant)
-  </div>
-</div>
-
-<div class="card">
-  <h3>Prioritize Content Categories</h3>
-  <p>Which content categories do you want to prioritize for the learner view?</p>
-  <input type="text" id="categoryInput" placeholder="e.g., Micro‑courses, Assessments, Projects">
-  <button class="btn-primary" id="saveCategories">Save</button>
-</div>
-
-<script>
-  const loginToggle = document.getElementById('loginToggle');
-  const adminTools = document.getElementById('adminTools');
-  const languageSelect = document.getElementById('languageSelect');
-  const relevantToggle = document.getElementById('relevantToggle');
-  const contentArea = document.getElementById('contentArea');
-  const saveBtn = document.getElementById('saveCategories');
-
-  // Show/hide admin tools based on login state
-  loginToggle.addEventListener('change', () => {
-    adminTools.style.display = loginToggle.checked ? 'none' : 'block';
-    filterContent();
-  });
-
-  // Filter content when language or relevance changes
-  languageSelect.addEventListener('change', filterContent);
-  relevantToggle.addEventListener('change', filterContent);
-
-  function filterContent() {
-    const isStudent = loginToggle.checked;
-    const selectedLang = languageSelect.value;
-    const showRelevant = relevantToggle.checked;
-
-    document.querySelectorAll('#contentArea .mini-card').forEach(card => {
-      const role = card.dataset.role;
-      const lang = card.dataset.lang;
-      const relevant = card.dataset.relevant === 'true';
-
-      let visible = true;
-      if (!isStudent && role === 'admin') visible = false;
-      if (lang !== selectedLang) visible = false;
-      if (showRelevant && !relevant) visible = false;
-
-      card.style.display = visible ? 'block' : 'none';
-    });
-  }
-
-  // Placeholder for saving prioritized categories
-  saveBtn.addEventListener('click', () => {
-    const cats = document.getElementById('categoryInput').value.trim();
-    if (cats) {
-      alert('Prioritized categories saved: ' + cats);
-    } else {
-      alert('Please enter at least one category.');
-    }
-  });
-
-  // Initial filter on load
-  filterContent();
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Login & Dashboard</title>
-<style>
-  body {font-family: Arial, sans-serif; margin:0; display:flex; justify-content:center; align-items:center; height:100vh; background:#f5f5f5;}
-  .login-container, .dashboard {background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); width:320px;}
-  .login-container h2, .dashboard h2 {margin-top:0; text-align:center;}
-  .form-group {margin-bottom:15px;}
-  .form-group label {display:block; margin-bottom:5px; font-weight:bold;}
-  .form-group input {width:100%; padding:8px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px;}
-  .btn-primary {background:#0069d9; color:#fff; border:none; padding:10px 15px; width:100%; border-radius:4px; cursor:pointer;}
-  .btn-primary:hover {background:#0053b3;}
-  .card {border:1px solid #e0e0e0; border-radius:6px; padding:15px; margin-top:20px; background:#fafafa;}
-  .mini-card {font-size:0.9rem; color:#555;}
-  .hidden {display:none;}
-</style>
-</head>
-<body>
-
-<div id="app">
-  <div class="login-container" id="loginPage">
-    <h2>Login</h2>
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter username">
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password">
-    </div>
-    <button class="btn-primary" id="loginBtn">Log In</button>
-  </div>
-
-  <div class="dashboard hidden" id="dashboardPage">
-    <h2>Welcome, <span id="displayUser"></span></h2>
-
-    <div class="card" id="githubCard">
-      <h3>10 Useful GitHub Repositories</h3>
-      <p class="mini-card">Here are ten curated repositories that help students learn and build projects.</p>
-      <ul class="mini-card">
-        <li>Repo 1</li>
-        <li>Repo 2</li>
-        <li>Repo 3</li>
-        <li>Repo 4</li>
-        <li>Repo 5</li>
-        <li>Repo 6</li>
-        <li>Repo 7</li>
-        <li>Repo 8</li>
-        <li>Repo 9</li>
-        <li>Repo 10</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<script>
-  const loginBtn = document.getElementById('loginBtn');
-  const loginPage = document.getElementById('loginPage');
-  const dashboardPage = document.getElementById('dashboardPage');
-  const displayUser = document.getElementById('displayUser');
-  const githubCard = document.getElementById('githubCard');
-
-  loginBtn.addEventListener('click', () => {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value; // In real app, validate securely
-
-    if (!username) {
-      alert('Please enter a username.');
-      return;
-    }
-
-    // Simple role check: "admin" gets admin rights, everything else is student
-    const isAdmin = username.toLowerCase() === 'admin';
-
-    // Hide login, show dashboard
-    loginPage.classList.add('hidden');
-    dashboardPage.classList.remove('hidden');
-    displayUser.textContent = username;
-
-    // Show or hide the GitHub card based on role
-    if (!isAdmin) {
-      githubCard.classList.add('hidden');
-    }
-  });
-</script>
-
-</body>
-</html>
-<style>
-  body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
-  .login-container, .app-container {max-width:400px; margin:50px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-  .card {background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:15px; margin-bottom:15px;}
-  .mini-card {background:#fafafa; border:1px solid #ddd; border-radius:4px; padding:10px; margin:5px 0;}
-  .btn-primary {background:#0069d9; color:#fff; border:none; padding:10px 15px; border-radius:4px; cursor:pointer;}
-  .btn-primary:hover {background:#0053ba;}
-  .hidden {display:none;}
-</style>
-
-<div id="loginScreen" class="login-container">
-  <h2>Login</h2>
-  <input type="text" id="username" placeholder="Username" style="width:100%;padding:8px;margin-bottom:10px;">
-  <select id="roleSelect" style="width:100%;padding:8px;margin-bottom:10px;">
-    <option value="student">Student</option>
-    <option value="admin">Admin</option>
-  </select>
-  <button class="btn-primary" onclick="login()">Login</button>
-</div>
-
-<div id="appScreen" class="app-container hidden">
-  <h2>Welcome, <span id="userName"></span>!</h2>
-
-  <div class="card">
-    <h3>General Resources</h3>
-    <div class="mini-card">Resource A</div>
-    <div class="mini-card">Resource B</div>
-  </div>
-
-  <div class="card github-card">
-    <h3>10 Useful GitHub Repositories</h3>
-    <ul>
-      <li>Repo 1</li>
-      <li>Repo 2</li>
-      <li>Repo 3</li>
-      <li>Repo 4</li>
-      <li>Repo 5</li>
-      <li>Repo 6</li>
-      <li>Repo 7</li>
-      <li>Repo 8</li>
-      <li>Repo 9</li>
-      <li>Repo 10</li>
-    </ul>
-  </div>
-
-  <button class="btn-primary" onclick="logout()">Logout</button>
-</div>
-
-<script>
-function login() {
-  const username = document.getElementById('username').value.trim() || 'User';
-  const role = document.getElementById('roleSelect').value; // 'student' or 'admin'
-
-  // Show app, hide login
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('appScreen').classList.remove('hidden');
-
-  // Set greeting
-  document.getElementById('userName').textContent = username + ' (' + role + ')';
-
-  // Hide GitHub cards for students
-  if (role === 'student') {
-    const githubCards = document.querySelectorAll('.github-card');
-    githubCards.forEach(c => c.classList.add('hidden'));
-  }
-}
-
-function logout() {
-  // Reset UI
-  document.getElementById('appScreen').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('username').value = '';
-  document.getElementById('roleSelect').value = 'student';
-}
-</script>
-<style>
-    .dashboard { max-width: 800px; margin: auto; padding: 1rem; font-family: Arial, sans-serif; }
-    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff; }
-    .card h3 { margin-top: 0; }
-    .mini-card { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 6px; margin-top: 0.5rem; }
-    .btn-primary { background: #0069d9; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
-    .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
-  </style>
-
-  <div class="dashboard">
-    <h2>📚 10 Useful GitHub Repositories</h2>
-
-    <div id="repo-list">
-      <!-- Cards will be injected by JS -->
-    </div>
-
-    <h2>🚀 Student Media Quota</h2>
-    <div class="mini-card">
-      <span>Videos generated today: <span id="video-count">0</span>/2</span>
-      <button class="btn-primary" id="btn-video">Generate Video</button>
-    </div>
-    <div class="mini-card">
-      <span>Images generated today: <span id="image-count">0</span>/5</span>
-      <button class="btn-primary" id="btn-image">Generate Image</button>
-    </div>
-  </div>
-
-  <script>
-    // ----- Repository Data -----
-    const repos = [
-      { name: "freeCodeCamp", desc: "Learn web development for free.", url: "https://github.com/freeCodeCamp/freeCodeCamp" },
-      { name: "awesome-python", desc: "A curated list of awesome Python frameworks.", url: "https://github.com/vinta/awesome-python" },
-      { name: "30-seconds-of-code", desc: "Short JavaScript snippets.", url: "https://github.com/30-seconds/30-seconds-of-code" },
-      { name: "public-apis", desc: "Free APIs for development.", url: "https://github.com/public-apis/public-apis" },
-      { name: "TensorFlow", desc: "Machine learning library.", url: "https://github.com/tensorflow/tensorflow" },
-      { name: "React", desc: "A JavaScript library for building UI.", url: "https://github.com/facebook/react" },
-      { name: "Django", desc: "High‑level Python web framework.", url: "https://github.com/django/django" },
-      { name: "Bootstrap", desc: "Popular CSS framework.", url: "https://github.com/twbs/bootstrap" },
-      { name: "Node.js", desc: "JavaScript runtime.", url: "https://github.com/nodejs/node" },
-      { name: "VSCode", desc: "Source‑code editor.", url: "https://github.com/microsoft/vscode" }
-    ];
-
-    // Render repo cards
-    const repoContainer = document.getElementById('repo-list');
-    repos.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <h3>${r.name}</h3>
-        <p>${r.desc}</p>
-        <a href="${r.url}" target="_blank" class="btn-primary">Open Repo</a>
-      `;
-      repoContainer.appendChild(card);
-    });
-
-    // ----- Quota Logic -----
-    const QUOTA = { video: 2, image: 5 };
-    const STORAGE_KEY = 'studentQuota';
-
-    function loadQuota() {
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      const today = new Date().toISOString().slice(0, 10);
-      if (data.date !== today) {
-        // reset for new day
-        return { date: today, video: 0, image: 0 };
-      }
-      return data;
-    }
-
-    function saveQuota(q) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(q));
-    }
-
-    let quota = loadQuota();
-    updateUI();
-
-    function updateUI() {
-      document.getElementById('video-count').textContent = quota.video;
-      document.getElementById('image-count').textContent = quota.image;
-      document.getElementById('btn-video').disabled = quota.video >= QUOTA.video;
-      document.getElementById('btn-image').disabled = quota.image >= QUOTA.image;
-    }
-
-    document.getElementById('btn-video').addEventListener('click', () => {
-      if (quota.video < QUOTA.video) {
-        quota.video++;
-        saveQuota(quota);
-        alert('Video generated! 🎬');
-        updateUI();
-      }
-    });
-
-    document.getElementById('btn-image').addEventListener('click', () => {
-      if (quota.image < QUOTA.image) {
-        quota.image++;
-        saveQuota(quota);
-        alert('Image generated! 🖼️');
-        updateUI();
-      }
-    });
-  </script>
-<style>
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      max-width: 400px;
-      margin: 0 auto;
-      background-color: #fafafa;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .mini-card {
-      margin-bottom: 12px;
-    }
-    .btn-primary {
-      background-color: #0069d9;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .btn-primary:hover {
-      background-color: #0053ba;
-    }
-    label {
-      font-size: 14px;
-      user-select: none;
-    }
-  </style>
-
-  <div class="card">
-    <div class="mini-card">
-      <label for="autoDeployToggle">
-        <input type="checkbox" id="autoDeployToggle" style="margin-right:6px;">
-        ⚡ Auto‑Deploy Immediately (Skip 2nd Click)
-      </label>
-    </div>
-    <button id="analyzeArchBtn" class="btn-primary">Analyze Architecture</button>
-  </div>
-
-  <script>
-    // Placeholder functions – replace with real implementations
-    async function generateUpgradePreview() {
-      console.log('Generating upgrade preview...');
-      // Simulate async work
-      return new Promise(r => setTimeout(r, 500));
-    }
-    async function validateWidgetHTML() {
-      console.log('Validating widget HTML...');
-      // Simulate validation (return true for success)
-      return new Promise(r => setTimeout(() => r(true), 300));
-    }
-    async function createBackup() {
-      console.log('Creating backup...');
-      return new Promise(r => setTimeout(r, 300));
-    }
-    async function executeArchitectPush() {
-      console.log('Executing architect push...');
-      return new Promise(r => setTimeout(r, 500));
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const analyzeBtn = document.getElementById('analyzeArchBtn');
-      const autoToggle = document.getElementById('autoDeployToggle');
-
-      analyzeBtn.addEventListener('click', async () => {
-        // Step 1: always generate the preview and show the summary
-        await generateUpgradePreview();
-
-        // Show plain‑language UPGRADE SUMMARY (implementation depends on your UI)
-        // For demo purposes we just log it:
-        console.log('UPGRADE SUMMARY: Preview generated.');
-
-        if (autoToggle.checked) {
-          // Auto‑deploy flow
-          const isValid = await validateWidgetHTML();
-          if (!isValid) {
-            alert('Validation failed. Please review the preview before deploying.');
-            return;
-          }
-          await createBackup();
-          await executeArchitectPush();
-
-          // Keep the 1‑Click Rollback button active in Alerts (implementation specific)
-          console.log('Auto‑deploy completed. Rollback button remains active.');
-        } else {
-          // Normal two‑click flow – you can trigger the next step elsewhere
-          console.log('Auto‑deploy disabled – awaiting second click for push.');
-        }
-      });
-    });
-  </script>
-<div class="card"><h3>✨ Upgrade</h3><p>UPGRADE SUMMARY:
-- Adds a realistic 2‑way video‑call interface with timer, PiP preview, mute, auto‑conversation loop and end‑call controls.  
-- Provides a Photo & Voice Clone Studio where students can snap or upload a selfie, name their avatar, record a 10‑second voice sample and store it locally for later use.  
-- Introduces an Adaptive Best‑Friend AI Trainer UI that will act as a warm, encouraging tutor, remembering progress and adjusting difficulty on the fly.  
-
-<widget>
-  <style>
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      margin: 12px 0;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,.1);
-    }
-    .btn-primary {
-      background: #0069d9;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-primary:hover { background: #0053b3; }
-    .mini-card {
-      border: 1px solid #eee;
-      border-radius: 6px;
-      padding: 8px;
-      margin-top: 8px;
-      background: #fafafa;
-    }
-    .flex { display: flex; align-items: center; gap: 8px; }
-    .flex-col { display: flex; flex-direction: column; gap: 8px; }
-    .hidden { display: none; }
-    #remoteVideo, #localVideo, #avatarPreview {
-      width: 100%;
-      max-height: 300px;
-      background: #000;
-      border-radius: 6px;
-    }
-    #avatarSelect { width: 100%; }
-    #chatBox { height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 8px; background:#f9f9f9; }
-    .message { margin: 4px 0; }
-    .message.ai { color: #0069d9; }
-    .message.user { color: #333; text-align: right; }
-  </style>
-
-  <!-- Video Call UI -->
-  <div class="card video-call-card">
-    <h3>🟢 Live AI Video Call</h3>
-    <div class="flex">
-      <video id="remoteVideo" autoplay playsinline></video>
-      <div class="mini-card">
-        <span>Call Timer: <span id="callTimer">00:00</span></span><br>
-        <button id="muteBtn" class="btn-primary">Mute Mic</button>
-        <label><input type="checkbox" id="autoLoopToggle"> Auto‑Conversation Loop</label><br>
-        <button id="endCallBtn" class="btn-primary">End Call</button>
-      </div>
-    </div>
-    <video id="localVideo" autoplay muted playsinline class="mini-card" style="width:120px; height:90px; position:absolute; bottom:20px; right:20px; border:2px solid #fff;"></video>
-  </div>
-
-  <!-- Photo & Voice Clone Studio -->
-  <div class="card avatar-studio-card">
-    <h3>📸 Photo & Voice Clone Studio</h3>
-    <div class="flex-col">
-      <label>Avatar Name:
-        <input type="text" id="avatarName" placeholder="e.g., My Buddy">
-      </label>
-
-      <div class="flex">
-        <button id="capturePhotoBtn" class="btn-primary">Capture Selfie</button>
-        <input type="file" id="uploadPhotoInput" accept="image/*">
-      </div>
-      <canvas id="photoCanvas" class="hidden"></canvas>
-      <img id="avatarPreview" src="" alt="Avatar Preview" class="mini-card">
-
-      <div class="flex">
-        <button id="startRecordBtn" class="btn-primary">Record Voice (10 s)</button>
-        <button id="stopRecordBtn" class="btn-primary hidden">Stop</button>
-      </div>
-      <audio id="voicePlayback" controls class="mini-card hidden"></audio>
-
-      <button id="saveAvatarBtn" class="btn-primary">Save Avatar to LocalStorage</button>
-
-      <label>Choose Avatar:
-        <select id="avatarSelect">
-          <option value="default">Cartoon Buddy (Default)</option>
-          <!-- custom avatars will be added here -->
-        </select>
-      </label>
-    </div>
-  </div>
-
-  <!-- Adaptive Best‑Friend AI Trainer -->
-  <div class="card ai-trainer-card">
-    <h3>🤖 Adaptive Best‑Friend AI Trainer</h3>
-    <div id="chatBox"></div>
-    <div class="flex">
-      <input type="text" id="userInput" placeholder="Say something…" style="flex:1;">
-      <button id="sendBtn" class="btn-primary">Send</button>
-    </div>
-  </div>
-
-  <script>
-    // ---------- Video Call ----------
-    const remoteVideo = document.getElementById('remoteVideo');
-    const localVideo = document.getElementById('localVideo');
-    const muteBtn = document.getElementById('muteBtn');
-    const endCallBtn = document.getElementById('endCallBtn');
-    const callTimerEl = document.getElementById('callTimer');
-    const autoLoopToggle = document.getElementById('autoLoopToggle');
-
-    let localStream = null;
-    let callTimer = null;
-    let seconds = 0;
-    let micMuted = false;
-
-    async function startCall() {
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localVideo.srcObject = localStream;
-        // In a real implementation, remoteVideo would be fed by WebRTC.
-        // Here we just mirror the local stream for demo purposes.
-        remoteVideo.srcObject = localStream.clone();
-        startTimer();
-      } catch (e) {
-        alert('Camera/Mic not available. Using placeholder.');
-        // fallback: show a placeholder image
-        remoteVideo.poster = 'https://via.placeholder.com/640x360?text=Video+Call+Unavailable';
-      }
-    }
-
-    function startTimer() {
-      seconds = 0;
-      callTimerEl.textContent = '00:00';
-      callTimer = setInterval(() => {
-        seconds++;
-        const mins = String(Math.floor(seconds/60)).padStart(2,'0');
-        const secs = String(seconds%60).padStart(2,'0');
-        callTimerEl.textContent = `${mins}:${secs}`;
-      }, 1000);
-    }
-
-    function stopCall() {
-      clearInterval(callTimer);
-      if (localStream) {
-        localStream.getTracks().forEach(t => t.stop());
-      }
-      remoteVideo.srcObject = null;
-      localVideo.srcObject = null;
-    }
-
-    muteBtn.addEventListener('click', () => {
-      if (!localStream) return;
-      micMuted = !micMuted;
-      localStream.getAudioTracks().forEach(t => t.enabled = !micMuted);
-      muteBtn.textContent = micMuted ? 'Unmute Mic' : 'Mute Mic';
-    });
-
-    endCallBtn.addEventListener('click', () => {
-      stopCall();
-    });
-
-    // Auto‑Conversation Loop placeholder
-    autoLoopToggle.addEventListener('change', (e) => {
-      console.log('Auto‑Loop:', e.target.checked);
-      // In a real system, you'd re‑trigger listening after AI finishes speaking.
-    });
-
-    startCall();
-
-    // ---------- Photo & Voice Clone ----------
-    const captureBtn = document.getElementById('capturePhotoBtn');
-    const uploadInput = document.getElementById('uploadPhotoInput');
-    const photoCanvas = document.getElementById('photoCanvas');
-    const avatarPreview = document.getElementById('avatarPreview');
-    const avatarNameInput = document.getElementById('avatarName');
-    const startRecordBtn = document.getElementById('startRecordBtn');
-    const stopRecordBtn = document.getElementById('stopRecordBtn');
-    const voicePlayback = document.getElementById('voicePlayback');
-    const saveAvatarBtn = document.getElementById('saveAvatarBtn');
-    const avatarSelect = document.getElementById('avatarSelect');
-
-    let mediaRecorder = null;
-    let recordedChunks = [];
-
-    // Capture selfie
-    captureBtn.addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const video = document.createElement('video');
-        video.autoplay = true;
-        video.srcObject = stream;
-        await new Promise(r => video.onloadedmetadata = r);
-        const ctx = photoCanvas.getContext('2d');
-        photoCanvas.width = video.videoWidth;
-        photoCanvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
-        const dataURL = photoCanvas.toDataURL('image/png');
-        avatarPreview.src = dataURL;
-        stream.getTracks().forEach(t => t.stop());
-      } catch (e) {
-        alert('Unable to access camera.');
-      }
-    });
-
-    // Upload photo fallback
-    uploadInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        avatarPreview.src = reader.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Voice recording
-    startRecordBtn.addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-          const url = URL.createObjectURL(blob);
-          voicePlayback.src = url;
-          voicePlayback.classList.remove('hidden');
-        };
-        mediaRecorder.start();
-        startRecordBtn.classList.add('hidden');
-        stopRecordBtn.classList.remove('hidden');
-
-        // Auto‑stop after 10 seconds
-        setTimeout(() => {
-          if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            stream.getTracks().forEach(t => t.stop());
-          }
-        }, 10000);
-      } catch (e) {
-        alert('Microphone not accessible.');
-      }
-    });
-
-    stopRecordBtn.addEventListener('click', () => {
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(t => t.stop());
-      }
-      stopRecordBtn.classList.add('hidden');
-      startRecordBtn.classList.remove('hidden');
-    });
-
-    // Save avatar to localStorage
-    saveAvatarBtn.addEventListener('click', () => {
-      const name = avatarNameInput.value.trim() || 'Custom Avatar';
-      const photo = avatarPreview.src;
-      if (!photo) { alert('Add a photo first.'); return; }
-      const voiceBlob = voicePlayback.src ? voicePlayback.src : null;
-
-      const avatar = { name, photo, voiceBlob };
-      const avatars = JSON.parse(localStorage.getItem('customAvatars')||'[]');
-      avatars.push(avatar);
-      localStorage.setItem('customAvatars', JSON.stringify(avatars));
-      populateAvatarSelect();
-      alert('Avatar saved!');
-    });
-
-    function populateAvatarSelect() {
-      const avatars = JSON.parse(localStorage.getItem('customAvatars')||'[]');
-      // Clear existing custom options
-      avatarSelect.querySelectorAll('option.custom').forEach(o => o.remove());
-      avatars.forEach((av, idx) => {
-        const opt = document.createElement('option');
-        opt.value = `custom-${idx}`;
-        opt.textContent = av.name;
-        opt.classList.add('custom');
-        avatarSelect.appendChild(opt);
-      });
-    }
-
-    avatarSelect.addEventListener('change', () => {
-      const val = avatarSelect.value;
-      if (val === 'default') {
-        avatarPreview.src = 'https://via.placeholder.com/200?text=Cartoon+Buddy';
-        voicePlayback.classList.add('hidden');
-      } else</p></div>
-<div id="leaderboard-widget" class="card">
-  <h2 class="mini-card">🏆 Top Learners Leaderboard &amp; Badges</h2>
-  
-  <!-- Current Student Section -->
-  <div id="current-student" class="mini-card">
-    <h3>Your Rank</h3>
-    <p id="student-rank">Loading…</p>
-    <h4>Earned Badges</h4>
-    <ul id="student-badges"></ul>
-  </div>
-  
-  <!-- Top 5 Learners -->
-  <div id="top-learners" class="mini-card">
-    <h3>Top 5 Learners</h3>
-    <ol id="leader-list"></ol>
-    <button class="btn-primary" id="refresh-btn">Refresh</button>
-  </div>
-</div>
-
-<script>
-(() => {
-  // Sample data – in production replace with API call
-  const learners = [
-    { name: "Alex", xp: 520, badges: ["First Step", "Fast Learner"] },
-    { name: "Sam", xp: 480, badges: ["First Step"] },
-    { name: "Jordan", xp: 450, badges: ["Fast Learner"] },
-    { name: "Taylor", xp: 430, badges: [] },
-    { name: "Riley", xp: 410, badges: [] },
-    { name: "You",   xp: 395, badges: ["First Step", "Streak Master"] }
-  ];
-
-  // Sort learners by XP descending
-  const sorted = [...learners].sort((a, b) => b.xp - a.xp);
-
-  // Populate top‑5 list
-  const leaderList = document.getElementById('leader-list');
-  leaderList.innerHTML = '';
-  sorted.slice(0,5).forEach((l, i) => {
-    const li = document.createElement('li');
-    li.textContent = `${i + 1}. ${l.name} – ${l.xp} XP`;
-    leaderList.appendChild(li);
-  });
-
-  // Show current student rank & badges
-  const current = learners.find(l => l.name === "You");
-  const rank = sorted.findIndex(l => l.name === "You") + 1;
-  document.getElementById('student-rank').textContent = `#${rank} with ${current.xp} XP`;
-
-  const badgesContainer = document.getElementById('student-badges');
-  badgesContainer.innerHTML = '';
-  const badgeMap = {
-    "First Step": "First Step – 25 XP",
-    "Fast Learner": "Fast Learner – 100 XP",
-    "Streak Master": "Streak Master – 200 XP"
-  };
-  current.badges.forEach(b => {
-    const li = document.createElement('li');
-    li.textContent = badgeMap[b] || b;
-    badgesContainer.appendChild(li);
-  });
-
-  // Refresh button (simulated new data)
-  document.getElementById('refresh-btn').addEventListener('click', () => {
-    // In a real app, re‑fetch data here.
-    alert('Data refreshed!');
-  });
-})();
-</script>
-<style>
-    /* Basic layout – keep it ultra‑clean and mobile‑friendly */
-    #smart-typing-card.card {
-      max-width: 600px;
-      margin: 1rem auto;
-      padding: 1.2rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.1);
-      background: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    #smart-typing-card .card-header {
-      font-size: 1.3rem;
-      font-weight: bold;
-      margin-bottom: 0.8rem;
-    }
-    #smart-typing-card .mini-card {
-      background:#f9f9f9;
-      border:1px solid #e0e0e0;
-      border-radius:6px;
-      padding:0.8rem;
-      margin:0.8rem 0;
-      font-size:0.9rem;
-      line-height:1.4;
-    }
-    #smart-typing-card .btn-primary {
-      background:#0069d9;
-      color:#fff;
-      border:none;
-      padding:0.5rem 1rem;
-      border-radius:4px;
-      cursor:pointer;
-      font-size:0.95rem;
-    }
-    #smart-typing-card .btn-primary:disabled {
-      background:#a0c4ff;
-      cursor:not-allowed;
-    }
-    #smart-typing-card select,
-    #smart-typing-card textarea {
-      width:100%;
-      padding:0.5rem;
-      margin-top:0.4rem;
-      border:1px solid #ccc;
-      border-radius:4px;
-      font-size:1rem;
-      box-sizing:border-box;
-    }
-    #smart-typing-card .stats {
-      margin-top:0.8rem;
-      font-size:0.95rem;
-    }
-    #smart-typing-card .xp-reward {
-      margin-top:0.6rem;
-      font-weight:bold;
-      color:#28a745;
-    }
-  </style>
-
-  <div id="smart-typing-card" class="card">
-    <div class="card-header">⌨️ Smart Typing &amp; Hand‑Posture Tutor</div>
-
-    <!-- Finger‑placement guide -->
-    <div class="mini-card">
-      <strong>Finger‑Placement Guide (Home Row)</strong><br>
-      <pre style="font-family:monospace; margin:0.5rem 0;">
-Left Hand:  A S D F   →  Pinky → Ring → Middle → Index
-Right Hand: J K L ;   →  Index → Middle → Ring → Pinky
-      </pre>
-      <em>Keep your wrists relaxed and fingers curved over the home row.</em>
-    </div>
-
-    <!-- Difficulty selector -->
-    <label for="difficulty-select">Select Difficulty:</label>
-    <select id="difficulty-select">
-      <option value="beginner">Beginner – Home Row (ASDF JKL;)</option>
-      <option value="intermediate">Intermediate – Short Sentences</option>
-      <option value="advanced">Advanced – Coding / CCC Terms</option>
-    </select>
-
-    <!-- Target text display -->
-    <div id="target-text" class="mini-card" style="min-height:4rem;"></div>
-
-    <!-- Typing area -->
-    <textarea id="typing-input" rows="4" placeholder="Start typing here..." disabled></textarea>
-
-    <!-- Controls -->
-    <button id="start-btn" class="btn-primary">Start Practice</button>
-    <button id="reset-btn" class="btn-primary" style="margin-left:0.5rem;" disabled>Reset</button>
-
-    <!-- Live stats -->
-    <div class="stats">
-      <span id="wpm-display">WPM: 0</span> |
-      <span id="accuracy-display">Accuracy: 0%</span>
-    </div>
-
-    <!-- XP reward -->
-    <div id="xp-reward" class="xp-reward" style="display:none;">🎉 +20 XP earned!</div>
-  </div>
-
-  <script>
-    (function(){
-      const texts = {
-        beginner: "asdf jkl; asdf jkl; asdf jkl;",
-        intermediate: "The quick brown fox jumps over the lazy dog.",
-        advanced: "function calculateWPM(chars, timeSec){ return (chars/5)/(timeSec/60); }"
-      };
-
-      const difficultySelect = document.getElementById('difficulty-select');
-      const targetDiv = document.getElementById('target-text');
-      const textarea = document.getElementById('typing-input');
-      const startBtn = document.getElementById('start-btn');
-      const resetBtn = document.getElementById('reset-btn');
-      const wpmSpan = document.getElementById('wpm-display');
-      const accSpan = document.getElementById('accuracy-display');
-      const xpDiv = document.getElementById('xp-reward');
-
-      let startTime = null;
-      let timer = null;
-      let currentText = "";
-
-      function loadTarget(){
-        const level = difficultySelect.value;
-        currentText = texts[level];
-        targetDiv.textContent = currentText;
-        textarea.value = "";
-        textarea.disabled = true;
-        startBtn.disabled = false;
-        resetBtn.disabled = true;
-        wpmSpan.textContent = "WPM: 0";
-        accSpan.textContent = "Accuracy: 0%";
-        xpDiv.style.display = "none";
-      }
-
-      function startPractice(){
-        textarea.disabled = false;
-        textarea.focus();
-        startBtn.disabled = true;
-        resetBtn.disabled = false;
-        startTime = performance.now();
-        timer = setInterval(updateStats, 500);
-      }
-
-      function resetPractice(){
-        clearInterval(timer);
-        loadTarget();
-      }
-
-      function updateStats(){
-        const typed = textarea.value;
-        const elapsedSec = (performance.now() - startTime) / 1000;
-        const charsTyped = typed.length;
-        const wordsTyped = charsTyped / 5;
-        const wpm = Math.round(wordsTyped / (elapsedSec/60));
-        // Accuracy
-        let correct = 0;
-        for(let i=0;i<typed.length;i++){
-          if(typed[i]===currentText[i]) correct++;
-        }
-        const accuracy = typed.length ? Math.round((correct/typed.length)*100) : 0;
-        wpmSpan.textContent = "WPM: " + wpm;
-        accSpan.textContent = "Accuracy: " + accuracy + "%";
-
-        // Completion check
-        if(typed === currentText){
-          clearInterval(timer);
-          textarea.disabled = true;
-          startBtn.disabled = true;
-          resetBtn.disabled = false;
-          xpDiv.style.display = "block";
-        }
-      }
-
-      // Event listeners
-      difficultySelect.addEventListener('change', loadTarget);
-      startBtn.addEventListener('click', startPractice);
-      resetBtn.addEventListener('click', resetPractice);
-      textarea.addEventListener('input', updateStats);
-
-      // Initial load
-      loadTarget();
-    })();
-  </script>
-<style>
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      margin: 12px 0;
-      background-color: #fafafa;
-    }
-    .mini-card {
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 8px;
-      margin-top: 8px;
-      background-color: #fff;
-    }
-    .btn-primary {
-      background-color: #0069d9;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-primary:hover {
-      background-color: #0053ba;
-    }
-    .toggle-label {
-      font-weight: normal;
-      margin-left: 8px;
-      cursor: pointer;
-    }
-  </style>
-
-  <div class="card">
-    <button id="analyzeArchBtn" class="btn-primary">Analyze Architecture</button>
-    <input type="checkbox" id="autoDeployToggle" style="margin-left:12px;">
-    <label for="autoDeployToggle" class="toggle-label">⚡ Auto-Deploy Immediately (Skip 2nd Click)</label>
-  </div>
-
-  <script>
-    // Placeholder functions – replace with real implementations in the main app
-    function generateUpgradePreview() {
-      console.log('Generating upgrade preview...');
-      // ... actual preview logic ...
-    }
-
-    function validateWidgetHTML() {
-      console.log('Validating widget HTML...');
-      // ... actual validation logic ...
-    }
-
-    function saveBackup() {
-      console.log('Saving backup...');
-      // ... actual backup logic ...
-    }
-
-    function executeArchitectPush() {
-      console.log('Executing architect push...');
-      // ... actual push logic ...
-    }
-
-    function showUpgradeSummary() {
-      const summary = document.createElement('div');
-      summary.className = 'mini-card';
-      summary.textContent = 'Upgrade preview generated, validation passed, backup saved, and push executed.';
-      document.body.appendChild(summary);
-      // Auto‑remove after a short period
-      setTimeout(() => summary.remove(), 5000);
-    }
-
-    document.getElementById('analyzeArchBtn').addEventListener('click', () => {
-      const autoDeploy = document.getElementById('autoDeployToggle').checked;
-
-      // Always generate preview and show summary
-      generateUpgradePreview();
-      showUpgradeSummary();
-
-      // If auto‑deploy is on, run the rest automatically
-      if (autoDeploy) {
-        validateWidgetHTML();
-        saveBackup();
-        executeArchitectPush();
-      } else {
-        // Normal flow – wait for the second click (handled elsewhere in the app)
-        console.log('Auto‑Deploy disabled – awaiting second confirmation click.');
-      }
-    });
-  </script>
-<!-- Student Login / Register Modal -->
-<div id="studentAuthModal" class="card">
-  <h3>Student Login / Register</h3>
-  <label for="stuAuthPin">6‑Digit PIN</label>
-  <input type="password" id="stuAuthPin" maxlength="6" placeholder="Enter 6‑digit PIN"
-         pattern="\\d{6}" class="mini-card" autocomplete="off">
-  <button id="stuLoginBtn" class="btn-primary">Login / Register</button>
-
-  <!-- Forgot PIN / Message Admin -->
-  <button id="forgotPinBtn" class="btn-primary" style="margin-top:8px;">
-    📩 Forgot PIN / Message Admin
-  </button>
-
-  <!-- Hidden Forgot PIN Form -->
-  <div id="forgotPinForm" class="mini-card" style="display:none; margin-top:12px;">
-    <label for="forgotContact">Mobile or Email</label>
-    <input type="text" id="forgotContact" placeholder="e.g. +1234567890 or user@example.com">
-    <label for="forgotMessage" style="margin-top:4px;">Optional Message</label>
-    <textarea id="forgotMessage" rows="2" placeholder="Your message (optional)"></textarea>
-    <button id="sendForgotBtn" class="btn-primary" style="margin-top:8px;">Send Request</button>
-    <div id="forgotResult" style="margin-top:6px; font-size:0.9em;"></div>
-  </div>
-</div>
-
-<!-- Admin Alerts Tab -->
-<div id="tab-alerts" class="card">
-  <h3>Admin Alerts</h3>
-
-  <!-- Student PIN Lookup & Reset Card -->
-  <div class="card mini-card" style="margin-top:12px; padding:12px;">
-    <h4>🔑 Student PIN Lookup & Reset</h4>
-    <label for="adminContact">Student Mobile / Email</label>
-    <input type="text" id="adminContact" placeholder="e.g. +1234567890 or user@example.com">
-    <label for="adminNewPin" style="margin-top:4px;">Optional New 6‑Digit PIN</label>
-    <input type="password" id="adminNewPin" maxlength="6" placeholder="Leave blank to only view"
-           pattern="\\d{6}" class="mini-card" autocomplete="off">
-    <button id="adminPinBtn" class="btn-primary" style="margin-top:8px;">Check / Reset PIN</button>
-    <div id="adminPinResult" style="margin-top:6px; font-size:0.9em;"></div>
-  </div>
-</div>
-
-<script>
-// Utility: enforce numeric 6‑digit input
-function enforceSixDigitNumeric(el) {
-  el.addEventListener('input', () => {
-    // Remove non‑digits
-    el.value = el.value.replace(/\D/g, '');
-    // Trim to 6 characters
-    if (el.value.length > 6) el.value = el.value.slice(0, 6);
-  });
-}
-
-// Apply to PIN fields
-enforceSixDigitNumeric(document.getElementById('stuAuthPin'));
-enforceSixDigitNumeric(document.getElementById('adminNewPin'));
-
-// ---------- Student Forgot PIN Flow ----------
-const forgotBtn = document.getElementById('forgotPinBtn');
-const forgotForm = document.getElementById('forgotPinForm');
-const sendForgotBtn = document.getElementById('sendForgotBtn');
-const forgotResult = document.getElementById('forgotResult');
-
-forgotBtn.addEventListener('click', () => {
-  forgotForm.style.display = forgotForm.style.display === 'none' ? 'block' : 'none';
-});
-
-sendForgotBtn.addEventListener('click', async () => {
-  const contact = document.getElementById('forgotContact').value.trim();
-  const message = document.getElementById('forgotMessage').value.trim();
-
-  if (!contact) {
-    forgotResult.textContent = '❗ Please enter a mobile number or email.';
-    return;
-  }
-
-  try {
-    const resp = await postBackend({
-      action: 'FORGOT_PIN',
-      contact,
-      message
-    });
-    forgotResult.textContent = resp.success
-      ? '✅ Request sent. Admin will contact you shortly.'
-      : `❌ ${resp.error || 'Failed to send request.'}`;
-  } catch (e) {
-    forgotResult.textContent = '❌ Unexpected error.';
-    console.error(e);
-  }
-});
-
-// ---------- Admin PIN Lookup / Reset ----------
-const adminPinBtn = document.getElementById('adminPinBtn');
-const adminPinResult = document.getElementById('adminPinResult');
-const ADMIN_PASS = 'YOUR_ADMIN_PASSWORD'; // <-- replace with secure handling
-
-adminPinBtn.addEventListener('click', async () => {
-  const contact = document.getElementById('adminContact').value.trim();
-  const newPin = document.getElementById('adminNewPin').value.trim();
-
-  if (!contact) {
-    adminPinResult.textContent = '❗ Provide student mobile or email.';
-    return;
-  }
-  if (newPin && newPin.length !== 6) {
-    adminPinResult.textContent = '❗ New PIN must be exactly 6 digits.';
-    return;
-  }
-
-  try {
-    const resp = await postBackend({
-      action: 'ADMIN_STUDENT_PIN',
-      adminPass: ADMIN_PASS,
-      contact,
-      newPin: newPin || undefined
-    });
-
-    if (resp.success) {
-      if (newPin) {
-        adminPinResult.textContent = `✅ PIN reset successfully.`;
-      } else {
-        adminPinResult.textContent = `✅ Current PIN: ${resp.currentPin}`;
-      }
-    } else {
-      adminPinResult.textContent = `❌ ${resp.error || 'Operation failed.'}`;
-    }
-  } catch (e) {
-    adminPinResult.textContent = '❌ Unexpected error.';
-    console.error(e);
-  }
-});
-</script></div>
     </div>
   </main>
 
-  <!-- FIXED BOTTOM NAVIGATION BAR (5 FULL-SCREEN MODES) -->
-  <nav id="studentBottomNav" class="bottom-nav">
-    <button class="bnav-btn bnav-active" data-scr="feed" onclick="openFullScreen('feed')"><span class="ico">📱</span>Reels</button>
-    <button class="bnav-btn" data-scr="chat" onclick="openFullScreen('chat')"><span class="ico">💬</span>AI Tutor</button>
-    <button class="bnav-btn" data-scr="speak" onclick="openFullScreen('speak')"><span class="ico">🎤</span>Speak</button>
-    <button class="bnav-btn" data-scr="lingo" onclick="openFullScreen('lingo')"><span class="ico">🌍</span>Courses</button>
-    <button class="bnav-btn" data-scr="studio" onclick="openFullScreen('studio')"><span class="ico">📹</span>Avatar</button>
-  </nav>
+  <!-- ==================== 5. LOCKED 48PX BOTTOM FOOTER ==================== -->
+  <footer id="studentBottomFooter" class="bottom-footer hidden">
+    <button class="footer-btn active" data-scr="home" onclick="openFullScreen('home')">🏠<span>Home</span></button>
+    <button class="footer-btn" data-scr="academy" onclick="openFullScreen('academy')">🏅<span>QR Certificate</span></button>
+    <button class="footer-btn" onclick="toggleUILanguage()">🌐<span>भाषा बदलें</span></button>
+    <button class="footer-btn" data-scr="help" onclick="openFullScreen('help')">🆘<span>Leave/Help</span></button>
+  </footer>
 
-  <!-- ==================== SECRET ADMIN COMMAND CENTER (HIDDEN FROM LEARNERS) ==================== -->
-  <section id="viewAdmin" class="app-workspace hidden" style="bottom:0;">
+  <!-- ==================== 6. SECRET ADMIN COMMAND CENTER (100% HIDDEN FROM STUDENTS) ==================== -->
+  <section id="viewAdmin" class="app-workspace hidden" style="top:0;bottom:0;z-index:80;">
     <div class="screen-inner">
       <div class="dark-studio" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
-          <h2 style="font-size:18px;">🛠️ Admin Command Center (v5.0)</h2>
-          <p style="font-size:12px;color:#94a3b8;">Registered Students: <strong id="adminStudentCount">0</strong> • Permanent Blueprint Memory</p>
+          <h2 style="font-size:18px;">🛠️ Admin Command Center</h2>
+          <p style="font-size:12px;color:#94A3B8;">Single-Admin Protected • Students Isolated</p>
         </div>
         <div style="display:flex;gap:8px;">
-          <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 New Plan</button>
+          <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 R&D Scan</button>
           <button class="btn-outline" onclick="exitAdminView()">Exit Admin</button>
         </div>
       </div>
 
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
-        <button class="btn-primary" onclick="showAdminTab('architect')">💬 Co-Architect</button>
-        <button class="btn-outline" onclick="showAdminTab('vault')">🔐 Vault & Ads</button>
-        <button class="btn-outline" onclick="showAdminTab('alerts')">🔔 Alerts & Rollback</button>
+      <!-- ADMIN CREDENTIAL RECOVERY TOOL -->
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:8px;">🔍 Search Help for Credentials (छात्र का पासवर्ड/डिटेल्स खोजें)</h3>
+        <div class="input-row" style="margin-bottom:10px;">
+          <input id="adminCredSearchInput" type="text" placeholder="छात्र का नाम, Phone या Email लिखें..." onkeydown="if(event.key==='Enter') searchStudentCredentials()" />
+          <button class="btn-primary" onclick="searchStudentCredentials()">Search</button>
+        </div>
+        <div id="adminCredResults"></div>
       </div>
 
-      <div id="tab-architect" class="admin-tab-panel card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <strong>💬 Discuss & Upgrade with AI Architect</strong>
-          <label style="font-size:11px;"><input type="checkbox" id="showCodeToggle" onchange="toggleCodeVisibility()" /> Show Code</label>
-        </div>
-        <div id="coArchitectChatBox" class="chat-messages" style="height:200px;background:#f8fafc;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;">
-          <div class="msg-ai">👋 Namaste Admin! Discuss any feature or improvement here, then click Ready to Build.</div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:12px;">
-          <textarea id="coArchChatInput" rows="2" placeholder="Discuss idea (Shift+Enter for new line, Enter to send)..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();chatWithCoArchitect();}"></textarea>
-          <button class="btn-dark" onclick="chatWithCoArchitect()">Send</button>
-        </div>
-        <button class="btn-primary" style="margin-bottom:12px;" onclick="finalizeDiscussionToBuilder()">✨ Send Agreed Plan to Builder</button>
-
-        <textarea id="architectPrompt" rows="2" placeholder="Finalized upgrade plan..."></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Preview</button>
+      <!-- CO-ARCHITECT & PROMPT UPGRADE BUILDER -->
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:8px;">🤖 AI Co-Architect (प्रॉम्प्ट से नया फीचर जोड़ें)</h3>
+        <textarea id="architectPrompt" rows="3" placeholder="यहाँ लिखें कि आप ऐप में क्या नया जोड़ना या बदलना चाहते हैं..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Safe Preview</button>
           <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Make Live 🚀</button>
         </div>
-        <div id="architectOutput" class="card hidden" style="margin-top:10px;background:#f8fafc;white-space:pre-line;font-size:13px;"></div>
-        <pre id="architectRawCodeBox" class="terminal hidden"></pre>
+        <div id="architectOutput" class="mini-card hidden" style="margin-top:10px;white-space:pre-line;font-size:13px;"></div>
       </div>
 
-      <div id="tab-vault" class="admin-tab-panel card hidden">
-        <strong style="display:block;margin-bottom:10px;">🔐 Config, Ads & API Vault</strong>
+      <!-- CONFIG VAULT -->
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:8px;">🔐 API & Config Vault</h3>
         <div id="configVaultGrid" class="grid-2"></div>
-      </div>
-
-      <div id="tab-alerts" class="admin-tab-panel card hidden">
-        <strong style="display:block;margin-bottom:8px;">🔔 Proposals & Bug Alerts</strong>
-        <div id="alertsContainer" style="margin-bottom:16px;"></div>
-        <strong style="display:block;margin-bottom:8px;">⏪ 1-Click Rollback (Last 5 Versions)</strong>
-        <div id="backupsContainer"></div>
       </div>
     </div>
   </section>
 
-  <!-- STUDENT LOGIN / REGISTRATION + 30-SEC LEVEL CHECK MODAL -->
-  <div id="studentAuthModal" class="modal-backdrop hidden">
+  <!-- FORGOT PASSWORD MODAL -->
+  <div id="forgotModal" class="modal-backdrop hidden">
     <div class="modal-box">
-      <h3 style="font-size:19px;margin-bottom:4px;">🎓 Welcome to Jesh AI</h3>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Login or create your free account so your AI mentor remembers your progress across devices.</p>
-
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <input id="stuAuthName" type="text" placeholder="Full Name (Required for new students)" />
-        <input id="stuAuthContact" type="text" placeholder="Mobile Number or Email" />
-        <input id="stuAuthPin" type="password" maxlength="6" placeholder="Create / Enter 4-Digit PIN" />
-        <div>
-          <label style="font-size:11px;font-weight:700;color:var(--muted);">Quick Self-Check: How comfortable are you in English & Computers?</label>
-          <select id="stuAuthLevel" style="margin-top:4px;">
-            <option value="A1 Beginner">🌱 Beginner — Start from basics</option>
-            <option value="B1 Intermediate">🚀 Intermediate — Practice fluency & coding</option>
-            <option value="C1 Advanced">🏆 Advanced — Mastery & interviews</option>
-          </select>
-        </div>
-        <button class="btn-primary" id="stuAuthSubmitBtn" style="justify-content:center;padding:12px;" onclick="submitStudentAuth()">🚀 Start Learning (Save Progress)</button>
-        <button class="btn-outline" style="justify-content:center;font-size:12px;" onclick="closeStudentAuthModal()">Continue as Guest</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECRET ADMIN LOGIN MODAL (5 TAPS ON LOGO OR CTRL+SHIFT+A) -->
-  <div id="adminLoginModal" class="modal-backdrop hidden">
-    <div class="modal-box">
-      <h3 style="margin-bottom:8px;">🔐 Admin Access</h3>
-      <input id="adminPassInput" type="password" placeholder="Master Password" onkeydown="if(event.key==='Enter') verifyAdminLogin()" />
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
-        <button class="btn-outline" onclick="document.getElementById('adminLoginModal').classList.add('hidden')">Cancel</button>
-        <button class="btn-dark" onclick="verifyAdminLogin()">Unlock</button>
+      <h3 style="margin-bottom:6px;">❓ पासवर्ड रीसेट सहायता</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">अपना Phone Number या Email लिखें—एडमिन आपको तुरंत नया PIN बता देंगे।</p>
+      <input id="forgotContactInput" type="text" placeholder="Phone Number या Email ID" style="margin-bottom:10px;" />
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn-outline" onclick="document.getElementById('forgotModal').classList.add('hidden')">बंद करें</button>
+        <button class="btn-primary" onclick="submitForgotRequest()">रिक्वेस्ट भेजें</button>
       </div>
     </div>
   </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
+    const SESSION_EXPIRY_MS = 48 * 60 * 60 * 1000; // 48 Hours Persistent Login
     let STUDENT_PROFILE = null;
     let ADMIN_PASS = "";
+    let AUTH_MODE = "login"; // 'login' or 'register'
     let GENERATED_CODE_BUFFER = "";
-    let LAST_WIDGET_CODE = "";
-    let LAST_DISCUSSED_PLAN = "";
-    let ATTACHED_IMAGE_B64 = null;
     let logoTapCount = 0, logoTapTimer = null;
 
-    window.onerror = function(msg, url, line) {
-      fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'REPORT_CLIENT_ERROR', errorMsg: msg, location: 'Line ' + line }) }).catch(() => {});
-    };
+    // Video Call & Speech State
+    let callTimerInterval = null, callSeconds = 0, localMediaStream = null;
+    let isMicMuted = false, isAutoLoop = true, isCallActive = false;
 
-    // Secret Admin Trigger: 5 taps on Logo or Ctrl+Shift+A
-    function handleLogoTap() {
-      logoTapCount++;
-      clearTimeout(logoTapTimer);
-      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 2000);
-      if (logoTapCount >= 5) {
-        logoTapCount = 0;
-        openAdminModal();
-      }
-    }
-    document.addEventListener('keydown', e => {
-      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') openAdminModal();
-    });
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      renderInitialReels();
-      const savedStu = localStorage.getItem('JESH_STUDENT_PROFILE');
-      if (savedStu) {
-        applyStudentProfile(JSON.parse(savedStu));
-      } else {
-        document.getElementById('studentAuthModal').classList.remove('hidden');
-      }
-
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        if (data.status === 'ONLINE' && data.config) {
-          document.title = data.config.brandName;
-          document.getElementById('uiBrandName').textContent = data.config.brandName;
-          if (data.config.themeAccent) document.documentElement.style.setProperty('--primary', data.config.themeAccent);
-          if (data.config.ads) {
-            document.getElementById('adBannerSlot').classList.toggle('hidden', !data.config.ads.enabled);
-            document.getElementById('adBannerText').textContent = '📢 ' + data.config.ads.title;
+    // ==================== INITIALIZATION & 48H SESSION CHECK ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedCustomAvatar();
+      const rawSession = localStorage.getItem('JESH_PERSISTENT_SESSION');
+      if (rawSession) {
+        try {
+          const sess = JSON.parse(rawSession);
+          if (sess && sess.student && (Date.now() - sess.loginTime < SESSION_EXPIRY_MS)) {
+            STUDENT_PROFILE = sess.student;
+            routeAfterAuth();
+            return;
+          } else {
+            localStorage.removeItem('JESH_PERSISTENT_SESSION');
           }
-        }
-      } catch (e) {}
+        } catch (e) {}
+      }
     });
 
-    // STUDENT AUTH & CLOUD PROGRESS SYNC
-    function openStudentAuthModal() { document.getElementById('studentAuthModal').classList.remove('hidden'); }
-    function closeStudentAuthModal() { document.getElementById('studentAuthModal').classList.add('hidden'); }
+    function savePersistentSession(studentObj) {
+      STUDENT_PROFILE = studentObj;
+      localStorage.setItem('JESH_PERSISTENT_SESSION', JSON.stringify({
+        student: studentObj,
+        loginTime: Date.now()
+      }));
+      // Also mirror in local registry for instant offline/admin lookup fallback
+      const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
+      db[studentObj.contact.toLowerCase()] = studentObj;
+      localStorage.setItem('JESH_LOCAL_STUDENTS_DB', JSON.stringify(db));
+    }
 
-    async function submitStudentAuth() {
-      const name = document.getElementById('stuAuthName').value.trim();
-      const contact = document.getElementById('stuAuthContact').value.trim();
-      const pin = document.getElementById('stuAuthPin').value.trim();
-      const level = document.getElementById('stuAuthLevel').value;
-      if (!contact || !pin) return alert('Please enter Phone/Email and PIN.');
+    // ==================== AUTH GATE LOGIC ====================
+    function switchAuthRole(role) {
+      document.getElementById('roleBtnStudent').classList.toggle('active', role === 'student');
+      document.getElementById('roleBtnAdmin').classList.toggle('active', role === 'admin');
+      document.getElementById('studentAuthForm').classList.toggle('hidden', role !== 'student');
+      document.getElementById('adminAuthForm').classList.toggle('hidden', role !== 'admin');
+    }
 
-      const btn = document.getElementById('stuAuthSubmitBtn');
+    function switchStudentMode(mode) {
+      AUTH_MODE = mode;
+      document.getElementById('modeBtnLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('modeBtnRegister').classList.toggle('active', mode === 'register');
+      document.getElementById('studentAuthSubmitBtn').textContent = mode === 'login' ? 'Login →' : 'Create Account (नया अकाउंट बनाएं) →';
+    }
+
+    async function handleStudentAuthSubmit() {
+      const contact = document.getElementById('authContactInput').value.trim();
+      const pin = document.getElementById('authPinInput').value.trim();
+      if (!contact) return alert('कृपया अपना Phone Number या Email ID लिखें।');
+      if (pin.length !== 6) return alert('कृपया 6 अंकों का पासवर्ड (PIN) लिखें।');
+
+      const btn = document.getElementById('studentAuthSubmitBtn');
       btn.disabled = true;
-      btn.textContent = 'Syncing with Cloud...';
+      btn.textContent = 'कृपया प्रतीक्षा करें...';
 
-      const res = await postBackend({ action: 'STUDENT_AUTH', name, contact, pin, level });
+      const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
+      const key = contact.toLowerCase();
+
+      // Try syncing with Google Apps Script backend
+      let backendRes = null;
+      try {
+        backendRes = await postBackend({
+          action: 'STUDENT_AUTH',
+          mode: AUTH_MODE,
+          contact: contact,
+          pin: pin
+        });
+      } catch (e) {}
+
       btn.disabled = false;
-      btn.textContent = '🚀 Start Learning (Save Progress)';
+      switchStudentMode(AUTH_MODE);
 
-      if (res.success && res.student) {
-        STUDENT_PROFILE = res.student;
-        localStorage.setItem('JESH_STUDENT_PROFILE', JSON.stringify(STUDENT_PROFILE));
-        applyStudentProfile(STUDENT_PROFILE);
-        closeStudentAuthModal();
+      if (AUTH_MODE === 'register') {
+        if (db[key] && db[key].pin) {
+          return alert('यह Phone/Email पहले से रजिस्टर्ड है! कृपया Login करें।');
+        }
+        const newStudent = {
+          userId: (backendRes && backendRes.student && backendRes.student.userId) || ('STU-' + Date.now().toString().slice(-6)),
+          contact: contact,
+          pin: pin,
+          name: (backendRes && backendRes.student && backendRes.student.name) || '',
+          age: (backendRes && backendRes.student && backendRes.student.age) || '',
+          xp: 10,
+          streak: 1,
+          mindsetTag: 'Curious Beginner',
+          skillMatrix: 'Grammar: A1 | Math: L1 | Logic: L1',
+          oneLineSummary: 'New learner starting personalized journey'
+        };
+        savePersistentSession(newStudent);
+        routeAfterAuth();
       } else {
-        alert(res.message || 'Login failed');
+        // Login Mode
+        if (backendRes && backendRes.success && backendRes.student) {
+          const merged = { ...db[key], ...backendRes.student, contact, pin };
+          savePersistentSession(merged);
+          routeAfterAuth();
+        } else if (db[key] && db[key].pin === pin) {
+          savePersistentSession(db[key]);
+          routeAfterAuth();
+        } else {
+          alert('गलत Phone/Email या 6-अंकों का पासवर्ड! नए छात्र पहले "Create Account" चुनें।');
+        }
       }
     }
 
-    function applyStudentProfile(s) {
-      STUDENT_PROFILE = s;
-      document.getElementById('hdrStudentName').textContent = s.name || 'Learner';
-      document.getElementById('userXpCount').textContent = s.xp || 0;
-      document.getElementById('userStreak').textContent = s.streak || 1;
-      document.getElementById('globalStudentLevel').value = s.level || 'A1 Beginner';
-      document.getElementById('studentProgressBanner').textContent = `Welcome back, ${s.name}! Progress Memory: ${s.progressSummary}`;
-      document.getElementById('tutorChatFeed').innerHTML = `<div class="msg-ai">👋 Welcome back, <strong>${s.name}</strong>! I loaded your progress (${s.progressSummary}). What shall we master today?</div>`;
-    }
-
-    function saveStudentLevel() {
-      const lvl = document.getElementById('globalStudentLevel').value;
-      if (STUDENT_PROFILE) {
-        STUDENT_PROFILE.level = lvl;
-        localStorage.setItem('JESH_STUDENT_PROFILE', JSON.stringify(STUDENT_PROFILE));
-        postBackend({ action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, level: lvl, xp: STUDENT_PROFILE.xp, summary: 'Updated level to ' + lvl });
+    function routeAfterAuth() {
+      document.getElementById('authGate').classList.add('hidden');
+      // Mandatory First-Time Profile Setup (Name -> Age)
+      if (!STUDENT_PROFILE.name || !STUDENT_PROFILE.age) {
+        document.getElementById('profileSetupGate').classList.remove('hidden');
+        document.getElementById('setupStepName').classList.remove('hidden');
+        document.getElementById('setupStepAge').classList.add('hidden');
+      } else {
+        unlockStudentDashboard();
       }
     }
 
-    function addStudentXP(points, activityNote) {
-      if (!STUDENT_PROFILE) {
-        let gXp = parseInt(localStorage.getItem('JESH_GUEST_XP') || '0', 10) + points;
-        localStorage.setItem('JESH_GUEST_XP', gXp);
-        document.getElementById('userXpCount').textContent = gXp;
-        return;
-      }
-      STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + points;
-      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
-      localStorage.setItem('JESH_STUDENT_PROFILE', JSON.stringify(STUDENT_PROFILE));
+    function goToAgeStep() {
+      const name = document.getElementById('setupNameInput').value.trim();
+      if (!name) return alert('कृपया अपना नाम लिखें।');
+      STUDENT_PROFILE.name = name;
+      document.getElementById('setupStepName').classList.add('hidden');
+      document.getElementById('setupStepAge').classList.remove('hidden');
+      document.getElementById('setupAgeInput').focus();
+    }
+
+    async function finishProfileSetup() {
+      const age = document.getElementById('setupAgeInput').value.trim();
+      if (!age || age < 5 || age > 99) return alert('कृपया अपनी सही उम्र (Age) लिखें।');
+      STUDENT_PROFILE.age = age;
+      savePersistentSession(STUDENT_PROFILE);
+
       postBackend({
         action: 'SYNC_STUDENT',
         userId: STUDENT_PROFILE.userId,
-        level: STUDENT_PROFILE.level,
+        contact: STUDENT_PROFILE.contact,
+        name: STUDENT_PROFILE.name,
+        age: STUDENT_PROFILE.age,
         xp: STUDENT_PROFILE.xp,
-        summary: activityNote || ''
-      });
+        summary: `Name: ${STUDENT_PROFILE.name}, Age: ${STUDENT_PROFILE.age}`
+      }).catch(() => {});
+
+      document.getElementById('profileSetupGate').classList.add('hidden');
+      unlockStudentDashboard();
     }
 
-    // FULL-SCREEN NAVIGATION CONTROLLER
-    function openFullScreen(screenName) {
-      document.querySelectorAll('.app-screen').forEach(s => s.classList.add('hidden'));
-      const target = document.getElementById('scr-' + screenName);
+    function unlockStudentDashboard() {
+      document.getElementById('mainAppHeader').classList.remove('hidden');
+      document.getElementById('viewLearner').classList.remove('hidden');
+      document.getElementById('studentBottomFooter').classList.remove('hidden');
+
+      document.getElementById('hdrStudentName').textContent = STUDENT_PROFILE.name;
+      document.getElementById('dashGreetingName').textContent = STUDENT_PROFILE.name;
+      document.getElementById('userStreak').textContent = STUDENT_PROFILE.streak || 1;
+      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp || 0;
+      document.getElementById('adaptiveSkillBadge').textContent =
+        `Mindset: ${STUDENT_PROFILE.mindsetTag || 'Adaptive'} • ${STUDENT_PROFILE.skillMatrix || 'Grammar: A1 | Math: L1 | Logic: L1'}`;
+
+      openFullScreen('home');
+    }
+
+    function logoutStudent() {
+      endLiveVideoCall();
+      localStorage.removeItem('JESH_PERSISTENT_SESSION');
+      location.reload();
+    }
+
+    function openForgotModal() { document.getElementById('forgotModal').classList.remove('hidden'); }
+    async function submitForgotRequest() {
+      const c = document.getElementById('forgotContactInput').value.trim();
+      if (!c) return alert('Phone या Email लिखें।');
+      await postBackend({ action: 'FORGOT_PIN', contact: c, message: 'Student requested PIN help' }).catch(() => {});
+      alert('✅ आपकी रिक्वेस्ट एडमिन को भेज दी गई है!');
+      document.getElementById('forgotModal').classList.add('hidden');
+    }
+
+    // ==================== NAVIGATION & ADAPTIVE AI ====================
+    function openFullScreen(scr) {
+      document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById('scr-' + scr);
       if (target) target.classList.remove('hidden');
-      document.querySelectorAll('.bnav-btn').forEach(b => {
-        b.classList.toggle('bnav-active', b.dataset.scr === screenName);
+      document.querySelectorAll('.footer-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.scr === scr);
       });
       document.getElementById('viewLearner').scrollTop = 0;
     }
 
-    // 1. REELS FEED
-    function renderInitialReels() {
-      const reels = [
-        { tag: '🗣️ Spoken English', title: 'Natural Reply to "How are you?"', body: 'Instead of "I am fine", say: "I am doing great, how about you?"' },
-        { tag: '🐍 Python Quick Tip', title: 'Reverse a List in 1 Second', body: 'Use my_list[::-1] to instantly reverse any list or string in Python!' },
-        { tag: '💻 CCC Shortcut', title: 'LibreOffice Calc Formula Bar', body: 'Press Ctrl + Shift + F2 to jump straight to the input line in Calc.' }
-      ];
-      document.getElementById('socialFeedContainer').innerHTML = reels.map(r => `
-        <div class="card">
-          <span style="font-size:11px;font-weight:700;color:var(--primary);background:#eef2ff;padding:3px 9px;border-radius:99px;">${r.tag}</span>
-          <h4 style="font-size:16px;margin:8px 0 4px;">${r.title}</h4>
-          <p style="font-size:14px;color:#334155;margin-bottom:10px;">${r.body}</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-outline" style="padding:6px 10px;font-size:12px;" onclick="this.textContent='❤️ +5 XP';addStudentXP(5)">🤍 Like</button>
-            <button class="btn-outline" style="padding:6px 10px;font-size:12px;" onclick="speakTextAloud('${r.title}. ${r.body}')">🔊 Listen</button>
-            <button class="btn-primary" style="padding:6px 10px;font-size:12px;" onclick="discussInFullTutor('${r.title}')">💬 Ask Tutor</button>
-          </div>
-        </div>
-      `).join('');
-    }
+    function addStudentXP(pts, note, skillUpdate) {
+      if (!STUDENT_PROFILE) return;
+      STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + pts;
+      if (skillUpdate) STUDENT_PROFILE.skillMatrix = skillUpdate;
+      if (note) STUDENT_PROFILE.oneLineSummary = note;
+      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
+      document.getElementById('adaptiveSkillBadge').textContent =
+        `Mindset: ${STUDENT_PROFILE.mindsetTag} • ${STUDENT_PROFILE.skillMatrix}`;
+      savePersistentSession(STUDENT_PROFILE);
 
-    async function loadFreshFeedCards() {
-      const lvl = document.getElementById('globalStudentLevel').value;
-      const box = document.getElementById('socialFeedContainer');
-      box.innerHTML = '<div class="card">⚡ Loading personalized reels...</div>';
-      const res = await postBackend({
-        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
-        prompt: `Create 3 short micro-learning cards for ${lvl} level (Spoken English, Python/AI, Digital Skills). Format strictly as 3 lines: TAG | TITLE | 2-SENTENCE LESSON`
-      });
-      if (res.success) {
-        const lines = res.reply.split('\n').filter(l => l.includes('|'));
-        if (lines.length) {
-          box.innerHTML = lines.map(l => {
-            const p = l.split('|');
-            return `<div class="card"><span style="font-size:11px;font-weight:700;color:var(--primary);">${p[0].trim()}</span><h4 style="margin:6px 0;">${p[1].trim()}</h4><p style="font-size:14px;margin-bottom:10px;">${(p[2]||'').trim()}</p><button class="btn-primary" style="padding:6px 10px;font-size:12px;" onclick="discussInFullTutor('${p[1].trim().replace(/'/g,'')}')">💬 Practice This</button></div>`;
-          }).join('');
-          addStudentXP(10, 'Explored daily learning reels');
-          return;
-        }
-      }
-      renderInitialReels();
-    }
-
-    function discussInFullTutor(topic) {
-      openFullScreen('chat');
-      document.getElementById('learnerPrompt').value = `Teach me "${topic}" step-by-step and give me 1 practice question.`;
-      askLearnerAI();
-    }
-
-    // 2. FULL-SCREEN AI TUTOR
-    function previewVisionImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => { ATTACHED_IMAGE_B64 = e.target.result; document.getElementById('visionBadge').classList.remove('hidden'); };
-      reader.readAsDataURL(file);
+      postBackend({
+        action: 'SYNC_STUDENT',
+        userId: STUDENT_PROFILE.userId,
+        xp: STUDENT_PROFILE.xp,
+        summary: `${STUDENT_PROFILE.mindsetTag} | ${STUDENT_PROFILE.skillMatrix} | ${note || ''}`
+      }).catch(() => {});
     }
 
     async function askLearnerAI() {
-      const input = document.getElementById('learnerPrompt');
-      const prompt = input.value.trim();
-      if (!prompt && !ATTACHED_IMAGE_B64) return;
+      const inp = document.getElementById('learnerPrompt');
+      const q = inp.value.trim();
+      if (!q) return;
       const feed = document.getElementById('tutorChatFeed');
-      const btn = document.getElementById('learnerAskBtn');
-      const lvl = document.getElementById('globalStudentLevel').value;
-
-      feed.innerHTML += `<div class="msg-user">${prompt || '📷 [Scanned Question]'}</div>`;
-      input.value = '';
+      feed.innerHTML += `<div class="msg-user">${q}</div>`;
+      inp.value = '';
       feed.scrollTop = feed.scrollHeight;
-      btn.disabled = true;
 
-      const useWeb = document.getElementById('learnerWebToggle').checked;
+      const context = `Student: ${STUDENT_PROFILE.name}, Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.skillMatrix}, Mindset: ${STUDENT_PROFILE.mindsetTag}.`;
       const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
-        prompt: `[Level: ${lvl}] ${prompt || 'Solve and explain this image step by step.'}`,
-        useWebSearch: useWeb, imageBase64: ATTACHED_IMAGE_B64
-      });
-      btn.disabled = false;
-      ATTACHED_IMAGE_B64 = null;
-      document.getElementById('visionBadge').classList.add('hidden');
+        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId,
+        prompt: `${context} Explain simply in friendly Hindi/English adapted to their age & level: ${q}`
+      }).catch(() => ({ success: false }));
 
-      const reply = res.reply || 'Please try again.';
+      const reply = (res && res.reply) || `बहुत अच्छा सवाल ${STUDENT_PROFILE.name}! इसे आसान उदाहरण से समझते हैं: "${q}" का मुख्य नियम अभ्यास से तुरंत स्पष्ट हो जाता है।`;
       feed.innerHTML += `<div class="msg-ai">${reply}</div>`;
       feed.scrollTop = feed.scrollHeight;
-      if (res.success) addStudentXP(10, 'Studied: ' + prompt.slice(0, 40));
+      addStudentXP(10, 'Asked AI Tutor: ' + q.slice(0, 30));
     }
 
-    // 3. SPEAKING & READALONG
-    let recognition = null, isRecording = false;
-    function toggleVoiceMic() {
+    // ==================== 2-WAY AI VIDEO-CALL TUTOR ====================
+    async function startLiveVideoCall() {
+      if (isCallActive) return;
+      isCallActive = true;
+      callSeconds = 0;
+      document.getElementById('callTimer').textContent = '00:00';
+      callTimerInterval = setInterval(() => {
+        callSeconds++;
+        const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+        const s = String(callSeconds % 60).padStart(2, '0');
+        document.getElementById('callTimer').textContent = `${m}:${s}`;
+      }, 1000);
+
+      // PiP Self Camera with Safe Fallback
+      try {
+        localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        const vid = document.getElementById('selfCameraVideo');
+        vid.srcObject = localMediaStream;
+        vid.classList.remove('hidden');
+        document.getElementById('pipInitials').classList.add('hidden');
+      } catch (e) {
+        document.getElementById('pipInitials').textContent = (STUDENT_PROFILE.name || 'YOU').slice(0, 2).toUpperCase();
+      }
+
+      const greeting = `Hi ${STUDENT_PROFILE.name}! I am your best friend tutor. How was your day today?`;
+      document.getElementById('avatarReplyCaption').textContent = '🗣️ ' + greeting;
+      speakAvatarVoice(greeting, () => { if (isAutoLoop && isCallActive) listenToStudentVoice(); });
+    }
+
+    function toggleCallMic() {
+      isMicMuted = !isMicMuted;
+      document.getElementById('muteCallBtn').textContent = isMicMuted ? '🔇 Unmute' : '🎤 Mute';
+    }
+
+    function toggleAutoLoop() {
+      isAutoLoop = !isAutoLoop;
+      document.getElementById('autoLoopBtn').textContent = isAutoLoop ? '🔁 Auto-Loop: ON' : '🔁 Auto-Loop: OFF';
+    }
+
+    function endLiveVideoCall() {
+      isCallActive = false;
+      clearInterval(callTimerInterval);
+      if (localMediaStream) {
+        localMediaStream.getTracks().forEach(t => t.stop());
+        localMediaStream = null;
+      }
+      document.getElementById('selfCameraVideo').classList.add('hidden');
+      document.getElementById('pipInitials').classList.remove('hidden');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      document.getElementById('avatarStage').classList.remove('avatar-speaking');
+      document.getElementById('avatarReplyCaption').textContent = '✅ कॉल समाप्त हुई। आपकी प्रगति सेव कर ली गई है!';
+      addStudentXP(20, 'Completed 2-Way Video Call practice');
+    }
+
+    function listenToStudentVoice() {
+      if (isMicMuted) return;
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert("Use Chrome or Edge for Voice Mic.");
-      const btn = document.getElementById('micRecordBtn');
-      const status = document.getElementById('micStatusText');
-      if (isRecording && recognition) { recognition.stop(); return; }
-      recognition = new SpeechRec();
-      recognition.lang = 'en-IN';
-      recognition.interimResults = true;
-      recognition.onstart = () => { isRecording = true; btn.classList.add('mic-active'); status.textContent = "🔴 Listening..."; };
-      recognition.onresult = e => {
-        let t = '';
-        for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
-        document.getElementById('speakingTranscriptInput').value = t;
+      if (!SpeechRec) return alert('वॉइस कॉल के लिए Chrome ब्राउज़र का उपयोग करें।');
+      const rec = new SpeechRec();
+      rec.lang = 'en-IN';
+      document.getElementById('avatarReplyCaption').textContent = '🔴 सुन रहा हूँ... बोलिए!';
+      rec.onresult = e => {
+        const spoken = e.results[0][0].transcript;
+        document.getElementById('avatarDiscussTopic').value = spoken;
+        talkWithVideoAvatar();
       };
-      recognition.onend = () => { isRecording = false; btn.classList.remove('mic-active'); status.textContent = "Mic Ready"; };
-      recognition.start();
+      rec.start();
     }
 
-    async function sendSpeakingTurn() {
-      const inputEl = document.getElementById('speakingTranscriptInput');
-      const userText = inputEl.value.trim();
-      if (!userText) return;
-      const mode = document.getElementById('speakingMode').value;
-      const history = document.getElementById('speakingChatHistory');
-      history.innerHTML += `<div class="msg-user">🗣️ ${userText}</div>`;
-      inputEl.value = "";
-      history.scrollTop = history.scrollHeight;
+    async function talkWithVideoAvatar() {
+      const inp = document.getElementById('avatarDiscussTopic');
+      const text = inp.value.trim();
+      if (!text) return;
+      inp.value = '';
+      const cap = document.getElementById('avatarReplyCaption');
+      cap.textContent = '💭 सोच रहा हूँ...';
 
+      const sysPrompt = `Act as a warm, encouraging best friend (not a strict teacher) on a video call with ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Skills: ${STUDENT_PROFILE.skillMatrix}). Student said: "${text}". Reply in 2 short natural sentences, gently fix any grammar mistake with a fun example, and ask 1 easy follow-up question.`;
       const res = await postBackend({
-        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
-        prompt: `Mode: ${mode}. Student spoke: "${userText}". Reply naturally in 2 short conversational sentences, then on a new line write "Tip:" with 1 quick grammar tip.`
+        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt: sysPrompt
+      }).catch(() => ({ success: false }));
+
+      const reply = (res && res.reply) || `That sounds awesome ${STUDENT_PROFILE.name}! You can also say: "I really enjoyed that!" Tell me, what do you want to learn next?`;
+      cap.textContent = '🗣️ ' + reply;
+      addStudentXP(15, 'Video call turn: ' + text.slice(0, 25));
+      speakAvatarVoice(reply, () => {
+        if (isAutoLoop && isCallActive && !isMicMuted) listenToStudentVoice();
       });
-      const aiText = res.reply || "Great effort! Keep speaking.";
-      history.innerHTML += `<div class="msg-ai" style="background:#1e293b;color:#f1f5f9;">🤖 ${aiText}</div>`;
-      history.scrollTop = history.scrollHeight;
-      addStudentXP(15, 'Practiced speaking (' + mode + ')');
-      speakTextAloud(aiText.split('Tip:')[0]);
+    }
+
+    function speakAvatarVoice(txt, onDoneCallback) {
+      const stage = document.getElementById('avatarStage');
+      stage.classList.add('avatar-speaking');
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(txt);
+        u.rate = 0.95;
+        u.onend = () => {
+          stage.classList.remove('avatar-speaking');
+          if (onDoneCallback) setTimeout(onDoneCallback, 800);
+        };
+        window.speechSynthesis.speak(u);
+      } else {
+        setTimeout(() => { stage.classList.remove('avatar-speaking'); }, 2000);
+      }
+    }
+
+    // Persistent Custom Avatar in localStorage
+    function selectPresetAvatar(url, name) {
+      document.getElementById('avatarPhotoPreview').src = url;
+      document.getElementById('activeAvatarTitle').textContent = name + ' (Best-Friend AI)';
+    }
+    function uploadCustomAvatar(e) {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => { document.getElementById('avatarPhotoPreview').src = ev.target.result; };
+      r.readAsDataURL(f);
+    }
+    function saveCustomAvatarToLocal() {
+      const name = document.getElementById('customAvatarNameInput').value.trim() || 'My AI Buddy';
+      const photo = document.getElementById('avatarPhotoPreview').src;
+      localStorage.setItem('JESH_CUSTOM_AVATAR', JSON.stringify({ name, photo }));
+      document.getElementById('activeAvatarTitle').textContent = name + ' (Custom Buddy)';
+      alert('✅ आपका अवतार सेव हो गया है!');
+    }
+    function loadSavedCustomAvatar() {
+      const saved = JSON.parse(localStorage.getItem('JESH_CUSTOM_AVATAR') || 'null');
+      if (saved && saved.photo) {
+        document.getElementById('avatarPhotoPreview').src = saved.photo;
+        document.getElementById('activeAvatarTitle').textContent = saved.name;
+      }
+    }
+
+    // ==================== JESHLINGO, READ & ACADEMY ====================
+    async function generateInteractiveCards() {
+      const lang = document.getElementById('lingoLangSelect').value;
+      const grid = document.getElementById('lingoCardsGrid');
+      grid.innerHTML = '<div class="mini-card">⚡ कार्ड्स तैयार हो रहे हैं...</div>';
+      const res = await postBackend({
+        action: 'CHAT', role: 'student',
+        prompt: `Give 4 daily phrases in ${lang} for ${STUDENT_PROFILE.name} (${STUDENT_PROFILE.skillMatrix}). Format strictly: PHRASE | PRONUNCIATION | HINDI MEANING`
+      }).catch(() => ({ success: false }));
+
+      const lines = (res && res.reply ? res.reply : 'Hello, how are you? | हेलो, हाउ आर यू? | नमस्ते, आप कैसे हैं?\nI am learning fast. | आई एम लर्निंग फास्ट | मैं तेज़ी से सीख रहा हूँ।')
+        .split('\n').filter(l => l.includes('|'));
+      grid.innerHTML = lines.map(l => {
+        const p = l.split('|');
+        return `<div class="mini-card"><strong style="color:var(--primary);font-size:16px;">${p[0].trim()}</strong><div style="font-size:12px;color:var(--muted);margin:4px 0;">🗣️ ${p[1].trim()}</div><div style="font-size:13px;margin-bottom:8px;">💡 ${(p[2]||'').trim()}</div><button class="btn-outline" style="min-height:36px;font-size:12px;" onclick="speakTextAloud('${p[0].trim().replace(/'/g,'')}')">🔊 सुनें</button></div>`;
+      }).join('');
+      addStudentXP(15, 'Practiced ' + lang);
     }
 
     async function generateNewReadAlongPassage() {
-      const lvl = document.getElementById('globalStudentLevel').value;
       const el = document.getElementById('readAlongTargetText');
-      el.textContent = "⚡ Loading passage...";
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 short 2-sentence English reading passage for ${lvl} level. Output ONLY the passage.` });
-      if (res.success) el.textContent = res.reply;
+      el.textContent = '⚡ नया वाक्य लोड हो रहा है...';
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 inspiring 2-sentence English reading passage for age ${STUDENT_PROFILE.age}. Output ONLY the English text.` }).catch(() => ({}));
+      el.textContent = (res && res.reply) || 'Every small step you take today builds a brighter future tomorrow.';
     }
 
     function startReadAlongCheck() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert("Use Chrome or Edge for ReadAlong.");
+      if (!SpeechRec) return alert('Chrome ब्राउज़र का उपयोग करें।');
       const target = document.getElementById('readAlongTargetText').textContent.trim();
-      const resBox = document.getElementById('readAlongResult');
-      resBox.innerHTML = "🔴 Listening... Read aloud now!";
+      const out = document.getElementById('readAlongResult');
+      out.textContent = '🔴 बोलकर पढ़ें...';
       const rec = new SpeechRec();
       rec.lang = 'en-IN';
       rec.onresult = e => {
         const spoken = e.results[0][0].transcript.toLowerCase();
         const words = target.split(/\s+/);
-        let matched = 0;
-        const highlighted = words.map(w => {
-          const clean = w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-          if (spoken.includes(clean)) { matched++; return `<span style="color:#059669;">${w}</span>`; }
-          return `<span style="color:#e11d48;text-decoration:underline;">${w}</span>`;
-        }).join(' ');
-        const score = Math.round((matched / words.length) * 100);
-        resBox.innerHTML = `Accuracy: <strong>${score}%</strong> (+20 XP)<br><div style="margin-top:6px;">${highlighted}</div>`;
-        addStudentXP(20, 'ReadAlong score ' + score + '%');
+        let ok = 0;
+        words.forEach(w => { if (spoken.includes(w.replace(/[^a-zA-Z]/g, '').toLowerCase())) ok++; });
+        const pct = Math.round((ok / words.length) * 100);
+        out.innerHTML = `✅ उच्चारण स्कोर: <span style="color:var(--emerald);">${pct}%</span> (+20 XP)`;
+        addStudentXP(20, 'ReadAlong score: ' + pct + '%');
       };
       rec.start();
     }
 
-    // 4. JESHLINGO & COURSES
-    async function generateInteractiveCards() {
-      const lang = document.getElementById('lingoLangSelect').value;
-      const lvl = document.getElementById('globalStudentLevel').value;
-      const grid = document.getElementById('lingoCardsGrid');
-      grid.innerHTML = '<div class="mini-card">⚡ Building flashcards...</div>';
-      const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        prompt: `Create 4 practical phrases in ${lang} for ${lvl} level. Format strictly as 4 lines: PHRASE | PRONUNCIATION | MEANING`
-      });
-      if (res.success) {
-        const lines = res.reply.split('\n').filter(l => l.includes('|'));
-        grid.innerHTML = lines.map(l => {
-          const p = l.split('|');
-          return `<div class="mini-card"><div style="font-size:16px;font-weight:800;color:var(--primary);">${p[0].trim()}</div><div style="font-size:12px;color:#64748b;">🗣️ ${p[1].trim()}</div><div style="font-size:13px;margin:4px 0 8px;">💡 ${(p[2]||'').trim()}</div><button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="speakTextAloud('${p[0].trim().replace(/'/g,'')}')">🔊 Listen</button></div>`;
-        }).join('');
-        addStudentXP(15, 'Learned ' + lang + ' flashcards');
-      }
+    function loadCodeSample(type) {
+      const ed = document.getElementById('academyCodeEditor');
+      if (type === 'python') ed.value = 'name = "' + STUDENT_PROFILE.name + '"\nprint("Welcome to Python,", name)';
+      else if (type === 'html') ed.value = '<h2 style="color:indigo;">Hello ' + STUDENT_PROFILE.name + '!</h2>';
+      else ed.value = '// Logic Challenge: 2, 4, 8, 16, ?\nconsole.log("Next number is:", 16 * 2);';
     }
 
-    function launchCourse(name) { discussInFullTutor(name + ' Lesson 1'); }
+    function runAcademySandbox() {
+      const code = document.getElementById('academyCodeEditor').value;
+      const out = document.getElementById('academyCodeOutput');
+      if (code.includes('<')) out.innerHTML = code;
+      else out.textContent = '▶️ Output:\n' + code.replace(/print\(|console\.log\(|\)/g, '');
+      addStudentXP(15, 'Practiced coding sandbox');
+    }
 
     function generateQRCertificate() {
-      const name = document.getElementById('certStudentName').value.trim() || (STUDENT_PROFILE ? STUDENT_PROFILE.name : '');
       const course = document.getElementById('certCourseSelect').value;
-      if (!name) return alert('Enter Student Name.');
       const certId = 'JESH-' + Math.floor(100000 + Math.random() * 900000);
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=85x85&data=${encodeURIComponent('Jesh AI Certificate: ' + name + ' | ' + course + ' | ' + certId)}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(STUDENT_PROFILE.name + ' | ' + course + ' | ' + certId)}`;
       document.getElementById('certPreviewArea').innerHTML = `
-        <div style="border:2px solid var(--primary);background:#fff;border-radius:14px;padding:16px;text-align:center;margin-top:12px;">
-          <div style="font-size:10px;font-weight:700;color:var(--primary);">JESH AI ACADEMY</div>
-          <h4 style="font-size:18px;margin:4px 0;">Certificate of Achievement</h4>
-          <div style="font-size:20px;font-weight:800;margin:4px 0;">${name}</div>
-          <p style="font-size:12px;">completed <strong>${course}</strong></p>
-          <div style="margin-top:10px;display:flex;justify-content:center;align-items:center;gap:10px;">
-            <img src="${qrUrl}" alt="QR" />
-            <div style="text-align:left;font-size:11px;"><div>ID: ${certId}</div><button class="btn-primary" style="margin-top:6px;padding:5px 9px;font-size:11px;" onclick="shareAndInvite('${name} earned a ${course} Certificate on Jesh AI!')">📤 Share</button></div>
-          </div>
+        <div style="border:2px solid var(--primary);border-radius:14px;padding:16px;text-align:center;margin-top:12px;background:#FFFFFF;">
+          <div style="font-size:11px;font-weight:800;color:var(--primary);">JESH AI VERIFIED CERTIFICATE</div>
+          <h3 style="font-size:20px;margin:6px 0;">${STUDENT_PROFILE.name}</h3>
+          <p style="font-size:13px;">ने <strong>${course}</strong> सफलतापूर्वक पूरा किया।</p>
+          <img src="${qrUrl}" alt="QR" style="margin:10px auto;display:block;" />
+          <div style="font-size:11px;color:var(--muted);">Certificate ID: ${certId}</div>
         </div>
       `;
-      addStudentXP(50, 'Earned certificate in ' + course);
+      addStudentXP(50, 'Earned QR Certificate: ' + course);
     }
 
-    // 5. VIDEO-CALL AVATAR & MEDIA STUDIO
-    function selectPresetAvatar(url, pitch) {
-      document.getElementById('avatarPhotoPreview').src = url;
-      document.getElementById('avatarPitch').value = pitch;
-    }
-    function uploadAvatarPhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => { document.getElementById('avatarPhotoPreview').src = e.target.result; };
-      reader.readAsDataURL(file);
-    }
-    function voiceToAvatarPrompt() {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert("Use Chrome or Edge.");
-      const rec = new SpeechRec();
-      rec.lang = 'en-IN';
-      rec.onresult = e => {
-        document.getElementById('avatarDiscussTopic').value = e.results[0][0].transcript;
-        talkWithVideoAvatar();
-      };
-      rec.start();
-    }
-    async function talkWithVideoAvatar() {
-      const topic = document.getElementById('avatarDiscussTopic').value.trim();
-      if (!topic) return;
-      const cap = document.getElementById('avatarReplyCaption');
-      const stage = document.getElementById('avatarStage');
-      cap.textContent = "📞 Connecting live reply...";
-      const res = await postBackend({
-        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
-        prompt: `You are speaking on a live video call with the student about: "${topic}". Reply warmly in 2 short, clear spoken sentences.`
-      });
-      const reply = res.reply || "Let's explore this topic together!";
-      cap.textContent = "🗣️ " + reply;
-      stage.classList.add('avatar-speaking');
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(reply);
-        u.pitch = parseFloat(document.getElementById('avatarPitch').value || '1.0');
-        u.onend = () => stage.classList.remove('avatar-speaking');
-        window.speechSynthesis.speak(u);
-      } else {
-        setTimeout(() => stage.classList.remove('avatar-speaking'), 2500);
-      }
-      addStudentXP(15, 'Video call session on ' + topic.slice(0, 30));
+    async function submitLeaveRequest() {
+      const r = document.getElementById('leaveReasonInput').value.trim();
+      if (!r) return alert('कृपया कारण लिखें।');
+      await postBackend({ action: 'STUDENT_LEAVE', userId: STUDENT_PROFILE.userId, name: STUDENT_PROFILE.name, reason: r }).catch(() => {});
+      alert('✅ आपकी छुट्टी का आवेदन एडमिन को भेज दिया गया है। आपकी Streak सुरक्षित रहेगी!');
+      document.getElementById('leaveReasonInput').value = '';
     }
 
-    function generateAIImage() {
-      const p = document.getElementById('mediaPromptInput').value.trim();
-      if (!p) return alert('Enter image topic.');
-      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', clean educational illustration')}?width=600&height=400&nologo=true`;
-      document.getElementById('mediaOutputZone').innerHTML = `<img src="${url}" style="width:100%;border-radius:12px;margin-bottom:8px;" /><a href="${url}" target="_blank" class="btn-outline" style="font-size:11px;text-decoration:none;">⬇️ Download</a>`;
-    }
-    async function generateVideoScript() {
-      const p = document.getElementById('mediaPromptInput').value.trim();
-      if (!p) return alert('Enter video topic.');
-      const z = document.getElementById('mediaOutputZone');
-      z.innerHTML = '⚡ Writing script...';
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write a crisp 3-scene educational video script for: "${p}".` });
-      z.innerHTML = `<div style="background:#f8fafc;padding:12px;border-radius:10px;font-size:13px;white-space:pre-line;">${res.reply}</div>`;
-    }
-
-    function shareAndInvite(customMsg) {
-      const url = window.location.href;
-      const text = customMsg || `🚀 Join me on Jesh AI Ecosystem to practice Spoken English, AI, Python & CCC for FREE! ${url}`;
-      if (navigator.share) navigator.share({ title: 'Jesh AI', text, url }).catch(() => {});
-      else window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-      addStudentXP(25, 'Shared platform with friends');
+    function toggleUILanguage() {
+      alert('🌐 भाषा मोड: हिंदी + सरल अंग्रेजी (Bilingual Mode Active)');
     }
 
     function speakTextAloud(txt) {
@@ -3375,141 +961,99 @@ adminPinBtn.addEventListener('click', async () => {
       }
     }
 
-    // ==================== SECRET ADMIN COMMAND CENTER ====================
-    function openAdminModal() {
-      if (ADMIN_PASS) { enterAdminView(); return; }
-      document.getElementById('adminLoginModal').classList.remove('hidden');
-      document.getElementById('adminPassInput').focus();
-    }
-    function enterAdminView() {
-      document.getElementById('viewLearner').classList.add('hidden');
-      document.getElementById('studentBottomNav').classList.add('hidden');
-      document.getElementById('viewAdmin').classList.remove('hidden');
-    }
-    function exitAdminView() {
-      document.getElementById('viewAdmin').classList.add('hidden');
-      document.getElementById('viewLearner').classList.remove('hidden');
-      document.getElementById('studentBottomNav').classList.remove('hidden');
+    // ==================== SECRET SINGLE-ADMIN COMMAND CENTER ====================
+    function handleLogoTap() {
+      logoTapCount++;
+      clearTimeout(logoTapTimer);
+      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 2000);
+      if (logoTapCount >= 5) { logoTapCount = 0; switchAuthRole('admin'); document.getElementById('authGate').classList.remove('hidden'); }
     }
 
-    const VAULT_FIELDS = [
-      { key: 'BRAND_NAME', label: 'Brand Name' },
-      { key: 'THEME_ACCENT', label: 'Theme Color (Hex)' },
-      { key: 'ENABLE_ADS', label: 'Enable Ads (TRUE/FALSE)' },
-      { key: 'AD_BANNER_TITLE', label: 'Ad Banner Text' },
-      { key: 'GROQ_API_KEY', label: 'Groq API Key', secret: true },
-      { key: 'OPENROUTER_API_KEY', label: 'OpenRouter Key', secret: true }
-    ];
-
-    async function verifyAdminLogin() {
-      const pass = document.getElementById('adminPassInput').value.trim();
+    async function verifyAdminFromGate() {
+      const pass = document.getElementById('gateAdminPass').value.trim();
       if (!pass) return;
-      const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass });
-      if (res.success) {
+      const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass }).catch(() => ({ success: false }));
+      if (res && res.success) {
         ADMIN_PASS = pass;
-        document.getElementById('adminLoginModal').classList.add('hidden');
-        document.getElementById('adminStudentCount').textContent = res.studentCount || 0;
-        enterAdminView();
-        renderVaultFields(res.config);
-        renderAlerts(res.alerts || []);
-        renderBackups(res.backups || []);
+        document.getElementById('authGate').classList.add('hidden');
+        document.getElementById('viewAdmin').classList.remove('hidden');
+        renderVaultFields(res.config || {});
       } else {
-        alert(res.message || 'Invalid Password');
+        alert('गलत एडमिन पासवर्ड!');
       }
     }
 
-    function showAdminTab(t) {
-      document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById('tab-' + t).classList.remove('hidden');
+    function exitAdminView() {
+      document.getElementById('viewAdmin').classList.add('hidden');
+      if (STUDENT_PROFILE) unlockStudentDashboard();
+      else document.getElementById('authGate').classList.remove('hidden');
     }
 
-    function formatBoldHTML(str) {
-      return str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    }
-
-    async function chatWithCoArchitect() {
-      const input = document.getElementById('coArchChatInput');
-      const msg = input.value.trim();
-      if (!msg) return;
-      const box = document.getElementById('coArchitectChatBox');
-      box.innerHTML += `<div class="msg-user">${msg}</div>`;
-      input.value = "";
-      box.scrollTop = box.scrollHeight;
-
-      const res = await postBackend({ action: 'CHAT', role: 'architect_chat', prompt: msg });
-      const reply = res.reply || "Let's refine that!";
-      LAST_DISCUSSED_PLAN = msg + " -> " + reply;
-      box.innerHTML += `<div class="msg-ai">🤖 ${formatBoldHTML(reply)}</div>`;
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function finalizeDiscussionToBuilder() {
-      if (!LAST_DISCUSSED_PLAN) return alert('Discuss your idea first!');
-      document.getElementById('architectPrompt').value = "Implement our discussed upgrade: " + LAST_DISCUSSED_PLAN;
-    }
-
-    function toggleCodeVisibility() {
-      const show = document.getElementById('showCodeToggle').checked;
-      const rawBox = document.getElementById('architectRawCodeBox');
-      if (show && LAST_WIDGET_CODE) { rawBox.textContent = LAST_WIDGET_CODE; rawBox.classList.remove('hidden'); }
-      else rawBox.classList.add('hidden');
+    function searchStudentCredentials() {
+      const q = document.getElementById('adminCredSearchInput').value.trim().toLowerCase();
+      const box = document.getElementById('adminCredResults');
+      if (!q) return;
+      const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
+      const matches = Object.values(db).filter(s =>
+        (s.name && s.name.toLowerCase().includes(q)) ||
+        (s.contact && s.contact.toLowerCase().includes(q)) ||
+        (s.userId && s.userId.toLowerCase().includes(q))
+      );
+      if (!matches.length) {
+        box.innerHTML = '<p style="font-size:13px;color:var(--muted);">कोई छात्र नहीं मिला।</p>';
+        return;
+      }
+      box.innerHTML = matches.map(s => `
+        <div class="mini-card" style="margin-bottom:8px;">
+          <strong>${s.name || 'Unnamed'}</strong> (${s.contact})<br/>
+          <span style="font-size:12px;">Age: ${s.age || '-'} | Saved PIN: <strong>${s.pin}</strong> | XP: ${s.xp}</span>
+        </div>
+      `).join('');
     }
 
     async function generateArchitectPlan() {
       const reqText = document.getElementById('architectPrompt').value.trim();
       if (!reqText) return;
       const out = document.getElementById('architectOutput');
-      const btn = document.getElementById('analyzeArchBtn');
       out.classList.remove('hidden');
-      btn.disabled = true;
-      out.textContent = "⚡ Preparing upgrade preview...";
+      out.textContent = '⚡ सुरक्षित अपग्रेड प्रीव्यू तैयार हो रहा है...';
 
       const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASS, filePath: 'index.html' });
-      if (!fileRes.success) { out.textContent = fileRes.message; btn.disabled = false; return; }
+      if (!fileRes.success) { out.textContent = fileRes.message; return; }
 
       const aiRes = await postBackend({
         action: 'CHAT', role: 'admin',
-        prompt: `Create a clean HTML+JS module using classes ("card", "btn-primary", "mini-card") for: "${reqText}". Write 3 short plain-language bullets starting with "UPGRADE SUMMARY:". Then put ONLY the HTML/JS inside <widget> ... </widget>.`
+        prompt: `Create a clean self-contained HTML+JS card widget (DO NOT include <html>, <head>, or <body> tags!) using class="card" and class="btn-primary" for: "${reqText}". Write 3 bullet points starting with "UPGRADE SUMMARY:" then put ONLY the clean widget inside <widget>...</widget>.`
       });
-      btn.disabled = false;
       if (!aiRes.success) { out.textContent = aiRes.reply; return; }
 
       const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
-      LAST_WIDGET_CODE = (wMatch && wMatch[1]) ? wMatch[1].trim() : `<div class="card"><h3>✨ Upgrade</h3><p>${aiRes.reply}</p></div>`;
-      const marker = 'id="dynamicExtensionsZone"';
-      if (fileRes.content.includes(marker)) {
-        const idx = fileRes.content.indexOf('>', fileRes.content.indexOf(marker)) + 1;
-        GENERATED_CODE_BUFFER = fileRes.content.slice(0, idx) + '\n' + LAST_WIDGET_CODE + fileRes.content.slice(idx);
-      } else {
-        GENERATED_CODE_BUFFER = fileRes.content.replace('</body>', LAST_WIDGET_CODE + '\n</body>');
-      }
+      const widgetHtml = (wMatch && wMatch[1]) ? wMatch[1].replace(/<!DOCTYPE[\s\S]*?<body[^>]*>|<\/body>|<\/html>/gi, '').trim() : '';
+      const marker = 'id="dynamicExtensionsZone">';
+      GENERATED_CODE_BUFFER = fileRes.content.replace(marker, marker + '\n' + widgetHtml);
 
-      out.innerHTML = formatBoldHTML(aiRes.reply.split('<widget>')[0].trim()) + "\n\n✅ Ready! Click Approve & Make Live.";
-      toggleCodeVisibility();
+      out.textContent = aiRes.reply.split('<widget>')[0].trim() + '\n\n✅ Ready! Click Approve & Make Live.';
       document.getElementById('approvePushBtn').classList.remove('hidden');
     }
 
     async function executeArchitectPush() {
       if (!GENERATED_CODE_BUFFER) return;
-      const out = document.getElementById('architectOutput');
-      const pushBtn = document.getElementById('approvePushBtn');
-      pushBtn.disabled = true;
       const res = await postBackend({
         action: 'GITHUB_PUSH', adminPass: ADMIN_PASS, filePath: 'index.html',
-        content: GENERATED_CODE_BUFFER, message: document.getElementById('architectPrompt').value.slice(0, 60)
+        content: GENERATED_CODE_BUFFER, message: 'Safe modular upgrade'
       });
-      out.innerHTML += "\n\n🎉 " + res.message;
-      pushBtn.classList.add('hidden');
-      pushBtn.disabled = false;
+      document.getElementById('architectOutput').textContent += '\n\n🎉 ' + res.message;
+      document.getElementById('approvePushBtn').classList.add('hidden');
     }
 
     function renderVaultFields(cfg) {
-      document.getElementById('configVaultGrid').innerHTML = VAULT_FIELDS.map(f => `
+      const keys = ['BRAND_NAME', 'GROQ_API_KEY', 'OPENROUTER_API_KEY'];
+      document.getElementById('configVaultGrid').innerHTML = keys.map(k => `
         <div class="mini-card">
-          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">${f.label}</label>
-          <div style="display:flex;gap:6px;">
-            <input id="cfg_${f.key}" type="${f.secret ? 'password' : 'text'}" placeholder="${cfg[f.key] || 'Not set'}" />
-            <button class="btn-primary" onclick="saveVaultKey('${f.key}')">Save</button>
+          <label style="font-size:12px;font-weight:700;">${k}</label>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <input id="cfg_${k}" type="password" placeholder="${cfg[k] ? '••••••' : 'Not set'}" />
+            <button class="btn-primary" onclick="saveVaultKey('${k}')">Save</button>
           </div>
         </div>
       `).join('');
@@ -3522,27 +1066,6 @@ adminPinBtn.addEventListener('click', async () => {
     }
     async function triggerAutonomousRD() {
       const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASS });
-      alert(res.message);
-      if (res.success) verifyAdminLogin();
-    }
-    function renderAlerts(alerts) {
-      document.getElementById('alertsContainer').innerHTML = alerts.length ? alerts.map(a => `
-        <div class="mini-card" style="margin-bottom:8px;">
-          <strong>${a.title}</strong> (${a.status})<p style="font-size:12px;margin:4px 0;">${a.details}</p>
-        </div>
-      `).join('') : '<p style="font-size:12px;">No alerts.</p>';
-    }
-    function renderBackups(backups) {
-      document.getElementById('backupsContainer').innerHTML = backups.length ? backups.map(b => `
-        <div class="mini-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;">${b.id} • ${b.reason}</span>
-          <button class="btn-rose" style="padding:5px 10px;font-size:11px;" onclick="triggerRollback(${b.row})">⏪ Restore</button>
-        </div>
-      `).join('') : '<p style="font-size:12px;">No backups yet.</p>';
-    }
-    async function triggerRollback(row) {
-      if (!confirm('Restore this version?')) return;
-      const res = await postBackend({ action: 'ROLLBACK_BACKUP', adminPass: ADMIN_PASS, row });
       alert(res.message);
     }
     async function postBackend(payload) {
