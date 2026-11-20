@@ -2,1495 +2,403 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Jesh AI Ecosystem</title>
   <meta name="theme-color" content="#4f46e5" />
   <style>
     :root {
       --primary: #4f46e5;
       --primary-dark: #3730a3;
-      --bg: #f1f5f9;
+      --bg: #f8fafc;
       --card: #ffffff;
       --text: #0f172a;
       --muted: #64748b;
       --border: #e2e8f0;
       --dark: #0f172a;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
     .hidden { display: none !important; }
+
+    /* COMPACT TOP APP BAR (NO ADMIN CLUTTER!) */
     header {
-      background: rgba(255,255,255,0.97); backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border); padding: 12px 20px;
-      display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; flex-wrap: wrap; gap: 10px;
+      height: 58px; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 0 14px;
+      display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 40;
     }
-    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand { display: flex; align-items: center; gap: 9px; }
     .logo {
-      width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #ec4899);
-      color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+      width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), #ec4899);
+      color: #fff; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none;
     }
-    .brand h1 { font-size: 17px; font-weight: 800; }
+    .brand h1 { font-size: 15px; font-weight: 800; line-height: 1.1; }
     .brand p { font-size: 11px; color: var(--muted); }
-    .nav-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .header-right { display: flex; align-items: center; gap: 6px; }
+
     button {
       cursor: pointer; border: none; border-radius: 10px; font-weight: 600; font-size: 13px;
-      padding: 8px 14px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 14px; transition: 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
     }
-    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(79,70,229,0.25); }
-    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: #fff; }
     .btn-dark { background: var(--dark); color: #fff; }
     .btn-emerald { background: #059669; color: #fff; }
     .btn-rose { background: #e11d48; color: #fff; }
-    .btn-amber { background: #d97706; color: #fff; }
+    .btn-amber { background: #f59e0b; color: #fff; }
     .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
-    .btn-outline:hover { background: #f8fafc; }
-    .btn-tab-active { background: var(--primary); color: #fff; }
 
-    .container { max-width: 1120px; margin: 18px auto; padding: 0 14px; }
-    .card {
-      background: var(--card); border-radius: 18px; border: 1px solid var(--border);
-      padding: 20px; box-shadow: 0 4px 20px rgba(15,23,42,0.04); margin-bottom: 18px;
+    /* FULL-SCREEN APP WORKSPACE */
+    .app-workspace {
+      position: fixed; top: 58px; bottom: 64px; left: 0; right: 0;
+      overflow-y: auto; padding: 14px; background: var(--bg);
     }
-    .hero-card { border-top: 4px solid var(--primary); }
-    .ad-strip {
-      background: linear-gradient(90deg, #fef3c7, #fde68a); border: 1px solid #f59e0b;
-      color: #92400e; padding: 10px 16px; border-radius: 12px; margin-bottom: 16px;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; font-weight: 600;
+    .screen-inner { max-width: 960px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+
+    /* FIXED BOTTOM NAVIGATION BAR (ALWAYS ACCESSIBLE) */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
+      background: #ffffff; border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(5, 1fr); z-index: 45;
+      box-shadow: 0 -4px 16px rgba(15,23,42,0.06);
     }
-    .tabs-bar { display: flex; flex-wrap: wrap; gap: 7px; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-    input[type="text"], input[type="password"], select, textarea {
-      width: 100%; padding: 10px 13px; border-radius: 10px; border: 1px solid #cbd5e1;
-      font-size: 14px; font-family: inherit; outline: none; background: #fff;
+    .bnav-btn {
+      background: none; border-radius: 0; flex-direction: column; justify-content: center;
+      gap: 2px; padding: 4px 2px; font-size: 10px; font-weight: 700; color: var(--muted);
+    }
+    .bnav-btn span.ico { font-size: 19px; line-height: 1.1; }
+    .bnav-active { color: var(--primary); background: #eef2ff; border-top: 3px solid var(--primary); }
+
+    /* CARDS & INPUTS */
+    .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .mini-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    input[type="text"], input[type="password"], input[type="tel"], select, textarea {
+      width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #cbd5e1;
+      font-size: 15px; font-family: inherit; outline: none; background: #fff;
     }
     .input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .input-row input { flex: 1; min-width: 200px; }
-    .response-box {
-      margin-top: 14px; padding: 16px; background: #f8fafc; border-radius: 12px;
-      border: 1px solid var(--border); font-size: 14px; white-space: pre-line;
-    }
+    .input-row input { flex: 1; min-width: 180px; }
 
-    /* Social Reels Learning Feed */
-    .feed-card {
-      background: linear-gradient(135deg, #ffffff, #f8fafc); border: 1px solid var(--border);
-      border-radius: 16px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
-    .feed-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: #eef2ff; color: var(--primary); margin-bottom: 8px; }
-    .feed-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+    /* FULL-SCREEN CHAT & SPEAKING FEEDS */
+    .full-chat-wrap { flex: 1; display: flex; flex-direction: column; min-height: calc(100vh - 155px); background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+    .chat-header-bar { padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .msg-ai { background: #f1f5f9; color: #0f172a; padding: 11px 14px; border-radius: 14px; max-width: 86%; align-self: flex-start; font-size: 14px; white-space: pre-line; line-height: 1.5; }
+    .msg-user { background: var(--primary); color: #fff; padding: 11px 14px; border-radius: 14px; max-width: 86%; align-self: flex-end; font-size: 14px; }
+    .chat-composer { padding: 10px; border-top: 1px solid var(--border); background: #fff; display: flex; gap: 8px; align-items: center; }
 
-    /* Speaking & Avatar Studio */
-    .dark-studio { background: #0f172a; color: #f8fafc; border-radius: 16px; padding: 18px; }
-    .chat-feed {
-      height: 250px; overflow-y: auto; background: #020617; border: 1px solid #1e293b;
-      border-radius: 12px; padding: 12px; margin: 12px 0; display: flex; flex-direction: column; gap: 10px;
-    }
-    .msg-ai { background: #1e293b; color: #f1f5f9; padding: 10px 14px; border-radius: 12px; max-width: 84%; align-self: flex-start; font-size: 13px; white-space: pre-line; }
-    .msg-user { background: var(--primary); color: #fff; padding: 10px 14px; border-radius: 12px; max-width: 84%; align-self: flex-end; font-size: 13px; }
+    .dark-studio { background: #0f172a; color: #f8fafc; border-radius: 16px; padding: 16px; }
     .mic-btn { width: 44px; height: 44px; border-radius: 50%; background: #e11d48; color: #fff; font-size: 18px; justify-content: center; flex-shrink: 0; }
     .mic-active { animation: pulse 1s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(225,29,72,0.7); } 70% { box-shadow: 0 0 0 12px rgba(225,29,72,0); } 100% { box-shadow: 0 0 0 0 rgba(225,29,72,0); } }
 
-    /* Talking Avatar Frame */
     .avatar-stage {
-      width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 12px; overflow: hidden;
-      border: 4px solid var(--primary); position: relative; background: #1e293b; display: flex; align-items: center; justify-content: center;
+      width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 10px; overflow: hidden;
+      border: 4px solid #10b981; background: #1e293b; display: flex; align-items: center; justify-content: center;
     }
     .avatar-stage img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-speaking { animation: speakBounce 0.4s infinite alternate; border-color: #10b981; box-shadow: 0 0 24px rgba(16,185,129,0.6); }
-    @keyframes speakBounce { from { transform: scale(1); } to { transform: scale(1.05); } }
+    .avatar-speaking { animation: speakBounce 0.35s infinite alternate; box-shadow: 0 0 25px rgba(16,185,129,0.7); }
+    @keyframes speakBounce { from { transform: scale(1); } to { transform: scale(1.06); } }
 
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
-    .mini-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 15px; }
-
-    .admin-banner {
-      background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #fff;
-      border-radius: 16px; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+    .ad-strip {
+      background: linear-gradient(90deg, #fef3c7, #fde68a); border: 1px solid #f59e0b;
+      color: #92400e; padding: 8px 12px; border-radius: 12px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
     }
-    .terminal {
-      background: #020617; color: #34d399; font-family: Consolas, monospace; font-size: 12px;
-      padding: 14px; border-radius: 12px; margin-top: 12px; white-space: pre-wrap; max-height: 280px; overflow-y: auto;
-    }
-    .cert-box { border: 3px double var(--primary); background: linear-gradient(135deg, #ffffff, #eef2ff); border-radius: 16px; padding: 20px; text-align: center; margin-top: 14px; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-    .modal-box { background: #fff; border-radius: 16px; padding: 22px; max-width: 400px; width: 100%; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.78); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .modal-box { background: #fff; border-radius: 18px; padding: 22px; max-width: 410px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+    .terminal { background: #020617; color: #34d399; font-family: Consolas, monospace; font-size: 12px; padding: 12px; border-radius: 10px; margin-top: 10px; white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
   </style>
 </head>
 <body>
 
+  <!-- TOP HEADER (COMPACT, STUDENT-ONLY, SECRET 5-TAP LOGO FOR ADMIN) -->
   <header>
     <div class="brand">
-      <div class="logo">J</div>
+      <div class="logo" id="secretAdminLogo" onclick="handleLogoTap()" title="Jesh AI">J</div>
       <div>
         <h1 id="uiBrandName">Jesh AI Ecosystem</h1>
-        <p>🔥 Streak: <strong id="userStreak">1</strong>d • ⚡ XP: <strong id="userXpCount">0</strong> • Level: <strong id="headerLevelBadge">A1</strong></p>
+        <p>👋 <span id="hdrStudentName">Guest</span> • 🔥 <span id="userStreak">1</span>d • ⚡ <span id="userXpCount">0</span> XP</p>
       </div>
     </div>
-    <div class="nav-btns">
-      <div id="hook-navbar" style="display:flex;gap:6px;"></div>
-      <button class="btn-amber" onclick="shareAndInvite()">🚀 Invite Friends (+100 XP)</button>
-      <button class="btn-outline" onclick="switchView('learner')">🎓 <span id="uiLearnerLabel">Learner</span> Hub</button>
-      <button class="btn-dark" onclick="openAdminModal()">🛠️ Admin</button>
+    <div class="header-right">
+      <select id="globalStudentLevel" onchange="saveStudentLevel()" style="width:auto;padding:6px 8px;font-size:11px;font-weight:700;background:#eef2ff;color:var(--primary);border-color:var(--primary);">
+        <option value="A1 Beginner">🌱 A1</option>
+        <option value="B1 Intermediate">🚀 B1</option>
+        <option value="C1 Advanced">🏆 C1</option>
+      </select>
+      <button class="btn-amber" style="padding:7px 10px;font-size:11px;" onclick="shareAndInvite()">🚀 Invite</button>
+      <button class="btn-outline" style="padding:7px 9px;font-size:11px;" onclick="openStudentAuthModal()">👤</button>
     </div>
   </header>
 
-  <main class="container">
-    <!-- ==================== LEARNER HUB ==================== -->
-    <section id="viewLearner">
-      <!-- MONETIZATION AD STRIP -->
-      <div id="adBannerSlot" class="ad-strip">
-        <span id="adBannerText">📢 Sponsored: Free Digital India, Python & AI Spoken English Mastery!</span>
-        <a id="adBannerBtn" href="#courses" onclick="switchLearnerTab('courses')" style="background:#92400e;color:#fff;padding:5px 12px;border-radius:8px;text-decoration:none;font-size:11px;">Explore Now →</a>
-      </div>
+  <!-- ==================== FULL-SCREEN LEARNER APP WORKSPACE ==================== -->
+  <main id="viewLearner" class="app-workspace">
+    <div class="screen-inner">
 
-      <div class="card hero-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-          <div>
-            <h2 id="uiHeroHeading" style="font-size:22px;font-weight:800;">Learn, Create & Grow with Your Personal AI</h2>
-            <p style="font-size:13px;color:var(--muted);">Personalized to your level • Safe & Family-Friendly AI</p>
+      <!-- SCREEN 1: DAILY REELS FEED -->
+      <section id="scr-feed" class="app-screen">
+        <div id="adBannerSlot" class="ad-strip">
+          <span id="adBannerText">📢 Free Digital India, Python & Spoken English Mastery!</span>
+          <button class="btn-amber" style="padding:4px 10px;font-size:11px;" onclick="openFullScreen('lingo')">Start →</button>
+        </div>
+        <div class="card" style="background:linear-gradient(135deg,#eef2ff,#ffffff);border-left:4px solid var(--primary);">
+          <div style="font-size:11px;font-weight:700;color:var(--primary);">📌 YOUR PERSONALIZED LEARNING MEMORY</div>
+          <p id="studentProgressBanner" style="font-size:13px;color:#334155;margin-top:4px;">Welcome! Tap any reel below or open AI Tutor to continue your personalized journey.</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <strong style="font-size:14px;">🔥 Daily Bite-Sized Reels</strong>
+          <button class="btn-primary" style="padding:6px 12px;font-size:12px;" onclick="loadFreshFeedCards()">✨ New Reels (+10 XP)</button>
+        </div>
+        <div id="socialFeedContainer"></div>
+      </section>
+
+      <!-- SCREEN 2: FULL-SCREEN AI TUTOR (CHATGPT + CLAUDE + VISION) -->
+      <section id="scr-chat" class="app-screen hidden" style="flex:1;display:flex;flex-direction:column;">
+        <div class="full-chat-wrap">
+          <div class="chat-header-bar">
+            <strong style="font-size:14px;">💬 Personal AI Tutor (Remembers Your Progress)</strong>
+            <label style="font-size:12px;display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="learnerWebToggle" /> 🌐 Web Search
+            </label>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;font-weight:700;">My Level:</span>
-            <select id="globalStudentLevel" onchange="saveStudentLevel()" style="width:auto;padding:7px 12px;font-size:12px;font-weight:700;background:#eef2ff;color:var(--primary);border-color:var(--primary);">
-              <option value="A1 Beginner">🌱 Beginner (A1)</option>
-              <option value="B1 Intermediate">🚀 Intermediate (B1)</option>
-              <option value="C1 Advanced">🏆 Advanced (C1)</option>
+          <div id="tutorChatFeed" class="chat-messages">
+            <div class="msg-ai">👋 Namaste! I remember your learning level and progress. Ask me any doubt, paste code, or upload a photo of a question!</div>
+          </div>
+          <div id="visionBadge" class="hidden" style="padding:4px 12px;background:#eef2ff;font-size:11px;color:var(--primary);font-weight:700;">🖼️ Question photo attached!</div>
+          <div class="chat-composer">
+            <label class="btn-outline" style="padding:9px 10px;" title="Scan Question Photo">
+              📷 <input type="file" accept="image/*" class="hidden" onchange="previewVisionImage(event)" />
+            </label>
+            <input id="learnerPrompt" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
+            <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: FULL-SCREEN VOICE SPEAKING & READALONG -->
+      <section id="scr-speak" class="app-screen hidden">
+        <div class="dark-studio" style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+            <strong style="font-size:15px;">🎙️ Live AI Speaking Practice</strong>
+            <select id="speakingMode" style="width:auto;background:#1e293b;color:#fff;border-color:#334155;font-size:12px;padding:6px 10px;">
+              <option value="Daily English Conversation">🗣️ Daily English</option>
+              <option value="Job Interview">💼 Job Interview</option>
+              <option value="Hindi/Bhojpuri to English">🇮🇳 Hindi → English</option>
             </select>
           </div>
-        </div>
-
-        <div id="hook-hero-tools" style="margin-bottom:12px;"></div>
-
-        <!-- ALL-IN-ONE NAVIGATION TABS -->
-        <div class="tabs-bar">
-          <button class="l-tab btn-tab-active" data-ltab="feed" onclick="switchLearnerTab('feed')">📱 Daily Reels Feed</button>
-          <button class="l-tab btn-outline" data-ltab="chat" onclick="switchLearnerTab('chat')">💬 AI Mentor & Artifacts</button>
-          <button id="nav-speaking" class="l-tab btn-outline" data-ltab="speaking" onclick="switchLearnerTab('speaking')">🎤 Speaking & ReadAlong</button>
-          <button id="nav-lingo" class="l-tab btn-outline" data-ltab="lingo" onclick="switchLearnerTab('lingo')">🌍 JeshLingo (20+)</button>
-          <button id="nav-media" class="l-tab btn-outline" data-ltab="media" onclick="switchLearnerTab('media')">🎬 Image, Video & AI Avatar</button>
-          <button id="nav-courses" class="l-tab btn-outline" data-ltab="courses" onclick="switchLearnerTab('courses')">🎓 Academy & QR</button>
-          <div id="hook-tabs" style="display:contents;"></div>
-        </div>
-
-        <!-- 1. ADDICTIVE SOCIAL LEARNING FEED (INSTA/FB + DUOLINGO STYLE) -->
-        <div id="ltab-feed" class="l-panel">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-            <span style="font-size:13px;font-weight:700;">🔥 Bite-Sized Knowledge Feed (Tailored to Your Level)</span>
-            <button class="btn-primary" onclick="loadFreshFeedCards()">✨ Load New Reels (+10 XP)</button>
+          <div id="speakingChatHistory" class="chat-messages" style="height:260px;background:#020617;border-radius:12px;margin-bottom:10px;">
+            <div class="msg-ai" style="background:#1e293b;color:#f1f5f9;">👋 Tap the red Mic, speak in English or Hindi, and press Send!</div>
           </div>
-          <div id="socialFeedContainer"></div>
-        </div>
-
-        <!-- 2. CHATGPT + CLAUDE ARTIFACTS + VISION + YOUTUBE GUIDE -->
-        <div id="ltab-chat" class="l-panel hidden">
           <div class="input-row">
-            <input id="learnerPrompt" type="text" placeholder="Ask anything, paste code, or request a YouTube study plan..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
-            <label class="btn-outline" style="padding:8px 12px;font-size:12px;">
-              📷 Scan <input type="file" id="visionFileInput" accept="image/*" class="hidden" onchange="previewVisionImage(event)" />
-            </label>
-            <label style="display:flex;align-items:center;gap:5px;font-size:12px;">
-              <input type="checkbox" id="learnerWebToggle" /> Live Web
-            </label>
-            <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">Ask AI ✨</button>
+            <button id="micRecordBtn" class="mic-btn" onclick="toggleVoiceMic()">🎤</button>
+            <input id="speakingTranscriptInput" type="text" style="background:#1e293b;color:#fff;border-color:#334155;" placeholder="Speak or type..." onkeydown="if(event.key==='Enter') sendSpeakingTurn()" />
+            <button class="btn-primary" onclick="sendSpeakingTurn()">Send 🔊</button>
           </div>
-          <div id="visionBadge" class="hidden" style="margin-top:8px;font-size:12px;color:var(--primary);font-weight:600;">🖼️ Image attached! Ask your question.</div>
-          <div id="learnerResponseBox" class="response-box hidden"></div>
+          <p id="micStatusText" style="font-size:11px;color:#94a3b8;margin-top:6px;">Mic Ready</p>
         </div>
 
-        <!-- 3. SPEAKING PRACTICE + READALONG WORD COACH -->
-        <div id="ltab-speaking" class="l-panel hidden">
-          <div class="dark-studio" style="margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-              <div>
-                <h3 style="font-size:16px;">🎙️ ChatGPT-Style AI Speaking Practice</h3>
-                <p style="font-size:12px;color:#94a3b8;">Tap Mic, speak naturally, get live voice reply + grammar tip.</p>
-              </div>
-              <select id="speakingMode" style="width:auto;background:#1e293b;color:#fff;border-color:#334155;font-size:12px;">
-                <option value="Daily English Conversation">🗣️ Daily English Conversation</option>
-                <option value="Job Interview Practice">💼 Job Interview</option>
-                <option value="Hindi/Bhojpuri to English">🇮🇳 Hindi/Bhojpuri → English</option>
-              </select>
-            </div>
-            <div id="speakingChatHistory" class="chat-feed">
-              <div class="msg-ai">👋 Hello! Tap the red <strong>Mic</strong> button, speak a sentence, and hit <strong>Send</strong>!</div>
-            </div>
-            <div class="input-row">
-              <button id="micRecordBtn" class="mic-btn" onclick="toggleVoiceMic()">🎤</button>
-              <input id="speakingTranscriptInput" type="text" style="background:#1e293b;color:#fff;border-color:#334155;" placeholder="Tap Mic to speak or type here..." onkeydown="if(event.key==='Enter') sendSpeakingTurn()" />
-              <button class="btn-primary" onclick="sendSpeakingTurn()">Send 🔊</button>
-            </div>
-            <p id="micStatusText" style="font-size:11px;color:#94a3b8;margin-top:6px;">Mic Ready</p>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong>📖 ReadAlong Pronunciation Check</strong>
+            <button class="btn-outline" style="padding:5px 10px;font-size:11px;" onclick="generateNewReadAlongPassage()">🔄 New Text</button>
           </div>
-
-          <!-- READALONG LIVE READING COACH -->
-          <div class="mini-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-              <h4>📖 ReadAlong Pronunciation Coach</h4>
-              <button class="btn-outline" style="font-size:11px;" onclick="generateNewReadAlongPassage()">🔄 New Story Passage</button>
-            </div>
-            <p id="readAlongTargetText" style="font-size:15px;font-weight:600;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border);margin-bottom:10px;">
-              Education is the most powerful weapon which you can use to change the world.
-            </p>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn-rose" onclick="startReadAlongCheck()">🎤 Read Aloud & Check Accuracy</button>
-              <button class="btn-outline" onclick="speakTextAloud(document.getElementById('readAlongTargetText').textContent)">🔊 Listen First</button>
-            </div>
-            <div id="readAlongResult" style="margin-top:10px;font-size:13px;font-weight:600;"></div>
+          <p id="readAlongTargetText" style="font-size:15px;font-weight:600;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);margin-bottom:10px;">
+            Consistent practice every single day turns beginners into confident leaders.
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-rose" onclick="startReadAlongCheck()">🎤 Read Aloud</button>
+            <button class="btn-outline" onclick="speakTextAloud(document.getElementById('readAlongTargetText').textContent)">🔊 Listen</button>
           </div>
+          <div id="readAlongResult" style="margin-top:10px;font-size:13px;font-weight:600;"></div>
         </div>
+      </section>
 
-        <!-- 4. JESHLINGO INTERACTIVE FLASHCARDS (NO RAW TABLES!) -->
-        <div id="ltab-lingo" class="l-panel hidden">
-          <div class="input-row" style="margin-bottom:14px;">
-            <select id="lingoLangSelect" style="max-width:250px;">
+      <!-- SCREEN 4: FULL-SCREEN JESHLINGO, COURSES & QR CERTIFICATE -->
+      <section id="scr-lingo" class="app-screen hidden">
+        <div class="card">
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">🌍 JeshLingo (20+ Languages Flashcards)</strong>
+          <div class="input-row" style="margin-bottom:12px;">
+            <select id="lingoLangSelect" style="max-width:220px;">
               <option>English (Global)</option><option>Hindi (हिन्दी)</option><option>Bhojpuri (भोजपुरी)</option>
               <option>Sanskrit (संस्कृत)</option><option>Mandarin Chinese (中文)</option><option>Japanese (日本語)</option>
               <option>Swahili (Africa)</option><option>Arabic (العربية)</option><option>French (Français)</option><option>Spanish (Español)</option>
             </select>
-            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 Build Interactive Flashcards</button>
+            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 Load Cards</button>
           </div>
           <div id="lingoCardsGrid" class="grid-2"></div>
         </div>
 
-        <!-- 5. IMAGE, VIDEO & AI TALKING AVATAR (FACE + VOICE CLONE STUDIO) -->
-        <div id="ltab-media" class="l-panel hidden">
-          <div class="grid-2">
-            <!-- AI IMAGE & VIDEO STORYBOARD GENERATOR -->
-            <div class="mini-card">
-              <h4 style="margin-bottom:8px;">🎨 AI Image & Video Storyboard Studio</h4>
-              <input id="mediaPromptInput" type="text" placeholder="Describe an image or educational video topic..." style="margin-bottom:10px;" />
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-                <button class="btn-primary" onclick="generateAIImage()">🖼️ Generate Image</button>
-                <button class="btn-dark" onclick="generateVideoScript()">🎬 Video Script & Scenes</button>
-              </div>
-              <div id="mediaOutputZone"></div>
-            </div>
-
-            <!-- AI TALKING AVATAR (CUSTOM PHOTO + VOICE CLONE PITCH/API) -->
-            <div class="dark-studio" style="text-align:center;">
-              <h4 style="margin-bottom:8px;">🎭 JeshLive AI Talking Avatar & Voice</h4>
-              <div id="avatarStage" class="avatar-stage">
-                <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=JeshMentor" alt="AI Avatar" />
-              </div>
-              <div style="margin-bottom:10px;">
-                <label class="btn-outline" style="font-size:11px;padding:6px 10px;color:#0f172a;">
-                  📸 Upload Your Face Photo <input type="file" accept="image/*" class="hidden" onchange="uploadAvatarPhoto(event)" />
-                </label>
-                <button class="btn-rose" style="font-size:11px;padding:6px 10px;" onclick="recordVoiceSample()">🎙️ 10s Voice Clone Sample</button>
-              </div>
-              <div style="display:flex;gap:6px;margin-bottom:8px;justify-content:center;align-items:center;font-size:11px;">
-                <span>Voice Tone:</span>
-                <input id="avatarPitch" type="range" min="0.7" max="1.4" step="0.1" value="1.0" style="width:110px;" />
-              </div>
-              <textarea id="avatarSpeakText" rows="2" style="background:#1e293b;color:#fff;border-color:#334155;font-size:12px;margin-bottom:8px;" placeholder="Type what your AI Avatar should speak...">Namaste! Welcome to Jesh AI Ecosystem. Let us learn something amazing today!</textarea>
-              <button class="btn-emerald" style="width:100%;justify-content:center;" onclick="animateAndSpeakAvatar()">▶️ Make Avatar Speak Live</button>
-            </div>
+        <div class="card">
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">🎓 Skill Micro-Courses & QR Certificate</strong>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+            <button class="btn-outline" onclick="launchCourse('Python Programming')">🐍 Python</button>
+            <button class="btn-outline" onclick="launchCourse('NIELIT CCC & CSC')">💻 CCC & CSC</button>
+            <button class="btn-outline" onclick="launchCourse('HTML & Web Design')">🌐 HTML/CSS</button>
+            <button class="btn-outline" onclick="launchCourse('Personal Finance')">💰 Finance</button>
           </div>
-        </div>
-
-        <!-- 6. MICRO-COURSES & QR CERTIFICATE -->
-        <div id="ltab-courses" class="l-panel hidden">
-          <div class="grid-3">
-            <div class="mini-card">
-              <h4>🐍 Python & AI Basics</h4>
-              <p style="font-size:12px;color:#64748b;margin:6px 0 10px;">Interactive coding lessons tailored to your level.</p>
-              <button class="btn-primary" onclick="launchCourse('Python Programming')">Start Lesson →</button>
-            </div>
-            <div class="mini-card">
-              <h4>💻 NIELIT CCC & CSC</h4>
-              <p style="font-size:12px;color:#64748b;margin:6px 0 10px;">CCC exam shortcuts, LibreOffice & digital services.</p>
-              <button class="btn-primary" onclick="launchCourse('NIELIT CCC & CSC Digital')">Start Lesson →</button>
-            </div>
-            <div class="mini-card">
-              <h4>🌐 HTML, CSS & Web</h4>
-              <p style="font-size:12px;color:#64748b;margin:6px 0 10px;">Build real websites from scratch.</p>
-              <button class="btn-primary" onclick="launchCourse('HTML5 & CSS3 Web Design')">Start Lesson →</button>
-            </div>
-          </div>
-
-          <div class="mini-card" style="margin-top:14px;">
-            <h4 style="margin-bottom:8px;">🏅 Instant QR-Verified Skill Certificate</h4>
+          <div class="mini-card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px;">🏅 Generate Verified QR Certificate</div>
             <div class="input-row">
-              <input id="certStudentName" type="text" placeholder="Enter Student Full Name" />
-              <select id="certCourseSelect" style="max-width:240px;">
-                <option>Python & AI Fundamentals</option>
-                <option>NIELIT CCC & Digital Literacy</option>
-                <option>AI Speaking & English Fluency</option>
-                <option>HTML5 & Modern Web Design</option>
+              <input id="certStudentName" type="text" placeholder="Student Full Name" />
+              <select id="certCourseSelect" style="max-width:210px;">
+                <option>Python & AI Basics</option>
+                <option>NIELIT CCC Digital Literacy</option>
+                <option>Spoken English Fluency</option>
               </select>
-              <button class="btn-emerald" onclick="generateQRCertificate()">Generate & Share</button>
+              <button class="btn-emerald" onclick="generateQRCertificate()">Get Certificate</button>
             </div>
             <div id="certPreviewArea"></div>
           </div>
         </div>
+      </section>
 
-        <div id="hook-tab-panels"></div>
-      </div>
+      <!-- SCREEN 5: FULL-SCREEN VIDEO-CALL AVATAR, IMAGE & VIDEO STUDIO -->
+      <section id="scr-studio" class="app-screen hidden">
+        <div class="dark-studio" style="margin-bottom:14px;text-align:center;">
+          <strong style="font-size:16px;display:block;margin-bottom:4px;">📹 JeshLive Video-Call Tutor (Cartoon & Custom Face)</strong>
+          <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Choose a cartoon teacher or upload your photo + voice tone, and start a live talking session!</p>
 
-      <div id="dynamicExtensionsZone">
-<style>
-    /* Simple overlay for the modal */
-    .jesh-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .jesh-modal {
-      max-width: 90%;
-      width: 340px;
-      background: #fff;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .jesh-question {
-      margin-bottom: 1rem;
-    }
-    .jesh-options button {
-      margin: 0.25rem 0;
-      width: 100%;
-    }
-    .jesh-hidden { display: none; }
-  </style>
-
-  <!-- Modal (hidden by default) -->
-  <div id="jeshLevelModal" class="jesh-modal-overlay jesh-hidden">
-    <div class="jesh-modal card">
-      <h3 style="margin-top:0;">Quick Level Check</h3>
-      <div id="jeshQuestionContainer"></div>
-      <div style="text-align:right; margin-top:1rem;">
-        <button id="jeshSkipBtn" class="btn-primary">Skip</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function(){
-      // ----- 1. QUICK LEVEL CHECK POPUP -----
-      const levelKey = 'JESH_LEVEL_VERIFIED';
-      const modal = document.getElementById('jeshLevelModal');
-      const qContainer = document.getElementById('jeshQuestionContainer');
-      const skipBtn = document.getElementById('jeshSkipBtn');
-
-      const questions = [
-        {
-          text: "How comfortable are you reading short English sentences?",
-          options: [
-            {label:"Very comfortable (C1)", value:"C1"},
-            {label:"Somewhat comfortable (B1)", value:"B1"},
-            {label:"Not comfortable (A1)", value:"A1"}
-          ]
-        },
-        {
-          text: "Can you hold a 5‑minute conversation in English?",
-          options: [
-            {label:"Easily (C1)", value:"C1"},
-            {label:"With some pauses (B1)", value:"B1"},
-            {label:"Hardly (A1)", value:"A1"}
-          ]
-        },
-        {
-          text: "How well do you understand English movies without subtitles?",
-          options: [
-            {label:"Almost everything (C1)", value:"C1"},
-            {label:"Main ideas (B1)", value:"B1"},
-            {label:"Very little (A1)", value:"A1"}
-          ]
-        }
-      ];
-
-      let answers = [];
-
-      function showModal(){
-        modal.classList.remove('jesh-hidden');
-        renderQuestion(0);
-      }
-
-      function hideModal(){
-        modal.classList.add('jesh-hidden');
-      }
-
-      function renderQuestion(index){
-        const q = questions[index];
-        qContainer.innerHTML = `
-          <div class="jesh-question"><strong>Q${index+1}.</strong> ${q.text}</div>
-          <div class="jesh-options">
-            ${q.options.map(opt=>`
-              <button class="btn-primary" data-value="${opt.value}">${opt.label}</button>
-            `).join('')}
+          <div id="avatarStage" class="avatar-stage">
+            <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru" alt="Teacher Avatar" />
           </div>
-        `;
-        // attach listeners
-        qContainer.querySelectorAll('button').forEach(btn=>{
-          btn.addEventListener('click',()=> {
-            answers.push(btn.dataset.value);
-            if(index+1 < questions.length){
-              renderQuestion(index+1);
-            } else {
-              finalizeLevel();
-            }
-          });
-        });
-      }
 
-      function finalizeLevel(){
-        // simple majority vote
-        const counts = answers.reduce((acc,val)=>{acc[val]=(acc[val]||0)+1;return acc;}, {});
-        const level = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
-        localStorage.setItem(levelKey, level);
-        hideModal();
-        console.log('Level set to', level);
-      }
+          <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+            <button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', 1.0)">🤖 Robo-Guru</button>
+            <button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', 1.25)">👩‍🏫 Didi-Mentor</button>
+            <button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/adventurer/svg?seed=CaptainCode', 0.85)">🦸 Captain-Code</button>
+            <label class="btn-amber" style="padding:5px 9px;font-size:11px;">
+              📸 My Photo <input type="file" accept="image/*" class="hidden" onchange="uploadAvatarPhoto(event)" />
+            </label>
+          </div>
 
-      skipBtn.addEventListener('click',()=>{
-        // default to A1 if skipped
-        localStorage.setItem(levelKey, 'A1');
-        hideModal();
-        console.log('Level skipped – default A1');
-      });
+          <div style="display:flex;gap:8px;justify-content:center;align-items:center;font-size:11px;margin-bottom:10px;">
+            <span>Voice Pitch:</span>
+            <input id="avatarPitch" type="range" min="0.7" max="1.4" step="0.1" value="1.0" style="width:100px;" />
+            <button class="btn-rose" style="padding:4px 8px;font-size:11px;" onclick="alert('🎙️ Voice sample saved!')">🎙️ Clone Voice</button>
+          </div>
 
-      // Show modal only on first visit
-      if(!localStorage.getItem(levelKey)){
-        // slight defer to let page render
-        setTimeout(showModal, 200);
-      }
+          <div class="input-row">
+            <button class="mic-btn" style="width:40px;height:40px;font-size:16px;" onclick="voiceToAvatarPrompt()">🎤</button>
+            <input id="avatarDiscussTopic" type="text" style="background:#1e293b;color:#fff;border-color:#334155;" placeholder="Ask your Video-Call Avatar any topic..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
+            <button class="btn-emerald" onclick="talkWithVideoAvatar()">📞 Talk Live</button>
+          </div>
+          <div id="avatarReplyCaption" style="margin-top:10px;font-size:13px;color:#a7f3d0;min-height:20px;"></div>
+        </div>
 
-      // ----- 2. INSTANT TAB SWITCHING & PRE‑CACHE -----
-      // Simulated content cache (in real use replace with fetch calls)
-      const contentCache = {
-        tabs: {
-          home: '<h2>Home Content</h2><p>Welcome back!</p>',
-          lessons: '<h2>Lessons</h2><p>Here are your lessons.</p>',
-          profile: '<h2>Profile</h2><p>Student info.</p>'
-        },
-        lessons: {
-          // lessonId: html
-          lesson1: '<div class="mini-card">Lesson 1 preview...</div>',
-          lesson2: '<div class="mini-card">Lesson 2 preview...</div>'
-        }
-      };
+        <div class="card">
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">🎨 AI Image & Video Storyboard Creator</strong>
+          <div class="input-row" style="margin-bottom:10px;">
+            <input id="mediaPromptInput" type="text" placeholder="Describe an image or video topic..." />
+            <button class="btn-primary" onclick="generateAIImage()">🖼️ Image</button>
+            <button class="btn-dark" onclick="generateVideoScript()">🎬 Video Script</button>
+          </div>
+          <div id="mediaOutputZone"></div>
+        </div>
+      </section>
 
-      // Pre‑load cache (simulated async)
-      function preloadCache(){
-        // In a real scenario you would fetch JSON/HTML and store it.
-        // Here we just resolve immediately.
-        return Promise.resolve();
-      }
+      <!-- DYNAMIC EXTENSIONS SLOT -->
+      <div id="dynamicExtensionsZone"></div>
+    </div>
+  </main>
 
-      // Switch content instantly
-      function switchTab(tabId){
-        const target = document.getElementById('jeshMainContent');
-        if(contentCache.tabs[tabId]){
-          target.innerHTML = contentCache.tabs[tabId];
-        }
-      }
-
-      // Attach listeners to tab buttons & nav icons
-      function initTabListeners(){
-        document.querySelectorAll('.tab-btn, .nav-icon').forEach(el=>{
-          const tabId = el.dataset.tab;
-          if(tabId){
-            el.addEventListener('click', (e)=>{
-              e.preventDefault();
-              switchTab(tabId);
-            });
-          }
-        });
-      }
-
-      // Lesson cards open instantly (demo: just log)
-      function initLessonCardListeners(){
-        document.querySelectorAll('.lesson-card').forEach(card=>{
-          const lessonId = card.dataset.lesson;
-          card.addEventListener('click', (e)=>{
-            e.preventDefault();
-            const content = contentCache.lessons[lessonId] || '<p>Lesson not found.</p>';
-            const modal = document.createElement('div');
-            modal.className = 'jesh-modal-overlay';
-            modal.innerHTML = `<div class="jesh-modal card">${content}<br><button class="btn-primary" style="margin-top:1rem;">Close</button></div>`;
-            modal.querySelector('button').addEventListener('click',()=>modal.remove());
-            document.body.appendChild(modal);
-          });
-        });
-      }
-
-      // Initialize after preload
-      preloadCache().then(()=>{
-        initTabListeners();
-        initLessonCardListeners();
-        // Optional: load default tab
-        if(!document.getElementById('jeshMainContent')){
-          const container = document.createElement('div');
-          container.id = 'jeshMainContent';
-          container.style.padding = '1rem';
-          document.body.appendChild(container);
-        }
-        switchTab('home');
-      });
-
-    })();
-  </script>
-<div class="card" id="quest-widget">
-  <h2 class="mini-card">📜 Interactive Quest Engine</h2>
-  <div id="quest-list">
-    <!-- quests will be injected here -->
-  </div>
-  <hr>
-  <h3 class="mini-card">Your Progress</h3>
-  <div id="progress-area">
-    <p>No quest started yet.</p>
-  </div>
-  <hr>
-  <h3 class="mini-card">Badge & QR Certificate</h3>
-  <div id="reward-area"></div>
-  <hr>
-  <h3 class="mini-card">Leaderboard</h3>
-  <ul id="leaderboard"></ul>
-</div>
-
-<script>
-(() => {
-  const quests = [
-    { id: 1, title: "Python Basics Quest", description: "Learn variables and loops.", reward: "Python Novice Badge" },
-    { id: 2, title: "Finance Fundamentals", description: "Understand interest & inflation.", reward: "Finance Explorer Badge" },
-    { id: 3, title: "Data Crunch Challenge", description: "Manipulate CSV data with Python.", reward: "Data Wrangler Badge" }
-  ];
-
-  const questListEl = document.getElementById('quest-list');
-  const progressEl = document.getElementById('progress-area');
-  const rewardEl = document.getElementById('reward-area');
-  const leaderboardEl = document.getElementById('leaderboard');
-
-  // Load or init user data
-  const user = JSON.parse(localStorage.getItem('questUser')) || { completed: [], points: 0 };
-  const leaderboard = JSON.parse(localStorage.getItem('questLeaderboard')) || [];
-
-  function renderQuests() {
-    questListEl.innerHTML = '';
-    quests.forEach(q => {
-      const completed = user.completed.includes(q.id);
-      const btnText = completed ? 'Completed ✅' : 'Start Quest';
-      const btnClass = completed ? 'btn-primary' : 'btn-primary';
-      const questDiv = document.createElement('div');
-      questDiv.className = 'mini-card';
-      questDiv.innerHTML = `
-        <strong>${q.title}</strong><br>
-        <small>${q.description}</small><br>
-        <button class="${btnClass}" ${completed ? 'disabled' : ''} data-id="${q.id}">${btnText}</button>
-      `;
-      questListEl.appendChild(questDiv);
-    });
-  }
-
-  function startQuest(id) {
-    const quest = quests.find(q => q.id === id);
-    if (!quest) return;
-    // Simulate instant completion for demo purposes
-    user.completed.push(id);
-    user.points += 10;
-    saveUser();
-    showReward(quest);
-    renderProgress();
-    renderLeaderboard();
-    renderQuests();
-  }
-
-  function showReward(quest) {
-    rewardEl.innerHTML = `
-      <p>🎉 You earned: <strong>${quest.reward}</strong></p>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(quest.reward)}" alt="QR Certificate">
-    `;
-  }
-
-  function renderProgress() {
-    if (user.completed.length === 0) {
-      progressEl.innerHTML = '<p>No quest started yet.</p>';
-      return;
-    }
-    const completedTitles = quests.filter(q => user.completed.includes(q.id)).map(q => q.title);
-    progressEl.innerHTML = `
-      <p>Completed quests: ${completedTitles.join(', ')}</p>
-      <p>Total points: ${user.points}</p>
-    `;
-  }
-
-  function renderLeaderboard() {
-    // Update local leaderboard with current user (simple demo using name "You")
-    const existing = leaderboard.find(e => e.name === 'You');
-    if (existing) {
-      existing.points = user.points;
-    } else {
-      leaderboard.push({ name: 'You', points: user.points });
-    }
-    // Sort descending
-    leaderboard.sort((a, b) => b.points - a.points);
-    // Keep top 5
-    const top = leaderboard.slice(0, 5);
-    leaderboardEl.innerHTML = '';
-    top.forEach(entry => {
-      const li = document.createElement('li');
-      li.textContent = `${entry.name}: ${entry.points} pts`;
-      leaderboardEl.appendChild(li);
-    });
-    localStorage.setItem('questLeaderboard', JSON.stringify(leaderboard));
-  }
-
-  function saveUser() {
-    localStorage.setItem('questUser', JSON.stringify(user));
-  }
-
-  // Event delegation for quest buttons
-  questListEl.addEventListener('click', e => {
-    if (e.target.tagName === 'BUTTON' && !e.target.disabled) {
-      const id = parseInt(e.target.dataset.id, 10);
-      startQuest(id);
-    }
-  });
-
-  // Initial render
-  renderQuests();
-  renderProgress();
-  renderLeaderboard();
-})();
-</script>
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Ultra‑Clean Mobile UI</title>
-<style>
-  /* Basic reset */
-  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family:Arial,Helvetica,sans-serif; overflow-x:hidden; }
-
-  /* Layout containers */
-  .header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#fff; border-bottom:1px solid #e0e0e0; }
-  .header .logo { font-size:1.2rem; font-weight:bold; }
-  .header .badge { background:#ffeb3b; padding:4px 8px; border-radius:12px; font-size:0.9rem; }
-  .header .icons { display:flex; gap:12px; }
-  .header .icons button { background:none; border:none; font-size:1.2rem; cursor:pointer; }
-
-  .content { padding:16px; padding-bottom:80px; /* space for bottom nav */ }
-  .card, .mini-card { background:#fff; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); padding:16px; margin-bottom:16px; font-size:16px; }
-  .btn-primary { background:#1976d2; color:#fff; border:none; border-radius:6px; padding:12px 16px; font-size:16px; cursor:pointer; width:100%; }
-
-  /* Bottom navigation */
-  .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:64px; background:#fff; border-top:1px solid #e0e0e0; display:flex; justify-content:space-around; align-items:center; z-index:1000; }
-  .bottom-nav button { background:none; border:none; font-size:0.9rem; color:#555; display:flex; flex-direction:column; align-items:center; cursor:pointer; }
-  .bottom-nav button.active { color:#1976d2; }
-
-  /* Mobile specific tweaks */
-  @media (max-width:768px) {
-    .header .tab-bar { display:none; }          /* hide horizontal tabs */
-    .header { padding:8px 12px; }               /* compact header */
-    .bottom-nav { height:72px; }                /* larger touch targets */
-    .bottom-nav button { font-size:0.85rem; }
-  }
-</style>
-</head>
-<body>
-
-<header class="header">
-  <div class="logo">MyApp</div>
-  <div class="badge">XP ⭐ 7‑Day Streak</div>
-  <div class="icons">
-    <button aria-label="Search">🔍</button>
-    <button aria-label="Notifications">🔔</button>
-    <button aria-label="Settings">⚙️</button>
-  </div>
-  <!-- Horizontal tabs (hidden on mobile) -->
-  <nav class="tab-bar" style="position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:24px;">
-    <a href="#">Feed</a>
-    <a href="#">AI Tutor</a>
-    <a href="#">Voice & Lingo</a>
-    <a href="#">Studio & Courses</a>
+  <!-- FIXED BOTTOM NAVIGATION BAR (5 FULL-SCREEN MODES) -->
+  <nav id="studentBottomNav" class="bottom-nav">
+    <button class="bnav-btn bnav-active" data-scr="feed" onclick="openFullScreen('feed')"><span class="ico">📱</span>Reels</button>
+    <button class="bnav-btn" data-scr="chat" onclick="openFullScreen('chat')"><span class="ico">💬</span>AI Tutor</button>
+    <button class="bnav-btn" data-scr="speak" onclick="openFullScreen('speak')"><span class="ico">🎤</span>Speak</button>
+    <button class="bnav-btn" data-scr="lingo" onclick="openFullScreen('lingo')"><span class="ico">🌍</span>Courses</button>
+    <button class="bnav-btn" data-scr="studio" onclick="openFullScreen('studio')"><span class="ico">📹</span>Avatar</button>
   </nav>
-</header>
 
-<main class="content">
-  <section class="card">
-    <h2>Welcome Back!</h2>
-    <p>Here’s your daily feed. Scroll, tap, learn.</p>
-  </section>
-
-  <section class="mini-card">
-    <h3>Chat with AI Tutor</h3>
-    <input type="text" placeholder="Ask a question…" style="width:100%; padding:12px; font-size:16px; margin-top:8px;">
-  </section>
-
-  <section class="card">
-    <h3>Voice & Lingo Session</h3>
-    <div style="background:#f5f5f5; height:180px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
-      <span>📹 Avatar Video Call Placeholder</span>
-    </div>
-  </section>
-
-  <button class="btn-primary">Start Learning</button>
-</main>
-
-<nav class="bottom-nav">
-  <button class="active" data-target="feed"><span>📜</span><span>Feed</span></button>
-  <button data-target="tutor"><span>🤖</span><span>AI Tutor</span></button>
-  <button data-target="voice"><span>🗣️</span><span>Voice & Lingo</span></button>
-  <button data-target="studio"><span>🎓</span><span>Studio</span></button>
-</nav>
-
-<script>
-  // Simple navigation state toggle (demo purpose)
-  const navButtons = document.querySelectorAll('.bottom-nav button');
-  navButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      navButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // In a real app you'd switch views here.
-    });
-  });
-</script>
-
-</body>
-</html>
-```
-<div id="student-auth-widget">
-  <!-- Login / Register Button (injected into #hook-navbar) -->
-  <script>
-    (function() {
-      const navbar = document.getElementById('hook-navbar');
-      if (!navbar) return;
-
-      // Create button
-      const loginBtn = document.createElement('button');
-      loginBtn.className = 'btn-primary';
-      loginBtn.textContent = '👤 Student Login / Register';
-      loginBtn.id = 'student-login-btn';
-      navbar.appendChild(loginBtn);
-
-      // Profile badge (mini-card)
-      const profileBadge = document.createElement('div');
-      profileBadge.className = 'mini-card';
-      profileBadge.id = 'student-profile-badge';
-      profileBadge.style.display = 'none';
-      navbar.appendChild(profileBadge);
-
-      // Modal container
-      const modalOverlay = document.createElement('div');
-      modalOverlay.id = 'student-auth-modal';
-      modalOverlay.style.cssText = `
-        position:fixed;top:0;left:0;width:100%;height:100%;
-        background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;
-        z-index:1000;
-      `;
-      modalOverlay.innerHTML = `
-        <div class="card" style="width:320px;padding:20px;position:relative;">
-          <h3 id="auth-modal-title">Student Register</h3>
-          <form id="auth-form">
-            <div style="margin-bottom:10px;">
-              <label>Name</label><br>
-              <input type="text" id="auth-name" required style="width:100%;">
-            </div>
-            <div style="margin-bottom:10px;">
-              <label>Email or Phone</label><br>
-              <input type="text" id="auth-contact" required style="width:100%;">
-            </div>
-            <div style="margin-bottom:10px;">
-              <label>PIN (4‑6 digits)</label><br>
-              <input type="password" id="auth-pin" pattern="\\d{4,6}" required style="width:100%;">
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%;">Submit</button>
-            <button type="button" id="auth-cancel" class="btn-primary" style="width:100%;margin-top:5px;background:#ccc;color:#000;">Cancel</button>
-          </form>
-        </div>
-      `;
-      document.body.appendChild(modalOverlay);
-
-      // Helper: hide admin UI
-      function hideAdminTools() {
-        document.querySelectorAll('.admin-tool').forEach(el => el.style.display = 'none');
-      }
-
-      // Load profile if exists
-      function loadProfile() {
-        const data = localStorage.getItem('studentProfile');
-        if (data) {
-          const profile = JSON.parse(data);
-          profileBadge.innerHTML = `
-            <strong>${profile.name}</strong><br>
-            Level ${profile.level} • XP ${profile.xp}
-          `;
-          profileBadge.style.display = 'inline-block';
-          loginBtn.style.display = 'none';
-          hideAdminTools();
-        } else {
-          profileBadge.style.display = 'none';
-          loginBtn.style.display = 'inline-block';
-        }
-      }
-
-      // Sync with backend (placeholder URL)
-      function syncProfile(profile) {
-        fetch('https://example.com/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(profile)
-        })
-        .then(res => res.json())
-        .then(updated => {
-          // Assume backend returns updated xp, streak, level
-          profile.xp = updated.xp ?? profile.xp;
-          profile.streak = updated.streak ?? profile.streak;
-          profile.level = updated.level ?? profile.level;
-          localStorage.setItem('studentProfile', JSON.stringify(profile));
-          loadProfile();
-        })
-        .catch(() => {
-          // If sync fails, keep local copy
-          console.warn('Unable to sync with backend.');
-        });
-      }
-
-      // Open modal
-      loginBtn.addEventListener('click', () => {
-        document.getElementById('auth-modal-title').textContent = 'Student Register';
-        document.getElementById('auth-form').reset();
-        modalOverlay.style.display = 'flex';
-      });
-
-      // Cancel button
-      document.getElementById('auth-cancel').addEventListener('click', () => {
-        modalOverlay.style.display = 'none';
-      });
-
-      // Form submit
-      document.getElementById('auth-form').addEventListener('submit', e => {
-        e.preventDefault();
-        const profile = {
-          name: document.getElementById('auth-name').value.trim(),
-          contact: document.getElementById('auth-contact').value.trim(),
-          pin: document.getElementById('auth-pin').value,
-          xp: 0,
-          streak: 0,
-          level: 1
-        };
-        localStorage.setItem('studentProfile', JSON.stringify(profile));
-        syncProfile(profile);
-        modalOverlay.style.display = 'none';
-      });
-
-      // Initialize
-      loadProfile();
-    })();
-  </script>
-</div>
-<div class="card" style="padding:20px; max-width:800px; margin:auto;">
-  <h2>Interactive Quest‑Based Learning Hub</h2>
-  
-  <!-- Course List -->
-  <div id="course-list" style="display:flex; flex-wrap:wrap; gap:15px;">
-    <div class="mini-card" data-course="HTML Basics" data-points="50">
-      <h4>HTML Basics</h4>
-      <p>Start your web adventure.</p>
-      <button class="btn-primary start-btn">Start Quest</button>
-    </div>
-    <div class="mini-card" data-course="JavaScript Intro" data-points="70">
-      <h4>JavaScript Intro</h4>
-      <p>Unlock dynamic powers.</p>
-      <button class="btn-primary start-btn">Start Quest</button>
-    </div>
-    <div class="mini-card" data-course="Python Fundamentals" data-points="80">
-      <h4>Python Fundamentals</h4>
-      <p>Code your first script.</p>
-      <button class="btn-primary start-btn">Start Quest</button>
-    </div>
-  </div>
-
-  <!-- Progress & Rewards -->
-  <div id="progress-panel" style="margin-top:30px; display:none;">
-    <h3 id="current-course"></h3>
-    <p id="hint"></p>
-    <button class="btn-primary" id="complete-btn">Complete Challenge</button>
-  </div>
-
-  <!-- Leaderboard -->
-  <div style="margin-top:30px;">
-    <h3>Class Leaderboard</h3>
-    <table id="leaderboard" style="width:100%; border-collapse:collapse;">
-      <thead>
-        <tr><th style="text-align:left;">Student</th><th style="text-align:right;">Points</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- QR Certificate -->
-  <div id="certificate" style="margin-top:30px; display:none;">
-    <h3>Congratulations!</h3>
-    <p>You earned a QR certificate for completing <span id="cert-course"></span>.</p>
-    <canvas id="qr-canvas" width="150" height="150" style="border:1px solid #ccc;"></canvas>
-  </div>
-</div>
-
-<script>
-// Simple in‑memory data (replace with real backend later)
-const studentName = "You"; // In a real app, fetch logged‑in user
-let points = 0;
-let completedCourses = [];
-
-// Initialize leaderboard with dummy data
-const leaderboardData = [
-  { name: "Alice", points: 120 },
-  { name: "Bob", points: 95 },
-  { name: studentName, points: points }
-];
-
-function renderLeaderboard() {
-  const tbody = document.querySelector("#leaderboard tbody");
-  tbody.innerHTML = "";
-  // Sort descending
-  const sorted = [...leaderboardData].sort((a,b)=>b.points-a.points);
-  sorted.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${row.name}</td><td style="text-align:right;">${row.points}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// Simple hint generator
-function getHint(course) {
-  const hints = {
-    "HTML Basics": "Remember tags are written inside < >.",
-    "JavaScript Intro": "Use console.log() to see output.",
-    "Python Fundamentals": "Indentation matters!"
-  };
-  return hints[course] || "Good luck!";
-}
-
-// QR generation (basic data URL)
-function generateQR(text) {
-  const canvas = document.getElementById("qr-canvas");
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  // Very simple placeholder QR (black squares)
-  ctx.fillStyle = "#000";
-  for(let i=0;i<25;i++){
-    for(let j=0;j<25;j++){
-      if(Math.random()>0.7){
-        ctx.fillRect(i*6, j*6, 5,5);
-      }
-    }
-  }
-  // In production replace with a QR library.
-}
-
-// Event listeners
-document.querySelectorAll(".start-btn").forEach(btn=>{
-  btn.addEventListener("click", e=>{
-    const card = e.target.closest(".mini-card");
-    const course = card.dataset.course;
-    const reward = parseInt(card.dataset.points);
-    document.getElementById("current-course").textContent = `Quest: ${course}`;
-    document.getElementById("hint").textContent = getHint(course);
-    document.getElementById("progress-panel").style.display = "block";
-    document.getElementById("complete-btn").dataset.course = course;
-    document.getElementById("complete-btn").dataset.reward = reward;
-  });
-});
-
-document.getElementById("complete-btn").addEventListener("click", e=>{
-  const course = e.target.dataset.course;
-  const reward = parseInt(e.target.dataset.reward);
-  points += reward;
-  completedCourses.push(course);
-  // Update leaderboard entry for this student
-  const entry = leaderboardData.find(o=>o.name===studentName);
-  if(entry) entry.points = points; else leaderboardData.push({name:studentName, points});
-  renderLeaderboard();
-  // Show certificate
-  document.getElementById("cert-course").textContent = course;
-  document.getElementById("certificate").style.display = "block";
-  generateQR(`${studentName}-${course}-${Date.now()}`);
-  // Reset UI
-  document.getElementById("progress-panel").style.display = "none";
-});
-
-renderLeaderboard();
-</script>
-<div class="card" style="max-width: 500px; margin: 20px auto; padding: 20px;">
-    <h2>Master Vision Blueprint</h2>
-    <ol>
-      <li>Core Goal: 100% safe, self‑healing, no‑code AI learning ecosystem for mobile, tablet, and laptop users.</li>
-      <li>Addictive Learning Feed: Reels, XP, daily streaks, viral friend invites.</li>
-      <li>AI Tutor & Practice: Chat‑style mentor, voice speaking practice, read‑along coach, adaptive lessons in 20+ languages.</li>
-      <li>Academy & Media: Micro‑courses with QR certificates, AI image/video studio, JeshLive cartoon & custom face/voice‑clone tutor.</li>
-      <li>Monetization & Control: AdSense/Sponsor banners, 48‑hour improvement proposals reviewed by Admin.</li>
-    </ol>
-    <button class="btn-primary" id="saveBlueprintBtn">Save Blueprint</button>
-    <div id="saveStatus" style="margin-top:10px; font-weight:bold;"></div>
-  </div>
-
-  <script>
-    (function() {
-      const blueprint = {
-        coreGoal: "Fast, 100% safe, self-healing, no-code AI learning ecosystem for mobile, tablet, and laptop users.",
-        learningFeed: "Instagram/Facebook‑style bite‑sized reels, XP, daily streaks, viral friend invite sharing.",
-        tutor: "ChatGPT/Claude‑style mentor with artifacts, voice practice, read‑along coach, adaptive lessons in 20+ languages.",
-        academy: "Micro‑courses (Python, HTML/CSS, C++, CCC, CSC, Finance) with QR certificates, AI Image/Video Studio, JeshLive cartoon & custom face/voice‑clone video‑call tutor.",
-        monetization: "AdSense/Sponsor ad banners and scheduled 48‑hour improvement proposals reviewed by Admin."
-      };
-
-      const btn = document.getElementById('saveBlueprintBtn');
-      const statusDiv = document.getElementById('saveStatus');
-
-      btn.addEventListener('click', () => {
-        try {
-          const data = {
-            ...blueprint,
-            savedAt: new Date().toISOString()
-          };
-          localStorage.setItem('masterBlueprint', JSON.stringify(data));
-          statusDiv.textContent = "✅ Blueprint saved successfully!";
-          statusDiv.style.color = "green";
-        } catch (e) {
-          statusDiv.textContent = "❌ Failed to save blueprint.";
-          statusDiv.style.color = "red";
-        }
-      });
-    })();
-  </script>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Co‑Architect Upgrade & JeshLive Tutor</title>
-<style>
-/* Minimal helpers – rely on existing .card, .btn-primary, .mini-card */
-#coArchChatBox {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-}
-#coArchChatInput {
-    width: 100%;
-    min-height: 50px;
-    resize: none;
-    box-sizing: border-box;
-    padding: 8px;
-    margin-top: 8px;
-    font-family: inherit;
-}
-.avatar-option {
-    cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-}
-.avatar-option.selected {
-    border-color: #007bff;
-}
-#videoCallScreen {
-    width: 100%;
-    height: 200px;
-    background:#000;
-    position: relative;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:1.2rem;
-}
-</style>
-</head>
-<body>
-
-<!-- 1️⃣ Co‑Architect Chat -->
-<div id="coArchitectChat" class="card">
-    <div id="coArchChatBox"></div>
-    <textarea id="coArchChatInput" class="mini-card" placeholder="Type a message…"></textarea>
-</div>
-
-<!-- 2️⃣ JeshLive Cartoon & Face Video‑Call Tutor -->
-<div id="jeshLiveCard" class="card">
-    <h3>📹 JeshLive Cartoon & Face Video‑Call Tutor</h3>
-
-    <!-- Avatar selection -->
-    <div id="avatarSelection">
-        <label><input type="radio" name="avatar" value="robo" checked hidden>
-            <img src="https://i.imgur.com/1XkzU5b.png" alt="Robo‑Guru" class="avatar-option selected" data-name="Robo‑Guru">
-        </label>
-        <label><input type="radio" name="avatar" value="didi" hidden>
-            <img src="https://i.imgur.com/2yZ3bK9.png" alt="Didi‑Mentor" class="avatar-option" data-name="Didi‑Mentor">
-        </label>
-        <label><input type="radio" name="avatar" value="captain" hidden>
-            <img src="https://i.imgur.com/3cJ4nL0.png" alt="Captain‑Code" class="avatar-option" data-name="Captain‑Code">
-        </label>
-        <label><input type="radio" name="avatar" value="global" hidden>
-            <img src="https://i.imgur.com/4dK5mQ1.png" alt="Global‑Guide" class="avatar-option" data-name="Global‑Guide">
-        </label>
-    </div>
-
-    <!-- Custom photo upload -->
-    <div style="margin-top:8px;">
-        <input type="file" id="customPhoto" accept="image/*">
-    </div>
-
-    <!-- Voice pitch selector -->
-    <div style="margin-top:8px;">
-        <label for="pitchRange">Voice Pitch: </label>
-        <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1">
-        <span id="pitchValue">1.0</span>
-    </div>
-
-    <!-- Start call button -->
-    <div style="margin-top:8px;">
-        <button id="startCallBtn" class="btn-primary">Start Video‑Call</button>
-    </div>
-
-    <!-- Video‑call screen (simulated) -->
-    <div id="videoCallScreen" class="mini-card" style="margin-top:8px;">
-        <span id="callStatus">Press “Start Video‑Call”</span>
-    </div>
-
-    <!-- Transcript / feedback -->
-    <div id="callTranscript" style="margin-top:8px; max-height:120px; overflow-y:auto; font-size:0.9rem;"></div>
-</div>
-
-<script>
-/* ---------- 1️⃣ Chat Logic ---------- */
-const chatBox = document.getElementById('coArchChatBox');
-const chatInput = document.getElementById('coArchChatInput');
-
-function autoExpand(el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-}
-chatInput.addEventListener('input', () => autoExpand(chatInput));
-
-chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        const raw = chatInput.value.trim();
-        if (raw) sendMessage(raw);
-        chatInput.value = '';
-        autoExpand(chatInput);
-    }
-});
-
-function sendMessage(text) {
-    const msgDiv = document.createElement('div');
-    // Convert **bold** to <strong>
-    const html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    msgDiv.innerHTML = `<span style="font-weight:bold;">You:</span> ${html}`;
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-/* ---------- 2️⃣ JeshLive Tutor Logic ---------- */
-const avatarOptions = document.querySelectorAll('.avatar-option');
-let selectedAvatar = 'Robo‑Guru';
-avatarOptions.forEach(img => {
-    img.addEventListener('click', () => {
-        avatarOptions.forEach(i => i.classList.remove('selected'));
-        img.classList.add('selected');
-        selectedAvatar = img.dataset.name;
-    });
-});
-
-const customPhotoInput = document.getElementById('customPhoto');
-let customPhotoURL = null;
-customPhotoInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = ev => {
-            customPhotoURL = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-});
-
-const pitchRange = document.getElementById('pitchRange');
-const pitchValue = document.getElementById('pitchValue');
-pitchRange.addEventListener('input', () => {
-    pitchValue.textContent = pitchRange.value;
-});
-
-const startBtn = document.getElementById('startCallBtn');
-const videoScreen = document.getElementById('videoCallScreen');
-const callStatus = document.getElementById('callStatus');
-const transcript = document.getElementById('callTranscript');
-
-let synth = window.speechSynthesis;
-
-function simulateTutorReply(userText) {
-    const reply = `Hello! I am ${selectedAvatar}. You said: "${userText}"`;
-    const utter = new SpeechSynthesisUtterance(reply);
-    utter.pitch = parseFloat(pitchRange.value);
-    synth.speak(utter);
-    addToTranscript('Tutor', reply);
-}
-
-function addToTranscript(sender, text) {
-    const p = document.createElement('p');
-    p.innerHTML = `<strong>${sender}:</strong> ${text}`;
-    transcript.appendChild(p);
-    transcript.scrollTop = transcript.scrollHeight;
-}
-
-startBtn.addEventListener('click', async () => {
-    // Show avatar (custom photo overrides preset)
-    videoScreen.innerHTML = '';
-    const img = document.createElement('img');
-    img.style.maxWidth = '100%';
-    img.style.maxHeight = '100%';
-    img.style.objectFit = 'contain';
-    if (customPhotoURL) {
-        img.src = customPhotoURL;
-    } else {
-        // Use placeholder cartoon avatar based on selection
-        const map = {
-            'Robo‑Guru': 'https://i.imgur.com/1XkzU5b.png',
-            'Didi‑Mentor': 'https://i.imgur.com/2yZ3bK9.png',
-            'Captain‑Code': 'https://i.imgur.com/3cJ4nL0.png',
-            'Global‑Guide': 'https://i.imgur.com/4dK5mQ1.png'
-        };
-        img.src = map[selectedAvatar];
-    }
-    videoScreen.appendChild(img);
-    callStatus.textContent = 'Listening… (speak into your mic)';
-
-    // Capture microphone (simple permission request)
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream);
-        let chunks = [];
-
-        mediaRecorder.ondataavailable = e => chunks.push(e.data);
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'audio/webm' });
-            // For demo we just use a placeholder text as "what the student said"
-            const placeholderText = 'I need help with loops.';
-            addToTranscript('You', placeholderText);
-            simulateTutorReply(placeholderText);
-            callStatus.textContent = 'Ready';
-            chunks = [];
-        };
-
-        // Record for 2 seconds then stop (simulates quick utterance)
-        mediaRecorder.start();
-        setTimeout(() => mediaRecorder.stop(), 2000);
-    } catch (err) {
-        callStatus.textContent = 'Mic access denied';
-    }
-});
-</script>
-</body>
-</html>
-<style>
-    .widget-container {
-      max-width: 800px;
-      margin: 0 auto;
-      font-family: Arial, sans-serif;
-    }
-    .phase-header {
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .phase-content {
-      display: none;
-      margin-top: 0.5rem;
-    }
-    .phase-card {
-      margin-bottom: 1rem;
-    }
-  </style>
-
-  <div class="widget-container">
-    <div class="card phase-card">
-      <div class="phase-header" data-target="phase1">
-        <h3>Phase 1 – Core Backend & Vault</h3>
-        <button class="btn-primary">Show</button>
-      </div>
-      <div class="phase-content" id="phase1">
-        <ul class="mini-card">
-          <li>Single‑Admin Lock for full control.</li>
-          <li>Active vs Last‑Input Vault with event‑sourcing.</li>
-          <li>Student Data Firewall & real‑time Alerts.</li>
-          <li>Hybrid Search (keyword + semantic).</li>
-          <li>Mindset Vault for personalized coaching.</li>
-          <li>Safe GitHub Push (LIVE) for continuous backup.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="card phase-card">
-      <div class="phase-header" data-target="phase2">
-        <h3>Phase 2 – Admin Command Center</h3>
-        <button class="btn-primary">Show</button>
-      </div>
-      <div class="phase-content" id="phase2">
-        <ul class="mini-card">
-          <li>Self‑Architect Impact Preview.</li>
-          <li>AI Behavior Controls (temperature, top‑K, …).</li>
-          <li>Smart Prompt Router.</li>
-          <li>48‑hour Opportunity Radar.</li>
-          <li>Theme Studio & Game Arena.</li>
-          <li>UPI Hub (Planned) for Indian payments.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="card phase-card">
-      <div class="phase-header" data-target="phase3">
-        <h3>Phase 3 – JeshLingo, JeshRead & Academy</h3>
-        <button class="btn-primary">Show</button>
-      </div>
-      <div class="phase-content" id="phase3">
-        <ul class="mini-card">
-          <li>20+ languages, including China & Africa.</li>
-          <li>Voice Pronunciation Coach (Web Speech API).</li>
-          <li>Micro‑courses (Python, HTML, C++, Finance, …).</li>
-          <li>QR Certificates (Planned).</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="card phase-card">
-      <div class="phase-header" data-target="phase4">
-        <h3>Phase 4 – JeshLive Avatar & Voice Clone (Planned)</h3>
-        <button class="btn-primary">Show</button>
-      </div>
-      <div class="phase-content" id="phase4">
-        <ul class="mini-card">
-          <li>Photo upload + 10‑sec voice clone.</li>
-          <li>Live video/voice call tutoring.</li>
-          <li>Official Mentor Avatar.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Toggle phase details
-    document.querySelectorAll('.phase-header').forEach(header => {
-      const btn = header.querySelector('button');
-      const targetId = header.getAttribute('data-target');
-      const content = document.getElementById(targetId);
-
-      header.addEventListener('click', (e) => {
-        // Prevent button click from bubbling twice
-        if (e.target !== btn) e.stopPropagation();
-        const isOpen = content.style.display === 'block';
-        content.style.display = isOpen ? 'none' : 'block';
-        btn.textContent = isOpen ? 'Show' : 'Hide';
-      });
-    });
-  </script></div>
-    </section>
-
-    <!-- ==================== ADMIN COMMAND CENTER (NO-CODE CO-ARCHITECT) ==================== -->
-    <section id="viewAdmin" class="hidden">
-      <div class="admin-banner">
+  <!-- ==================== SECRET ADMIN COMMAND CENTER (HIDDEN FROM LEARNERS) ==================== -->
+  <section id="viewAdmin" class="app-workspace hidden" style="bottom:0;">
+    <div class="screen-inner">
+      <div class="dark-studio" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
-          <h2 style="font-size:20px;">🛠️ Architect & AI Command Center (v4.0)</h2>
-          <p style="font-size:12px;color:#cbd5e1;">Permanent Blueprint Memory • No-Code Discussion & Build • Ads & Time-Machine</p>
+          <h2 style="font-size:18px;">🛠️ Admin Command Center (v5.0)</h2>
+          <p style="font-size:12px;color:#94a3b8;">Registered Students: <strong id="adminStudentCount">0</strong> • Permanent Blueprint Memory</p>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 Generate New Improvement Plan</button>
-          <button class="btn-outline" onclick="switchView('learner')">Exit Admin</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 New Plan</button>
+          <button class="btn-outline" onclick="exitAdminView()">Exit Admin</button>
         </div>
       </div>
 
-      <div class="tabs-bar">
-        <button class="admin-tab-btn btn-tab-active" data-tab="architect" onclick="showAdminTab('architect')">💬 Co-Architect Discussion & Builder</button>
-        <button class="admin-tab-btn btn-outline" data-tab="vault" onclick="showAdminTab('vault')">🔐 Vault, Ads & Feature Flags</button>
-        <button class="admin-tab-btn btn-outline" data-tab="connectors" onclick="showAdminTab('connectors')">🔌 Universal MCP & API Hub</button>
-        <button class="admin-tab-btn btn-outline" data-tab="alerts" onclick="showAdminTab('alerts')">🔔 Alerts & Time-Machine (<span id="alertCount">0</span>)</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn-primary" onclick="showAdminTab('architect')">💬 Co-Architect</button>
+        <button class="btn-outline" onclick="showAdminTab('vault')">🔐 Vault & Ads</button>
+        <button class="btn-outline" onclick="showAdminTab('alerts')">🔔 Alerts & Rollback</button>
       </div>
 
-      <!-- TAB 1: CONVERSATIONAL NO-CODE CO-ARCHITECT -->
       <div id="tab-architect" class="admin-tab-panel card">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-          <div>
-            <h3>💬 Discuss & Plan Upgrades with Your AI Architect</h3>
-            <p style="font-size:12px;color:var(--muted);">AI remembers your entire MasterBlueprint sheet. Discuss changes first, then click Build & Deploy.</p>
-          </div>
-          <label style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;background:#f1f5f9;padding:6px 12px;border-radius:8px;">
-            <input type="checkbox" id="showCodeToggle" onchange="toggleCodeVisibility()" /> Show Code (Optional)
-          </label>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong>💬 Discuss & Upgrade with AI Architect</strong>
+          <label style="font-size:11px;"><input type="checkbox" id="showCodeToggle" onchange="toggleCodeVisibility()" /> Show Code</label>
         </div>
+        <div id="coArchitectChatBox" class="chat-messages" style="height:200px;background:#f8fafc;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;">
+          <div class="msg-ai">👋 Namaste Admin! Discuss any feature or improvement here, then click Ready to Build.</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <textarea id="coArchChatInput" rows="2" placeholder="Discuss idea (Shift+Enter for new line, Enter to send)..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();chatWithCoArchitect();}"></textarea>
+          <button class="btn-dark" onclick="chatWithCoArchitect()">Send</button>
+        </div>
+        <button class="btn-primary" style="margin-bottom:12px;" onclick="finalizeDiscussionToBuilder()">✨ Send Agreed Plan to Builder</button>
 
-        <!-- DISCUSSION CHAT -->
-        <div id="coArchitectChatBox" class="chat-feed" style="background:#f8fafc;border-color:#cbd5e1;height:220px;">
-          <div class="msg-ai" style="background:#eef2ff;color:#1e1b4b;">👋 Namaste Admin! I have loaded your full MasterBlueprint memory. Tell me what new feature, UI change, or improvement you want to discuss before we build it!</div>
+        <textarea id="architectPrompt" rows="2" placeholder="Finalized upgrade plan..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Preview</button>
+          <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Make Live 🚀</button>
         </div>
-        <div class="input-row" style="margin-bottom:16px;">
-          <input id="coArchChatInput" type="text" placeholder="Discuss idea (e.g., Let's add a daily leaderboard or improve the Reels feed)..." onkeydown="if(event.key==='Enter') chatWithCoArchitect()" />
-          <button class="btn-dark" onclick="chatWithCoArchitect()">Discuss 💬</button>
-          <button class="btn-primary" onclick="finalizeDiscussionToBuilder()">✨ Ready to Build This</button>
-        </div>
-
-        <!-- FINAL BUILD & DEPLOY -->
-        <div class="mini-card">
-          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Finalized Upgrade Plan to Deploy:</label>
-          <textarea id="architectPrompt" rows="2" placeholder="Your finalized plan appears here automatically..."></textarea>
-          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
-            <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Upgrade Preview</button>
-            <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Make Live 🚀</button>
-          </div>
-          <div id="architectOutput" class="response-box hidden"></div>
-          <pre id="architectRawCodeBox" class="terminal hidden"></pre>
-        </div>
+        <div id="architectOutput" class="card hidden" style="margin-top:10px;background:#f8fafc;white-space:pre-line;font-size:13px;"></div>
+        <pre id="architectRawCodeBox" class="terminal hidden"></pre>
       </div>
 
-      <!-- TAB 2: VAULT, ADS & FEATURE FLAGS -->
       <div id="tab-vault" class="admin-tab-panel card hidden">
-        <h3 style="margin-bottom:6px;">🔐 Active Vault, Ad Monetization & Feature Flags</h3>
-        <p class="subtitle">Control Ads, API keys, brand headings, and module visibility anytime.</p>
+        <strong style="display:block;margin-bottom:10px;">🔐 Config, Ads & API Vault</strong>
         <div id="configVaultGrid" class="grid-2"></div>
       </div>
 
-      <!-- TAB 3: CONNECTORS -->
-      <div id="tab-connectors" class="admin-tab-panel card hidden">
-        <h3 style="margin-bottom:6px;">🔌 Universal MCP Server, Repo & External API Bridge</h3>
-        <div class="grid-2" style="margin-bottom:14px;">
-          <input id="connName" type="text" placeholder="Tool Name (e.g., ElevenLabs / n8n / Custom MCP)" />
-          <select id="connType">
-            <option value="REMOTE_MCP">Remote MCP Server URL</option>
-            <option value="REST_API">External REST API</option>
-            <option value="WEBHOOK">Automation Webhook (n8n/Make)</option>
-          </select>
-          <input id="connUrl" type="text" placeholder="Endpoint URL (https://...)" />
-          <input id="connAuth" type="password" placeholder="API Key / Bearer Token (Optional)" />
-          <input id="connDesc" type="text" placeholder="What does this tool do?" />
-          <button class="btn-dark" onclick="saveConnector()">➕ Connect Tool</button>
-        </div>
-        <div id="connectorsList"></div>
-      </div>
-
-      <!-- TAB 4: ALERTS & TIME-MACHINE -->
       <div id="tab-alerts" class="admin-tab-panel card hidden">
-        <h3 style="margin-bottom:10px;">🔔 Scheduled Improvement Plans & Auto-Bug Alerts</h3>
-        <div id="alertsContainer" style="margin-bottom:20px;"></div>
-        <h3 style="margin-bottom:8px;padding-top:14px;border-top:1px solid var(--border);">⏪ 1-Click Time-Machine Rollback (Last 5 Safe Versions)</h3>
+        <strong style="display:block;margin-bottom:8px;">🔔 Proposals & Bug Alerts</strong>
+        <div id="alertsContainer" style="margin-bottom:16px;"></div>
+        <strong style="display:block;margin-bottom:8px;">⏪ 1-Click Rollback (Last 5 Versions)</strong>
         <div id="backupsContainer"></div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <!-- ADMIN LOGIN MODAL -->
+  <!-- STUDENT LOGIN / REGISTRATION + 30-SEC LEVEL CHECK MODAL -->
+  <div id="studentAuthModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <h3 style="font-size:19px;margin-bottom:4px;">🎓 Welcome to Jesh AI</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Login or create your free account so your AI mentor remembers your progress across devices.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <input id="stuAuthName" type="text" placeholder="Full Name (Required for new students)" />
+        <input id="stuAuthContact" type="text" placeholder="Mobile Number or Email" />
+        <input id="stuAuthPin" type="password" maxlength="6" placeholder="Create / Enter 4-Digit PIN" />
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--muted);">Quick Self-Check: How comfortable are you in English & Computers?</label>
+          <select id="stuAuthLevel" style="margin-top:4px;">
+            <option value="A1 Beginner">🌱 Beginner — Start from basics</option>
+            <option value="B1 Intermediate">🚀 Intermediate — Practice fluency & coding</option>
+            <option value="C1 Advanced">🏆 Advanced — Mastery & interviews</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="stuAuthSubmitBtn" style="justify-content:center;padding:12px;" onclick="submitStudentAuth()">🚀 Start Learning (Save Progress)</button>
+        <button class="btn-outline" style="justify-content:center;font-size:12px;" onclick="closeStudentAuthModal()">Continue as Guest</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECRET ADMIN LOGIN MODAL (5 TAPS ON LOGO OR CTRL+SHIFT+A) -->
   <div id="adminLoginModal" class="modal-backdrop hidden">
     <div class="modal-box">
-      <h3 style="margin-bottom:8px;">🔐 Admin Verification</h3>
-      <input id="adminPassInput" type="password" placeholder="Enter Master Admin Password" onkeydown="if(event.key==='Enter') verifyAdminLogin()" />
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
-        <button class="btn-outline" onclick="closeAdminModal()">Cancel</button>
+      <h3 style="margin-bottom:8px;">🔐 Admin Access</h3>
+      <input id="adminPassInput" type="password" placeholder="Master Password" onkeydown="if(event.key==='Enter') verifyAdminLogin()" />
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
+        <button class="btn-outline" onclick="document.getElementById('adminLoginModal').classList.add('hidden')">Cancel</button>
         <button class="btn-dark" onclick="verifyAdminLogin()">Unlock</button>
       </div>
     </div>
@@ -1498,154 +406,184 @@ startBtn.addEventListener('click', async () => {
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
+    let STUDENT_PROFILE = null;
     let ADMIN_PASS = "";
     let GENERATED_CODE_BUFFER = "";
     let LAST_WIDGET_CODE = "";
     let LAST_DISCUSSED_PLAN = "";
     let ATTACHED_IMAGE_B64 = null;
+    let logoTapCount = 0, logoTapTimer = null;
 
     window.onerror = function(msg, url, line) {
       fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'REPORT_CLIENT_ERROR', errorMsg: msg, location: 'Line ' + line }) }).catch(() => {});
     };
 
-    const VAULT_FIELDS = [
-      { key: 'BRAND_NAME', label: 'Platform Brand Name' },
-      { key: 'HERO_HEADING', label: 'Main Home Heading' },
-      { key: 'THEME_ACCENT', label: 'Theme Color (Hex)' },
-      { key: 'ENABLE_ADS', label: 'Enable Ads Banner (TRUE/FALSE)' },
-      { key: 'AD_BANNER_TITLE', label: 'Sponsor / Ad Banner Text' },
-      { key: 'AD_BANNER_LINK', label: 'Ad Click URL' },
-      { key: 'ADSENSE_CLIENT_ID', label: 'Google AdSense Publisher ID (ca-pub-...)' },
-      { key: 'GROQ_API_KEY', label: 'Groq AI Key (gsk_...)', secret: true },
-      { key: 'OPENROUTER_API_KEY', label: 'OpenRouter Backup Key', secret: true },
-      { key: 'ELEVENLABS_API_KEY', label: 'ElevenLabs Voice Clone Key (Optional)', secret: true },
-      { key: 'STUDENT_SYSTEM_PROMPT', label: 'AI Tutor Behavior & Safety Prompt' }
-    ];
+    // Secret Admin Trigger: 5 taps on Logo or Ctrl+Shift+A
+    function handleLogoTap() {
+      logoTapCount++;
+      clearTimeout(logoTapTimer);
+      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 2000);
+      if (logoTapCount >= 5) {
+        logoTapCount = 0;
+        openAdminModal();
+      }
+    }
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') openAdminModal();
+    });
 
     window.addEventListener('DOMContentLoaded', async () => {
-      initGamification();
       renderInitialReels();
-      const cached = localStorage.getItem('JESH_UI_CFG_V4');
-      if (cached) applyThemeConfig(JSON.parse(cached));
+      const savedStu = localStorage.getItem('JESH_STUDENT_PROFILE');
+      if (savedStu) {
+        applyStudentProfile(JSON.parse(savedStu));
+      } else {
+        document.getElementById('studentAuthModal').classList.remove('hidden');
+      }
+
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
         if (data.status === 'ONLINE' && data.config) {
-          localStorage.setItem('JESH_UI_CFG_V4', JSON.stringify(data.config));
-          applyThemeConfig(data.config);
+          document.title = data.config.brandName;
+          document.getElementById('uiBrandName').textContent = data.config.brandName;
+          if (data.config.themeAccent) document.documentElement.style.setProperty('--primary', data.config.themeAccent);
+          if (data.config.ads) {
+            document.getElementById('adBannerSlot').classList.toggle('hidden', !data.config.ads.enabled);
+            document.getElementById('adBannerText').textContent = '📢 ' + data.config.ads.title;
+          }
         }
       } catch (e) {}
     });
 
-    function initGamification() {
-      const savedLvl = localStorage.getItem('JESH_STUDENT_LVL') || 'A1 Beginner';
-      document.getElementById('globalStudentLevel').value = savedLvl;
-      document.getElementById('headerLevelBadge').textContent = savedLvl.split(' ')[0];
-      updateXP(0);
-      const today = new Date().toDateString();
-      const lastDay = localStorage.getItem('JESH_LAST_DAY');
-      let streak = parseInt(localStorage.getItem('JESH_STREAK') || '1', 10);
-      if (lastDay && lastDay !== today) streak += 1;
-      localStorage.setItem('JESH_LAST_DAY', today);
-      localStorage.setItem('JESH_STREAK', streak);
-      document.getElementById('userStreak').textContent = streak;
+    // STUDENT AUTH & CLOUD PROGRESS SYNC
+    function openStudentAuthModal() { document.getElementById('studentAuthModal').classList.remove('hidden'); }
+    function closeStudentAuthModal() { document.getElementById('studentAuthModal').classList.add('hidden'); }
+
+    async function submitStudentAuth() {
+      const name = document.getElementById('stuAuthName').value.trim();
+      const contact = document.getElementById('stuAuthContact').value.trim();
+      const pin = document.getElementById('stuAuthPin').value.trim();
+      const level = document.getElementById('stuAuthLevel').value;
+      if (!contact || !pin) return alert('Please enter Phone/Email and PIN.');
+
+      const btn = document.getElementById('stuAuthSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Syncing with Cloud...';
+
+      const res = await postBackend({ action: 'STUDENT_AUTH', name, contact, pin, level });
+      btn.disabled = false;
+      btn.textContent = '🚀 Start Learning (Save Progress)';
+
+      if (res.success && res.student) {
+        STUDENT_PROFILE = res.student;
+        localStorage.setItem('JESH_STUDENT_PROFILE', JSON.stringify(STUDENT_PROFILE));
+        applyStudentProfile(STUDENT_PROFILE);
+        closeStudentAuthModal();
+      } else {
+        alert(res.message || 'Login failed');
+      }
+    }
+
+    function applyStudentProfile(s) {
+      STUDENT_PROFILE = s;
+      document.getElementById('hdrStudentName').textContent = s.name || 'Learner';
+      document.getElementById('userXpCount').textContent = s.xp || 0;
+      document.getElementById('userStreak').textContent = s.streak || 1;
+      document.getElementById('globalStudentLevel').value = s.level || 'A1 Beginner';
+      document.getElementById('studentProgressBanner').textContent = `Welcome back, ${s.name}! Progress Memory: ${s.progressSummary}`;
+      document.getElementById('tutorChatFeed').innerHTML = `<div class="msg-ai">👋 Welcome back, <strong>${s.name}</strong>! I loaded your progress (${s.progressSummary}). What shall we master today?</div>`;
     }
 
     function saveStudentLevel() {
       const lvl = document.getElementById('globalStudentLevel').value;
-      localStorage.setItem('JESH_STUDENT_LVL', lvl);
-      document.getElementById('headerLevelBadge').textContent = lvl.split(' ')[0];
-      loadFreshFeedCards();
-    }
-
-    function updateXP(add) {
-      let xp = parseInt(localStorage.getItem('JESH_USER_XP') || '0', 10) + add;
-      localStorage.setItem('JESH_USER_XP', xp);
-      document.getElementById('userXpCount').textContent = xp;
-    }
-
-    function applyThemeConfig(c) {
-      document.title = c.brandName || 'Jesh AI Ecosystem';
-      document.getElementById('uiBrandName').textContent = c.brandName || 'Jesh AI Ecosystem';
-      document.getElementById('uiLearnerLabel').textContent = c.studentLabel || 'Learner';
-      document.getElementById('uiHeroHeading').textContent = c.heroHeading || 'Learn, Create & Grow with Your Personal AI';
-      if (c.themeAccent) document.documentElement.style.setProperty('--primary', c.themeAccent);
-      if (c.ads) {
-        document.getElementById('adBannerSlot').classList.toggle('hidden', !c.ads.enabled);
-        document.getElementById('adBannerText').textContent = '📢 ' + c.ads.title;
-        if (c.ads.link && c.ads.link !== '#') document.getElementById('adBannerBtn').href = c.ads.link;
+      if (STUDENT_PROFILE) {
+        STUDENT_PROFILE.level = lvl;
+        localStorage.setItem('JESH_STUDENT_PROFILE', JSON.stringify(STUDENT_PROFILE));
+        postBackend({ action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, level: lvl, xp: STUDENT_PROFILE.xp, summary: 'Updated level to ' + lvl });
       }
     }
 
-    function switchView(view) {
-      document.getElementById('viewLearner').classList.toggle('hidden', view !== 'learner');
-      document.getElementById('viewAdmin').classList.toggle('hidden', view !== 'admin');
-    }
-
-    function switchLearnerTab(tab) {
-      document.querySelectorAll('.l-panel').forEach(p => p.classList.add('hidden'));
-      const target = document.getElementById('ltab-' + tab);
-      if (target) target.classList.remove('hidden');
-      document.querySelectorAll('.l-tab').forEach(b => {
-        b.className = (b.dataset.ltab === tab) ? 'l-tab btn-tab-active' : 'l-tab btn-outline';
+    function addStudentXP(points, activityNote) {
+      if (!STUDENT_PROFILE) {
+        let gXp = parseInt(localStorage.getItem('JESH_GUEST_XP') || '0', 10) + points;
+        localStorage.setItem('JESH_GUEST_XP', gXp);
+        document.getElementById('userXpCount').textContent = gXp;
+        return;
+      }
+      STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + points;
+      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
+      localStorage.setItem('JESH_STUDENT_PROFILE', JSON.stringify(STUDENT_PROFILE));
+      postBackend({
+        action: 'SYNC_STUDENT',
+        userId: STUDENT_PROFILE.userId,
+        level: STUDENT_PROFILE.level,
+        xp: STUDENT_PROFILE.xp,
+        summary: activityNote || ''
       });
     }
 
-    // 1. ADDICTIVE SOCIAL REELS LEARNING FEED
-    function renderInitialReels() {
-      const reels = [
-        { tag: '🗣️ Spoken English Hack', title: 'Stop saying "I am fine" every time!', body: 'Try these natural alternatives: "I am doing great, thanks!" or "Couldn’t be better!"' },
-        { tag: '🐍 Python 30-Sec Trick', title: 'Swap two variables in 1 line', body: 'In Python, write: a, b = b, a — no temporary variable needed!' },
-        { tag: '💻 CCC Exam Goldmine', title: 'LibreOffice Writer Shortcut', body: 'Press Ctrl + Shift + J for Full Screen mode and Ctrl + F12 to insert a Table.' }
-      ];
-      document.getElementById('socialFeedContainer').innerHTML = reels.map((r, i) => buildReelCardHTML(r, i)).join('');
+    // FULL-SCREEN NAVIGATION CONTROLLER
+    function openFullScreen(screenName) {
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.add('hidden'));
+      const target = document.getElementById('scr-' + screenName);
+      if (target) target.classList.remove('hidden');
+      document.querySelectorAll('.bnav-btn').forEach(b => {
+        b.classList.toggle('bnav-active', b.dataset.scr === screenName);
+      });
+      document.getElementById('viewLearner').scrollTop = 0;
     }
 
-    function buildReelCardHTML(r, idx) {
-      return `
-        <div class="feed-card">
-          <span class="feed-tag">${r.tag}</span>
-          <h4 style="font-size:16px;margin-bottom:6px;">${r.title}</h4>
-          <p style="font-size:14px;color:#334155;">${r.body}</p>
-          <div class="feed-actions">
-            <button class="btn-outline" onclick="this.textContent='❤️ Liked (+5 XP)';updateXP(5)">🤍 Like</button>
-            <button class="btn-outline" onclick="speakTextAloud('${r.title}. ${r.body}')">🔊 Listen</button>
-            <button class="btn-outline" onclick="discussFeedItem('${r.title}')">💬 Discuss with AI</button>
-            <button class="btn-outline" onclick="shareAndInvite()">📤 Share</button>
+    // 1. REELS FEED
+    function renderInitialReels() {
+      const reels = [
+        { tag: '🗣️ Spoken English', title: 'Natural Reply to "How are you?"', body: 'Instead of "I am fine", say: "I am doing great, how about you?"' },
+        { tag: '🐍 Python Quick Tip', title: 'Reverse a List in 1 Second', body: 'Use my_list[::-1] to instantly reverse any list or string in Python!' },
+        { tag: '💻 CCC Shortcut', title: 'LibreOffice Calc Formula Bar', body: 'Press Ctrl + Shift + F2 to jump straight to the input line in Calc.' }
+      ];
+      document.getElementById('socialFeedContainer').innerHTML = reels.map(r => `
+        <div class="card">
+          <span style="font-size:11px;font-weight:700;color:var(--primary);background:#eef2ff;padding:3px 9px;border-radius:99px;">${r.tag}</span>
+          <h4 style="font-size:16px;margin:8px 0 4px;">${r.title}</h4>
+          <p style="font-size:14px;color:#334155;margin-bottom:10px;">${r.body}</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-outline" style="padding:6px 10px;font-size:12px;" onclick="this.textContent='❤️ +5 XP';addStudentXP(5)">🤍 Like</button>
+            <button class="btn-outline" style="padding:6px 10px;font-size:12px;" onclick="speakTextAloud('${r.title}. ${r.body}')">🔊 Listen</button>
+            <button class="btn-primary" style="padding:6px 10px;font-size:12px;" onclick="discussInFullTutor('${r.title}')">💬 Ask Tutor</button>
           </div>
         </div>
-      `;
+      `).join('');
     }
 
     async function loadFreshFeedCards() {
       const lvl = document.getElementById('globalStudentLevel').value;
       const box = document.getElementById('socialFeedContainer');
-      box.innerHTML = '<div class="mini-card">⚡ Curating personalized learning reels for ' + lvl + '...</div>';
+      box.innerHTML = '<div class="card">⚡ Loading personalized reels...</div>';
       const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        prompt: `Create 3 short, addictive social-media style micro-learning cards for a ${lvl} student (1 on Spoken English, 1 on Python/AI, 1 on Digital Literacy/Life Skills). Format strictly as 3 lines: TAG | TITLE | 2-SENTENCE LESSON`
+        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
+        prompt: `Create 3 short micro-learning cards for ${lvl} level (Spoken English, Python/AI, Digital Skills). Format strictly as 3 lines: TAG | TITLE | 2-SENTENCE LESSON`
       });
       if (res.success) {
         const lines = res.reply.split('\n').filter(l => l.includes('|'));
         if (lines.length) {
-          box.innerHTML = lines.map((l, i) => {
+          box.innerHTML = lines.map(l => {
             const p = l.split('|');
-            return buildReelCardHTML({ tag: p[0].trim(), title: p[1].trim(), body: (p[2] || '').trim() }, i);
+            return `<div class="card"><span style="font-size:11px;font-weight:700;color:var(--primary);">${p[0].trim()}</span><h4 style="margin:6px 0;">${p[1].trim()}</h4><p style="font-size:14px;margin-bottom:10px;">${(p[2]||'').trim()}</p><button class="btn-primary" style="padding:6px 10px;font-size:12px;" onclick="discussInFullTutor('${p[1].trim().replace(/'/g,'')}')">💬 Practice This</button></div>`;
           }).join('');
-          updateXP(10);
+          addStudentXP(10, 'Explored daily learning reels');
           return;
         }
       }
       renderInitialReels();
     }
 
-    function discussFeedItem(topic) {
-      switchLearnerTab('chat');
-      document.getElementById('learnerPrompt').value = `Tell me more about "${topic}" with a real-life example and quiz me!`;
+    function discussInFullTutor(topic) {
+      openFullScreen('chat');
+      document.getElementById('learnerPrompt').value = `Teach me "${topic}" step-by-step and give me 1 practice question.`;
       askLearnerAI();
     }
 
-    // 2. AI TUTOR CHAT + VISION
+    // 2. FULL-SCREEN AI TUTOR
     function previewVisionImage(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1655,28 +593,36 @@ startBtn.addEventListener('click', async () => {
     }
 
     async function askLearnerAI() {
-      const prompt = document.getElementById('learnerPrompt').value.trim();
+      const input = document.getElementById('learnerPrompt');
+      const prompt = input.value.trim();
       if (!prompt && !ATTACHED_IMAGE_B64) return;
-      const lvl = document.getElementById('globalStudentLevel').value;
-      const box = document.getElementById('learnerResponseBox');
+      const feed = document.getElementById('tutorChatFeed');
       const btn = document.getElementById('learnerAskBtn');
-      box.classList.remove('hidden');
-      box.textContent = "⚡ Thinking...";
+      const lvl = document.getElementById('globalStudentLevel').value;
+
+      feed.innerHTML += `<div class="msg-user">${prompt || '📷 [Scanned Question]'}</div>`;
+      input.value = '';
+      feed.scrollTop = feed.scrollHeight;
       btn.disabled = true;
+
       const useWeb = document.getElementById('learnerWebToggle').checked;
       const res = await postBackend({
         action: 'CHAT', role: 'student',
-        prompt: `[Student Level: ${lvl}] ${prompt || 'Explain this image clearly.'}`,
+        studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
+        prompt: `[Level: ${lvl}] ${prompt || 'Solve and explain this image step by step.'}`,
         useWebSearch: useWeb, imageBase64: ATTACHED_IMAGE_B64
       });
-      box.textContent = res.reply || res.message;
       btn.disabled = false;
       ATTACHED_IMAGE_B64 = null;
       document.getElementById('visionBadge').classList.add('hidden');
-      if (res.success) updateXP(10);
+
+      const reply = res.reply || 'Please try again.';
+      feed.innerHTML += `<div class="msg-ai">${reply}</div>`;
+      feed.scrollTop = feed.scrollHeight;
+      if (res.success) addStudentXP(10, 'Studied: ' + prompt.slice(0, 40));
     }
 
-    // 3. SPEAKING PRACTICE + READALONG
+    // 3. SPEAKING & READALONG
     let recognition = null, isRecording = false;
     function toggleVoiceMic() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1687,13 +633,13 @@ startBtn.addEventListener('click', async () => {
       recognition = new SpeechRec();
       recognition.lang = 'en-IN';
       recognition.interimResults = true;
-      recognition.onstart = () => { isRecording = true; btn.classList.add('mic-active'); status.textContent = "🔴 Listening... Speak now!"; };
+      recognition.onstart = () => { isRecording = true; btn.classList.add('mic-active'); status.textContent = "🔴 Listening..."; };
       recognition.onresult = e => {
         let t = '';
         for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
         document.getElementById('speakingTranscriptInput').value = t;
       };
-      recognition.onend = () => { isRecording = false; btn.classList.remove('mic-active'); status.textContent = "Mic Ready • Press Send 🔊"; };
+      recognition.onend = () => { isRecording = false; btn.classList.remove('mic-active'); status.textContent = "Mic Ready"; };
       recognition.start();
     }
 
@@ -1702,37 +648,36 @@ startBtn.addEventListener('click', async () => {
       const userText = inputEl.value.trim();
       if (!userText) return;
       const mode = document.getElementById('speakingMode').value;
-      const lvl = document.getElementById('globalStudentLevel').value;
       const history = document.getElementById('speakingChatHistory');
       history.innerHTML += `<div class="msg-user">🗣️ ${userText}</div>`;
       inputEl.value = "";
       history.scrollTop = history.scrollHeight;
 
       const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        prompt: `Mode: ${mode}, Level: ${lvl}. Student said: "${userText}". Reply naturally in 2 short sentences to continue the conversation, then on a new line write "Tip:" with 1 grammar/fluency tip.`
+        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
+        prompt: `Mode: ${mode}. Student spoke: "${userText}". Reply naturally in 2 short conversational sentences, then on a new line write "Tip:" with 1 quick grammar tip.`
       });
-      const aiText = res.reply || "Great job! Keep speaking.";
-      history.innerHTML += `<div class="msg-ai">🤖 ${aiText}</div>`;
+      const aiText = res.reply || "Great effort! Keep speaking.";
+      history.innerHTML += `<div class="msg-ai" style="background:#1e293b;color:#f1f5f9;">🤖 ${aiText}</div>`;
       history.scrollTop = history.scrollHeight;
-      updateXP(15);
+      addStudentXP(15, 'Practiced speaking (' + mode + ')');
       speakTextAloud(aiText.split('Tip:')[0]);
     }
 
     async function generateNewReadAlongPassage() {
       const lvl = document.getElementById('globalStudentLevel').value;
       const el = document.getElementById('readAlongTargetText');
-      el.textContent = "⚡ Loading new passage...";
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 inspiring 2-sentence English reading passage suitable for a ${lvl} student. Output ONLY the passage.` });
+      el.textContent = "⚡ Loading passage...";
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 short 2-sentence English reading passage for ${lvl} level. Output ONLY the passage.` });
       if (res.success) el.textContent = res.reply;
     }
 
     function startReadAlongCheck() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert("Use Chrome or Edge for ReadAlong Mic.");
+      if (!SpeechRec) return alert("Use Chrome or Edge for ReadAlong.");
       const target = document.getElementById('readAlongTargetText').textContent.trim();
       const resBox = document.getElementById('readAlongResult');
-      resBox.innerHTML = "🔴 Listening... Read the passage aloud now!";
+      resBox.innerHTML = "🔴 Listening... Read aloud now!";
       const rec = new SpeechRec();
       rec.lang = 'en-IN';
       rec.onresult = e => {
@@ -1746,60 +691,59 @@ startBtn.addEventListener('click', async () => {
         }).join(' ');
         const score = Math.round((matched / words.length) * 100);
         resBox.innerHTML = `Accuracy: <strong>${score}%</strong> (+20 XP)<br><div style="margin-top:6px;">${highlighted}</div>`;
-        updateXP(20);
+        addStudentXP(20, 'ReadAlong score ' + score + '%');
       };
       rec.start();
     }
 
-    // 4. JESHLINGO INTERACTIVE FLASHCARDS
+    // 4. JESHLINGO & COURSES
     async function generateInteractiveCards() {
       const lang = document.getElementById('lingoLangSelect').value;
       const lvl = document.getElementById('globalStudentLevel').value;
       const grid = document.getElementById('lingoCardsGrid');
-      grid.innerHTML = '<div class="mini-card">⚡ Building interactive flashcards...</div>';
+      grid.innerHTML = '<div class="mini-card">⚡ Building flashcards...</div>';
       const res = await postBackend({
         action: 'CHAT', role: 'student',
-        prompt: `Create 4 practical phrases in ${lang} for a ${lvl} learner. Format strictly as 4 lines: PHRASE | PRONUNCIATION | ENGLISH MEANING`
+        prompt: `Create 4 practical phrases in ${lang} for ${lvl} level. Format strictly as 4 lines: PHRASE | PRONUNCIATION | MEANING`
       });
       if (res.success) {
         const lines = res.reply.split('\n').filter(l => l.includes('|'));
         grid.innerHTML = lines.map(l => {
           const p = l.split('|');
-          return `
-            <div class="mini-card">
-              <div style="font-size:17px;font-weight:800;color:var(--primary);">${p[0].trim()}</div>
-              <div style="font-size:12px;color:#64748b;margin:4px 0;">🗣️ ${p[1].trim()}</div>
-              <div style="font-size:13px;font-weight:600;margin-bottom:8px;">💡 ${(p[2] || '').trim()}</div>
-              <button class="btn-outline" style="font-size:11px;" onclick="speakTextAloud('${p[0].trim().replace(/'/g, '')}')">🔊 Listen</button>
-            </div>
-          `;
+          return `<div class="mini-card"><div style="font-size:16px;font-weight:800;color:var(--primary);">${p[0].trim()}</div><div style="font-size:12px;color:#64748b;">🗣️ ${p[1].trim()}</div><div style="font-size:13px;margin:4px 0 8px;">💡 ${(p[2]||'').trim()}</div><button class="btn-outline" style="padding:5px 9px;font-size:11px;" onclick="speakTextAloud('${p[0].trim().replace(/'/g,'')}')">🔊 Listen</button></div>`;
         }).join('');
-        updateXP(15);
+        addStudentXP(15, 'Learned ' + lang + ' flashcards');
       }
     }
 
-    // 5. IMAGE, VIDEO & TALKING AVATAR STUDIO
-    function generateAIImage() {
-      const prompt = document.getElementById('mediaPromptInput').value.trim();
-      if (!prompt) return alert('Enter an image description first.');
-      const safePrompt = encodeURIComponent(prompt + ', educational, clean, high quality');
-      const imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=600&height=400&nologo=true`;
-      document.getElementById('mediaOutputZone').innerHTML = `
-        <img src="${imgUrl}" alt="Generated AI Visual" style="width:100%;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;" />
-        <a href="${imgUrl}" target="_blank" class="btn-outline" style="font-size:11px;text-decoration:none;">⬇️ Open / Download Image</a>
+    function launchCourse(name) { discussInFullTutor(name + ' Lesson 1'); }
+
+    function generateQRCertificate() {
+      const name = document.getElementById('certStudentName').value.trim() || (STUDENT_PROFILE ? STUDENT_PROFILE.name : '');
+      const course = document.getElementById('certCourseSelect').value;
+      if (!name) return alert('Enter Student Name.');
+      const certId = 'JESH-' + Math.floor(100000 + Math.random() * 900000);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=85x85&data=${encodeURIComponent('Jesh AI Certificate: ' + name + ' | ' + course + ' | ' + certId)}`;
+      document.getElementById('certPreviewArea').innerHTML = `
+        <div style="border:2px solid var(--primary);background:#fff;border-radius:14px;padding:16px;text-align:center;margin-top:12px;">
+          <div style="font-size:10px;font-weight:700;color:var(--primary);">JESH AI ACADEMY</div>
+          <h4 style="font-size:18px;margin:4px 0;">Certificate of Achievement</h4>
+          <div style="font-size:20px;font-weight:800;margin:4px 0;">${name}</div>
+          <p style="font-size:12px;">completed <strong>${course}</strong></p>
+          <div style="margin-top:10px;display:flex;justify-content:center;align-items:center;gap:10px;">
+            <img src="${qrUrl}" alt="QR" />
+            <div style="text-align:left;font-size:11px;"><div>ID: ${certId}</div><button class="btn-primary" style="margin-top:6px;padding:5px 9px;font-size:11px;" onclick="shareAndInvite('${name} earned a ${course} Certificate on Jesh AI!')">📤 Share</button></div>
+          </div>
+        </div>
       `;
-      updateXP(15);
+      addStudentXP(50, 'Earned certificate in ' + course);
     }
 
-    async function generateVideoScript() {
-      const prompt = document.getElementById('mediaPromptInput').value.trim();
-      if (!prompt) return alert('Enter a video topic first.');
-      const zone = document.getElementById('mediaOutputZone');
-      zone.innerHTML = '<p style="font-size:12px;">⚡ Writing 3-scene educational video script...</p>';
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write a crisp 3-scene educational short video script + visual cue for: "${prompt}".` });
-      zone.innerHTML = `<div class="response-box" style="margin-top:0;font-size:12px;">${res.reply}</div>`;
+    // 5. VIDEO-CALL AVATAR & MEDIA STUDIO
+    function selectPresetAvatar(url, pitch) {
+      document.getElementById('avatarPhotoPreview').src = url;
+      document.getElementById('avatarPitch').value = pitch;
     }
-
     function uploadAvatarPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1807,69 +751,63 @@ startBtn.addEventListener('click', async () => {
       reader.onload = e => { document.getElementById('avatarPhotoPreview').src = e.target.result; };
       reader.readAsDataURL(file);
     }
-
-    function recordVoiceSample() {
-      alert("🎙️ Voice Sample Profile Saved! Your custom pitch & cadence will now be applied to your JeshLive Talking Avatar.");
+    function voiceToAvatarPrompt() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) return alert("Use Chrome or Edge.");
+      const rec = new SpeechRec();
+      rec.lang = 'en-IN';
+      rec.onresult = e => {
+        document.getElementById('avatarDiscussTopic').value = e.results[0][0].transcript;
+        talkWithVideoAvatar();
+      };
+      rec.start();
     }
-
-    function animateAndSpeakAvatar() {
-      const text = document.getElementById('avatarSpeakText').value.trim();
-      if (!text) return;
+    async function talkWithVideoAvatar() {
+      const topic = document.getElementById('avatarDiscussTopic').value.trim();
+      if (!topic) return;
+      const cap = document.getElementById('avatarReplyCaption');
       const stage = document.getElementById('avatarStage');
-      const pitch = parseFloat(document.getElementById('avatarPitch').value || '1.0');
+      cap.textContent = "📞 Connecting live reply...";
+      const res = await postBackend({
+        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE ? STUDENT_PROFILE.userId : '',
+        prompt: `You are speaking on a live video call with the student about: "${topic}". Reply warmly in 2 short, clear spoken sentences.`
+      });
+      const reply = res.reply || "Let's explore this topic together!";
+      cap.textContent = "🗣️ " + reply;
       stage.classList.add('avatar-speaking');
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.pitch = pitch;
+        const u = new SpeechSynthesisUtterance(reply);
+        u.pitch = parseFloat(document.getElementById('avatarPitch').value || '1.0');
         u.onend = () => stage.classList.remove('avatar-speaking');
         window.speechSynthesis.speak(u);
       } else {
-        setTimeout(() => stage.classList.remove('avatar-speaking'), 2000);
+        setTimeout(() => stage.classList.remove('avatar-speaking'), 2500);
       }
-      updateXP(10);
+      addStudentXP(15, 'Video call session on ' + topic.slice(0, 30));
     }
 
-    // 6. COURSES, QR CERTIFICATE & VIRAL INVITE
-    function launchCourse(name) {
-      switchLearnerTab('chat');
-      document.getElementById('learnerPrompt').value = `Teach me Lesson 1 of ${name} with a practical example and 1 practice question.`;
-      askLearnerAI();
+    function generateAIImage() {
+      const p = document.getElementById('mediaPromptInput').value.trim();
+      if (!p) return alert('Enter image topic.');
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', clean educational illustration')}?width=600&height=400&nologo=true`;
+      document.getElementById('mediaOutputZone').innerHTML = `<img src="${url}" style="width:100%;border-radius:12px;margin-bottom:8px;" /><a href="${url}" target="_blank" class="btn-outline" style="font-size:11px;text-decoration:none;">⬇️ Download</a>`;
     }
-
-    function generateQRCertificate() {
-      const name = document.getElementById('certStudentName').value.trim();
-      const course = document.getElementById('certCourseSelect').value;
-      if (!name) return alert('Enter student name first.');
-      const certId = 'JESH-' + Math.floor(100000 + Math.random() * 900000);
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent('Jesh AI Verified Certificate: ' + name + ' | ' + course + ' | ID: ' + certId)}`;
-      document.getElementById('certPreviewArea').innerHTML = `
-        <div class="cert-box">
-          <div style="font-size:11px;font-weight:700;color:var(--primary);">JESH AI AUTONOMOUS ACADEMY</div>
-          <h3 style="font-size:20px;margin:4px 0;">Certificate of Achievement</h3>
-          <div style="font-size:22px;font-weight:800;margin:6px 0;">${name}</div>
-          <p style="font-size:13px;">completed <strong>${course}</strong></p>
-          <div style="margin-top:10px;display:flex;justify-content:center;align-items:center;gap:12px;">
-            <img src="${qrUrl}" alt="QR" style="border-radius:8px;" />
-            <div style="text-align:left;font-size:11px;">
-              <div><strong>ID:</strong> ${certId}</div>
-              <button class="btn-primary" style="margin-top:6px;font-size:11px;" onclick="shareAndInvite('${name} just earned a ${course} Certificate on Jesh AI!')">📤 Share Achievement</button>
-            </div>
-          </div>
-        </div>
-      `;
-      updateXP(50);
+    async function generateVideoScript() {
+      const p = document.getElementById('mediaPromptInput').value.trim();
+      if (!p) return alert('Enter video topic.');
+      const z = document.getElementById('mediaOutputZone');
+      z.innerHTML = '⚡ Writing script...';
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write a crisp 3-scene educational video script for: "${p}".` });
+      z.innerHTML = `<div style="background:#f8fafc;padding:12px;border-radius:10px;font-size:13px;white-space:pre-line;">${res.reply}</div>`;
     }
 
     function shareAndInvite(customMsg) {
       const url = window.location.href;
-      const text = customMsg || `🚀 I am learning Spoken English, AI, Python & CCC for FREE on Jesh AI Ecosystem! Join me here: ${url}`;
-      if (navigator.share) {
-        navigator.share({ title: 'Jesh AI Ecosystem', text, url }).catch(() => {});
-      } else {
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-      }
-      updateXP(25);
+      const text = customMsg || `🚀 Join me on Jesh AI Ecosystem to practice Spoken English, AI, Python & CCC for FREE! ${url}`;
+      if (navigator.share) navigator.share({ title: 'Jesh AI', text, url }).catch(() => {});
+      else window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+      addStudentXP(25, 'Shared platform with friends');
     }
 
     function speakTextAloud(txt) {
@@ -1879,13 +817,31 @@ startBtn.addEventListener('click', async () => {
       }
     }
 
-    // ==================== ADMIN NO-CODE CO-ARCHITECT ====================
+    // ==================== SECRET ADMIN COMMAND CENTER ====================
     function openAdminModal() {
-      if (ADMIN_PASS) { switchView('admin'); return; }
+      if (ADMIN_PASS) { enterAdminView(); return; }
       document.getElementById('adminLoginModal').classList.remove('hidden');
       document.getElementById('adminPassInput').focus();
     }
-    function closeAdminModal() { document.getElementById('adminLoginModal').classList.add('hidden'); }
+    function enterAdminView() {
+      document.getElementById('viewLearner').classList.add('hidden');
+      document.getElementById('studentBottomNav').classList.add('hidden');
+      document.getElementById('viewAdmin').classList.remove('hidden');
+    }
+    function exitAdminView() {
+      document.getElementById('viewAdmin').classList.add('hidden');
+      document.getElementById('viewLearner').classList.remove('hidden');
+      document.getElementById('studentBottomNav').classList.remove('hidden');
+    }
+
+    const VAULT_FIELDS = [
+      { key: 'BRAND_NAME', label: 'Brand Name' },
+      { key: 'THEME_ACCENT', label: 'Theme Color (Hex)' },
+      { key: 'ENABLE_ADS', label: 'Enable Ads (TRUE/FALSE)' },
+      { key: 'AD_BANNER_TITLE', label: 'Ad Banner Text' },
+      { key: 'GROQ_API_KEY', label: 'Groq API Key', secret: true },
+      { key: 'OPENROUTER_API_KEY', label: 'OpenRouter Key', secret: true }
+    ];
 
     async function verifyAdminLogin() {
       const pass = document.getElementById('adminPassInput').value.trim();
@@ -1893,23 +849,24 @@ startBtn.addEventListener('click', async () => {
       const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass });
       if (res.success) {
         ADMIN_PASS = pass;
-        closeAdminModal();
-        switchView('admin');
+        document.getElementById('adminLoginModal').classList.add('hidden');
+        document.getElementById('adminStudentCount').textContent = res.studentCount || 0;
+        enterAdminView();
         renderVaultFields(res.config);
         renderAlerts(res.alerts || []);
-        renderConnectors(res.connectors || []);
         renderBackups(res.backups || []);
       } else {
-        alert(res.message || 'Incorrect Password');
+        alert(res.message || 'Invalid Password');
       }
     }
 
-    function showAdminTab(tabName) {
-      document.querySelectorAll('.admin-tab-panel').forEach(el => el.classList.add('hidden'));
-      document.getElementById('tab-' + tabName).classList.remove('hidden');
-      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-        btn.className = (btn.dataset.tab === tabName) ? 'admin-tab-btn btn-tab-active' : 'admin-tab-btn btn-outline';
-      });
+    function showAdminTab(t) {
+      document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('tab-' + t).classList.remove('hidden');
+    }
+
+    function formatBoldHTML(str) {
+      return str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
     async function chatWithCoArchitect() {
@@ -1922,26 +879,22 @@ startBtn.addEventListener('click', async () => {
       box.scrollTop = box.scrollHeight;
 
       const res = await postBackend({ action: 'CHAT', role: 'architect_chat', prompt: msg });
-      const reply = res.reply || "Let's refine that idea together!";
+      const reply = res.reply || "Let's refine that!";
       LAST_DISCUSSED_PLAN = msg + " -> " + reply;
-      box.innerHTML += `<div class="msg-ai" style="background:#eef2ff;color:#1e1b4b;">🤖 ${reply}</div>`;
+      box.innerHTML += `<div class="msg-ai">🤖 ${formatBoldHTML(reply)}</div>`;
       box.scrollTop = box.scrollHeight;
     }
 
     function finalizeDiscussionToBuilder() {
-      if (!LAST_DISCUSSED_PLAN) return alert('First type your idea in the discussion box above!');
+      if (!LAST_DISCUSSED_PLAN) return alert('Discuss your idea first!');
       document.getElementById('architectPrompt').value = "Implement our discussed upgrade: " + LAST_DISCUSSED_PLAN;
     }
 
     function toggleCodeVisibility() {
       const show = document.getElementById('showCodeToggle').checked;
       const rawBox = document.getElementById('architectRawCodeBox');
-      if (show && LAST_WIDGET_CODE) {
-        rawBox.textContent = LAST_WIDGET_CODE;
-        rawBox.classList.remove('hidden');
-      } else {
-        rawBox.classList.add('hidden');
-      }
+      if (show && LAST_WIDGET_CODE) { rawBox.textContent = LAST_WIDGET_CODE; rawBox.classList.remove('hidden'); }
+      else rawBox.classList.add('hidden');
     }
 
     async function generateArchitectPlan() {
@@ -1951,20 +904,20 @@ startBtn.addEventListener('click', async () => {
       const btn = document.getElementById('analyzeArchBtn');
       out.classList.remove('hidden');
       btn.disabled = true;
-      out.textContent = "⚡ Preparing your upgrade plan (reading MasterBlueprint & live site)...";
+      out.textContent = "⚡ Preparing upgrade preview...";
 
       const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASS, filePath: 'index.html' });
-      if (!fileRes.success) { out.textContent = "Connection Error: " + fileRes.message; btn.disabled = false; return; }
+      if (!fileRes.success) { out.textContent = fileRes.message; btn.disabled = false; return; }
 
       const aiRes = await postBackend({
         action: 'CHAT', role: 'admin',
-        prompt: `Create a clean, self-contained HTML+JS module using existing CSS classes ("card", "btn-primary", "mini-card") for: "${reqText}". First write 3 simple bullet points in plain language starting with "UPGRADE SUMMARY:" (no code jargon). Then put ONLY the HTML/JS snippet inside <widget> ... </widget>.`
+        prompt: `Create a clean HTML+JS module using classes ("card", "btn-primary", "mini-card") for: "${reqText}". Write 3 short plain-language bullets starting with "UPGRADE SUMMARY:". Then put ONLY the HTML/JS inside <widget> ... </widget>.`
       });
       btn.disabled = false;
       if (!aiRes.success) { out.textContent = aiRes.reply; return; }
 
       const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
-      LAST_WIDGET_CODE = (wMatch && wMatch[1]) ? wMatch[1].trim() : `<div class="card"><h3>✨ New Feature</h3><p>${aiRes.reply}</p></div>`;
+      LAST_WIDGET_CODE = (wMatch && wMatch[1]) ? wMatch[1].trim() : `<div class="card"><h3>✨ Upgrade</h3><p>${aiRes.reply}</p></div>`;
       const marker = 'id="dynamicExtensionsZone"';
       if (fileRes.content.includes(marker)) {
         const idx = fileRes.content.indexOf('>', fileRes.content.indexOf(marker)) + 1;
@@ -1973,7 +926,7 @@ startBtn.addEventListener('click', async () => {
         GENERATED_CODE_BUFFER = fileRes.content.replace('</body>', LAST_WIDGET_CODE + '\n</body>');
       }
 
-      out.textContent = `${aiRes.reply.split('<widget>')[0].trim()}\n\n✅ Ready! Click "2️⃣ Approve & Make Live 🚀" to publish and save to MasterBlueprint memory.`;
+      out.innerHTML = formatBoldHTML(aiRes.reply.split('<widget>')[0].trim()) + "\n\n✅ Ready! Click Approve & Make Live.";
       toggleCodeVisibility();
       document.getElementById('approvePushBtn').classList.remove('hidden');
     }
@@ -1983,12 +936,11 @@ startBtn.addEventListener('click', async () => {
       const out = document.getElementById('architectOutput');
       const pushBtn = document.getElementById('approvePushBtn');
       pushBtn.disabled = true;
-      out.textContent += "\n\nPublishing live & updating MasterBlueprint sheet...";
       const res = await postBackend({
         action: 'GITHUB_PUSH', adminPass: ADMIN_PASS, filePath: 'index.html',
         content: GENERATED_CODE_BUFFER, message: document.getElementById('architectPrompt').value.slice(0, 60)
       });
-      out.textContent += "\n🎉 " + res.message + "\nRefresh page in 30 seconds to enjoy your upgrade!";
+      out.innerHTML += "\n\n🎉 " + res.message;
       pushBtn.classList.add('hidden');
       pushBtn.disabled = false;
     }
@@ -1996,94 +948,45 @@ startBtn.addEventListener('click', async () => {
     function renderVaultFields(cfg) {
       document.getElementById('configVaultGrid').innerHTML = VAULT_FIELDS.map(f => `
         <div class="mini-card">
-          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">${f.label}</label>
+          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">${f.label}</label>
           <div style="display:flex;gap:6px;">
             <input id="cfg_${f.key}" type="${f.secret ? 'password' : 'text'}" placeholder="${cfg[f.key] || 'Not set'}" />
             <button class="btn-primary" onclick="saveVaultKey('${f.key}')">Save</button>
           </div>
-          <button style="background:none;color:#64748b;font-size:11px;padding:6px 0 0 0;" onclick="restoreVaultKey('${f.key}')">↩️ Restore Last Input</button>
         </div>
       `).join('');
     }
-
     async function saveVaultKey(key) {
       const val = document.getElementById('cfg_' + key).value.trim();
-      if (!val) return alert('Enter a value first.');
+      if (!val) return;
       const res = await postBackend({ action: 'UPDATE_CONFIG', adminPass: ADMIN_PASS, key, value: val });
-      alert(res.success ? 'Saved & archived!' : res.message);
+      alert(res.success ? 'Saved!' : res.message);
     }
-
-    async function restoreVaultKey(key) {
-      const res = await postBackend({ action: 'RESTORE_CONFIG', adminPass: ADMIN_PASS, key });
-      alert(res.success ? 'Restored previous input!' : res.message);
-    }
-
-    async function saveConnector() {
-      const name = document.getElementById('connName').value.trim();
-      const type = document.getElementById('connType').value;
-      const endpointUrl = document.getElementById('connUrl').value.trim();
-      const authHeader = document.getElementById('connAuth').value.trim();
-      const description = document.getElementById('connDesc').value.trim();
-      if (!name || !endpointUrl) return alert('Name and URL required.');
-      const res = await postBackend({ action: 'ADD_CONNECTOR', adminPass: ADMIN_PASS, name, type, endpointUrl, authHeader, description });
-      alert(res.message);
-      if (res.success) verifyAdminLogin();
-    }
-
-    function renderConnectors(list) {
-      document.getElementById('connectorsList').innerHTML = list.length ? list.map(c => `<div class="mini-card" style="margin-bottom:8px;"><b>${c.name}</b> (${c.type}) — ${c.description}</div>`).join('') : '<p style="font-size:12px;color:#64748b;">No connectors yet.</p>';
-    }
-
     async function triggerAutonomousRD() {
       const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASS });
       alert(res.message);
       if (res.success) verifyAdminLogin();
     }
-
     function renderAlerts(alerts) {
-      document.getElementById('alertCount').textContent = alerts.filter(a => a.status === 'PENDING').length;
       document.getElementById('alertsContainer').innerHTML = alerts.length ? alerts.map(a => `
-        <div class="mini-card" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--primary);">
-            <span>${a.title}</span><span>${a.status}</span>
-          </div>
-          <p style="font-size:13px;margin:8px 0;">${a.details}</p>
-          ${a.status === 'PENDING' ? `<div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-emerald" onclick='discussProposal(${JSON.stringify(a.details)}, ${a.row})'>💬 Discuss & Customize in Co-Architect</button>
-            <button class="btn-outline" onclick="markAlert(${a.row}, 'DISMISSED')">Dismiss</button>
-          </div>` : ''}
+        <div class="mini-card" style="margin-bottom:8px;">
+          <strong>${a.title}</strong> (${a.status})<p style="font-size:12px;margin:4px 0;">${a.details}</p>
         </div>
-      `).join('') : '<p style="font-size:12px;color:#64748b;">No pending proposals.</p>';
+      `).join('') : '<p style="font-size:12px;">No alerts.</p>';
     }
-
-    function discussProposal(details, row) {
-      markAlert(row, 'APPROVED');
-      showAdminTab('architect');
-      const box = document.getElementById('coArchitectChatBox');
-      box.innerHTML += `<div class="msg-ai" style="background:#eef2ff;color:#1e1b4b;">📋 <strong>Scheduled Plan Proposal:</strong><br>${details}<br><br>Would you like to modify anything in this plan before we make it live?</div>`;
-      LAST_DISCUSSED_PLAN = details;
-    }
-
     function renderBackups(backups) {
       document.getElementById('backupsContainer').innerHTML = backups.length ? backups.map(b => `
-        <div class="mini-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:12px;"><strong>${b.id}</strong> • ${b.reason}</div>
-          <button class="btn-rose" style="padding:6px 12px;font-size:11px;" onclick="triggerRollback(${b.row})">⏪ Restore This Version</button>
+        <div class="mini-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;">${b.id} • ${b.reason}</span>
+          <button class="btn-rose" style="padding:5px 10px;font-size:11px;" onclick="triggerRollback(${b.row})">⏪ Restore</button>
         </div>
-      `).join('') : '<p style="font-size:12px;color:#64748b;">No backups recorded yet.</p>';
+      `).join('') : '<p style="font-size:12px;">No backups yet.</p>';
     }
-
     async function triggerRollback(row) {
-      if (!confirm('Restore this previous version live?')) return;
+      if (!confirm('Restore this version?')) return;
       const res = await postBackend({ action: 'ROLLBACK_BACKUP', adminPass: ADMIN_PASS, row });
       alert(res.message);
     }
-
-    async function markAlert(row, status) {
-      await postBackend({ action: 'UPDATE_ALERT', adminPass: ADMIN_PASS, row, status });
-      verifyAdminLogin();
-    }
-
     async function postBackend(payload) {
       const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
       return await res.json();
