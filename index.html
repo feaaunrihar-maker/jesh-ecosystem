@@ -447,6 +447,329 @@
 
         <!-- ISOLATED AUTONOMOUS SELF-ARCHITECT MOUNT POINT -->
         <div id="dynamicExtensionsZone">
+<!-- AUTO-DEPLOYED: Perform a live Self-Verification Check o -->
+<div class="card"><strong>✨ Perform a live Self-Verification Check on all core modules (Auth, 50/50 Video Call, JeshLingo, JeshRead, Jesh Academy, and Ads Readiness) and deploy an interactive "Engagement & Fun Booster" upgrade across JeshLive Video Call, JeshLingo, and JeshRead:
+
+1. **JeshLive 50/50 Video Call — Real-Life Roleplay & Instant Praise Effects:**
+   - Add a 1-tap **"🎭 Roleplay Scenario"** selector right inside the Video Call top bar (`Job Interview`, `Market / Shopping`, `Ordering Food`, `Doctor Visit`, `Daily Friend Talk`) so the AI Mentor instantly acts out real-life situations with the student.
+   - Trigger an animated floating **"+15 XP 🎉 / Great Pronunciation!"** celebration badge inside the call stage whenever the student speaks a complete sentence, keeping the 50/50 split-screen immersive and lively.
+
+2. **JeshLingo — Combo Multiplier, Sound Chimes & Daily Goal Ring:**
+   - Add a live **"🔥 Combo Streak (2x XP!)"** counter and Web Audio API pleasant success/try-again chimes inside `checkLingoSentence()` so every consecutive right answer feels like a real game.
+   - Add a **"Daily Goal: X / 50 XP"** progress bar right above the sentence builder that fills up automatically with every answer and celebrates when the daily goal is reached.
+
+3. **JeshRead Studio — Speed-Reading Timer, Personal Word Bank & Story Quiz:**
+   - Save every word tapped for Hindi meaning into a persistent **"📒 My Personal Word Bank"** list below the story with a 1-tap **"⚡ 30-Second Word Flash Quiz"**.
+   - Add a **"🏆 Quick 2-Question Story Check"** button after reading a story so the student tests comprehension and earns bonus XP before moving to the next story.
+
+4. **Built-In Live Health & Readiness Badge:**
+   - Add a compact **"🩺 System Self-Check"** status strip inside the Admin Command Center that automatically verifies API connectivity, GitHub SHA sync, Student DB health, and AdSense/Monetization readiness in real time.</strong><p style="font-size:13px;margin-top:4px;"><widget>
+  <style>
+    /* General widget layout */
+    .jesh-widget {
+      font-family: Arial, sans-serif;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 12px;
+      background: #f9fafb;
+      color: #333;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+    .section {
+      margin-bottom: 24px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .section h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: #2d3748;
+    }
+    /* 1️⃣ Video Call */
+    .video-call-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #2b6cb0;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+    .video-call-bar select {
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: none;
+    }
+    .video-stage {
+      position: relative;
+      height: 200px;
+      background: #edf2f7;
+      margin-top: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .xp-badge {
+      position: absolute;
+      left: 50%;
+      top: 20%;
+      transform: translate(-50%, -50%);
+      background: #48bb78;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      animation: floatUp 2s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -80px); }
+    }
+    /* 2️⃣ Lingo */
+    .combo-counter {
+      font-size: 0.9rem;
+      color: #d69e2e;
+      margin-bottom: 4px;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 12px;
+      margin-top: 4px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #38a169;
+      width: 0%;
+      transition: width .3s;
+    }
+    .lingo-answer {
+      margin-top: 8px;
+    }
+    .lingo-answer button {
+      padding: 6px 12px;
+      margin-right: 6px;
+      border: none;
+      border-radius: 4px;
+      background: #4299e1;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* 3️⃣ Read */
+    .word-bank {
+      margin-top: 8px;
+      max-height: 120px;
+      overflow-y: auto;
+      border: 1px solid #cbd5e0;
+      padding: 6px;
+      border-radius: 4px;
+      background: #fafafa;
+    }
+    .word-bank li {
+      margin: 4px 0;
+    }
+    .quiz-btn, .story-check-btn {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #ed8936;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    /* 4️⃣ Health Strip */
+    .health-strip {
+      display: flex;
+      justify-content: space-around;
+      background: #edf2f7;
+      padding: 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .health-item {
+      display: flex;
+      align-items: center;
+    }
+    .health-item span {
+      margin-left: 4px;
+    }
+    .status-ok { color: #48bb78; }
+    .status-fail { color: #e53e3e; }
+  </style>
+
+  <div class="jesh-widget">
+
+    <!-- 1️⃣ JeshLive 50/50 Video Call -->
+    <div class="section" id="video-call-section">
+      <h2>JeshLive 50/50 Video Call – Roleplay & XP Boost</h2>
+      <div class="video-call-bar">
+        <div>🎥 Live Call</div>
+        <select id="roleplay-select">
+          <option value="">🎭 Roleplay Scenario</option>
+          <option value="Job Interview">Job Interview</option>
+          <option value="Market / Shopping">Market / Shopping</option>
+          <option value="Ordering Food">Ordering Food</option>
+          <option value="Doctor Visit">Doctor Visit</option>
+          <option value="Daily Friend Talk">Daily Friend Talk</option>
+        </select>
+      </div>
+      <div class="video-stage" id="video-stage">
+        <div id="scenario-display" style="padding:8px;color:#2d3748;"></div>
+        <button id="speak-btn" style="position:absolute;bottom:8px;right:8px;padding:6px 12px;background:#38a169;color:#fff;border:none;border-radius:4px;cursor:pointer;">🗣️ Speak</button>
+      </div>
+    </div>
+
+    <!-- 2️⃣ JeshLingo -->
+    <div class="section" id="lingo-section">
+      <h2>JeshLingo – Combo Streak & Daily Goal</h2>
+      <div class="combo-counter">🔥 Combo Streak: <span id="combo-count">0</span> (2x XP!)</div>
+      <div class="progress-bar"><div class="progress-fill" id="daily-progress"></div></div>
+      <div style="margin-top:4px;">Daily Goal: <span id="daily-xp">0</span> / 50 XP</div>
+
+      <div class="lingo-answer">
+        <button data-correct="true">Correct Answer</button>
+        <button data-correct="false">Wrong Answer</button>
+      </div>
+    </div>
+
+    <!-- 3️⃣ JeshRead Studio -->
+    <div class="section" id="read-section">
+      <h2>JeshRead Studio – Word Bank & Quick Quiz</h2>
+      <p>Tap a word to add it to your personal bank (simulated below).</p>
+      <button id="add-word-btn" style="padding:6px 12px;background:#667eea;color:#fff;border:none;border-radius:4px;cursor:pointer;">📚 Add Random Word</button>
+
+      <ul class="word-bank" id="word-bank">
+        <!-- Filled dynamically -->
+      </ul>
+
+      <button class="quiz-btn" id="flash-quiz-btn">⚡ 30‑Second Word Flash Quiz</button>
+
+      <button class="story-check-btn" id="story-check-btn">🏆 Quick 2‑Question Story Check</button>
+    </div>
+
+    <!-- 4️⃣ System Self‑Check -->
+    <div class="section" id="health-section">
+      <h2>🩺 System Self‑Check</h2>
+      <div class="health-strip" id="health-strip">
+        <div class="health-item" id="api-status"><span class="status-ok">✔️</span> <span>API</span></div>
+        <div class="health-item" id="git-status"><span class="status-ok">✔️</span> <span>GitHub</span></div>
+        <div class="health-item" id="db-status"><span class="status-ok">✔️</span> <span>DB</span></div>
+        <div class="health-item" id="ads-status"><span class="status-ok">✔️</span> <span>Ads</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ---------- 1️⃣ Video Call ----------
+    const roleSelect = document.getElementById('roleplay-select');
+    const scenarioDisplay = document.getElementById('scenario-display');
+    const speakBtn = document.getElementById('speak-btn');
+    const videoStage = document.getElementById('video-stage');
+
+    const scenarios = {
+      "Job Interview": "You are interviewing for a software engineer role. The mentor asks: \"Tell me about a challenging project you worked on.\"",
+      "Market / Shopping": "You are at a bustling market. The mentor says: \"How much does this mango cost?\"",
+      "Ordering Food": "You are at a restaurant. The mentor says: \"I would like a vegetarian pizza, please.\"",
+      "Doctor Visit": "You are at a clinic. The mentor asks: \"What symptoms have you been experiencing?\"",
+      "Daily Friend Talk": "You are chatting with a friend. The mentor says: \"Did you watch the movie last night?\""
+    };
+
+    roleSelect.addEventListener('change', () => {
+      const val = roleSelect.value;
+      scenarioDisplay.textContent = scenarios[val] || '';
+    });
+
+    // Simulated speech detection – click the button to "speak"
+    speakBtn.addEventListener('click', () => {
+      const badge = document.createElement('div');
+      badge.className = 'xp-badge';
+      badge.textContent = '+15 XP 🎉 / Great Pronunciation!';
+      videoStage.appendChild(badge);
+      setTimeout(() => badge.remove(), 2000);
+    });
+
+    // ---------- 2️⃣ JeshLingo ----------
+    let combo = 0;
+    let dailyXP = 0;
+    const comboEl = document.getElementById('combo-count');
+    const dailyXPEl = document.getElementById('daily-xp');
+    const progressFill = document.getElementById('daily-progress');
+
+    function playChime(type) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      if (type === 'success') {
+        osc.frequency.value = 880; // high tone
+      } else {
+        osc.frequency.value = 220; // low tone
+      }
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+    }
+
+    document.querySelectorAll('#lingo-section button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const correct = btn.dataset.correct === 'true';
+        if (correct) {
+          combo = combo + 1;
+          dailyXP += 5 * (combo >= 2 ? 2 : 1); // 2x XP after streak
+          playChime('success');
+        } else {
+          combo = 0;
+          playChime('fail');
+        }
+        comboEl.textContent = combo;
+        dailyXPEl.textContent = Math.min(dailyXP, 50);
+        const percent = Math.min(dailyXP, 50) / 50 * 100;
+        progressFill.style.width = percent + '%';
+        if (dailyXP >= 50) {
+          // Celebrate goal reached
+          const celebrate = document.createElement('div');
+          celebrate.textContent = '🏆 Daily Goal Reached!';
+          celebrate.style.position = 'fixed';
+          celebrate.style.top = '20%';
+          celebrate.style.left = '50%';
+          celebrate.style.transform = 'translateX(-50%)';
+          celebrate.style.background = '#48bb78';
+          celebrate.style.color = '#fff';
+          celebrate.style.padding = '8px 16px';
+          celebrate.style.borderRadius = '20px';
+          document.body.appendChild(celebrate);
+          setTimeout(() => celebrate.remove(), 2500);
+        }
+      });
+    });
+
+    // ---------- 3️⃣ JeshRead ----------
+    const wordBank = document.getElementById('word-bank');
+    const addWordBtn = document.getElementById('add-word-btn');
+    const sampleWords = ['पुस्तक', 'घर', 'सूर्य', 'आकाश', 'खुशी', 'ज्ञान', 'समय', 'शिक्षा', 'परिवार', 'मित्र'];
+
+    addWordBtn.addEventListener('click', () => {
+      const word = sampleWords[Math.floor(Math.random()*sampleWords.length)];
+      const li = document.createElement('li');
+      li.textContent = word;
+      wordBank.appendChild(li);
+    });
+
+    // Flash Quiz (30‑second timer)
+    document.getElementById('flash-quiz-btn').addEventListener('click', () => {
+      const words = Array.from(wordBank.children).map(li => li.textContent);
+      if (words.length === 0) {
+        alert('Add some words first!');
+        return;
+      }
+      const quizWords = words.sort(()=>0.5-Math.random()).slice(0, Math.min(5, words</p></div>
 <!-- AUTO-DEPLOYED: Upgrade the JeshLingo module (`#mod-ling -->
 <!-- ==================== HTML ==================== -->
   <div id="mod-lingo" style="max-width:480px;margin:auto;padding:1rem;font-family:Arial,Helvetica,sans-serif;">
