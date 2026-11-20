@@ -301,6 +301,117 @@
       <div id="dynamicExtensionsZone">
 <style>
     .card {
+      background: #222;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 20px auto;
+      font-family: Arial, sans-serif;
+    }
+    .card h2 {
+      margin-top: 0;
+      color: #ffeb3b;
+    }
+    .mini-card {
+      background: #333;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+    .mini-card h3 {
+      margin: 0 0 8px;
+      color: #4caf50;
+    }
+    .btn-primary {
+      background: #ff9800;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      height: 48px;
+      line-height: 48px;
+      padding: 0 20px;
+      font-size: 16px;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 20px;
+    }
+    .input-group {
+      margin-top: 10px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background: #444;
+      color: #fff;
+      font-size: 14px;
+    }
+  </style>
+
+  <div class="card">
+    <h2>Priority 1: JeshLingo + JeshRead Studio</h2>
+
+    <div class="mini-card">
+      <h3>JeshLingo</h3>
+      <p>20+ global languages, interactive beginner‑to‑advanced paths.</p>
+    </div>
+
+    <div class="mini-card">
+      <h3>JeshRead Studio</h3>
+      <p>Live voice reading, real‑time pronunciation feedback, word meanings, custom interest‑based stories.</p>
+    </div>
+
+    <div class="input-group">
+      <label for="mindset">MindsetTag</label>
+      <input type="text" id="mindset" placeholder="e.g., multilingual‑boost">
+    </div>
+
+    <div class="input-group">
+      <label for="summary">OneLineSummary</label>
+      <textarea id="summary" rows="2" placeholder="Brief impact summary..."></textarea>
+    </div>
+
+    <button class="btn-primary" onclick="submitImpact()">Save Impact Summary</button>
+  </div>
+
+  <script>
+    function submitImpact() {
+      const mindset = document.getElementById('mindset').value.trim();
+      const summary = document.getElementById('summary').value.trim();
+
+      if (!mindset || !summary) {
+        alert('Please fill both fields.');
+        return;
+      }
+
+      const payload = {
+        MindsetTag: mindset,
+        OneLineSummary: summary
+      };
+
+      // Replace with your actual Google Apps Script endpoint
+      const endpoint = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+      fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => alert('Impact summary saved!'))
+      .catch(() => alert('Error saving data.'));
+    }
+  </script>
+<style>
+    .card {
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 16px;
