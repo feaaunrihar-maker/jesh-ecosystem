@@ -303,6 +303,131 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Learner Dashboard Upgrade</title>
+<style>
+  body {font-family: Arial, sans-serif; margin:0; padding:20px; background:#f5f5f5;}
+  .card {background:#fff; border-radius:8px; padding:20px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+  .mini-card {background:#e9ecef; border-radius:6px; padding:10px; margin:5px 0;}
+  .btn-primary {background:#007bff; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;}
+  .btn-primary:hover {background:#0056b3;}
+  .toggle-group {display:flex; align-items:center; gap:10px; margin-bottom:15px;}
+  .hidden {display:none;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>👤 Student Login</h2>
+  <div class="toggle-group">
+    <label for="loginToggle">Logged in as Student?</label>
+    <input type="checkbox" id="loginToggle">
+  </div>
+</div>
+
+<div class="card" id="adminTools" class="hidden">
+  <h3>Admin‑Only Tools</h3>
+  <button class="btn-primary">Vault</button>
+  <button class="btn-primary">GitHub Push</button>
+</div>
+
+<div class="card">
+  <h3>Smart Prompt Router</h3>
+  <label for="languageSelect">Select Language:</label>
+  <select id="languageSelect">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="es">Spanish</option>
+  </select>
+</div>
+
+<div class="card">
+  <h3>View Options</h3>
+  <div class="toggle-group">
+    <label for="relevantToggle">Relevant‑Only View</label>
+    <input type="checkbox" id="relevantToggle" checked>
+  </div>
+</div>
+
+<div class="card" id="contentArea">
+  <h3>Available Modules</h3>
+  <div class="mini-card" data-role="student" data-lang="en" data-relevant="true">
+    English Micro‑Course: Basics
+  </div>
+  <div class="mini-card" data-role="student" data-lang="hi" data-relevant="true">
+    Hindi Micro‑Course: Introduction
+  </div>
+  <div class="mini-card" data-role="admin" data-lang="en" data-relevant="false">
+    Admin Dashboard Overview
+  </div>
+  <div class="mini-card" data-role="student" data-lang="es" data-relevant="false">
+    Spanish Advanced Grammar (Irrelevant)
+  </div>
+</div>
+
+<div class="card">
+  <h3>Prioritize Content Categories</h3>
+  <p>Which content categories do you want to prioritize for the learner view?</p>
+  <input type="text" id="categoryInput" placeholder="e.g., Micro‑courses, Assessments, Projects">
+  <button class="btn-primary" id="saveCategories">Save</button>
+</div>
+
+<script>
+  const loginToggle = document.getElementById('loginToggle');
+  const adminTools = document.getElementById('adminTools');
+  const languageSelect = document.getElementById('languageSelect');
+  const relevantToggle = document.getElementById('relevantToggle');
+  const contentArea = document.getElementById('contentArea');
+  const saveBtn = document.getElementById('saveCategories');
+
+  // Show/hide admin tools based on login state
+  loginToggle.addEventListener('change', () => {
+    adminTools.style.display = loginToggle.checked ? 'none' : 'block';
+    filterContent();
+  });
+
+  // Filter content when language or relevance changes
+  languageSelect.addEventListener('change', filterContent);
+  relevantToggle.addEventListener('change', filterContent);
+
+  function filterContent() {
+    const isStudent = loginToggle.checked;
+    const selectedLang = languageSelect.value;
+    const showRelevant = relevantToggle.checked;
+
+    document.querySelectorAll('#contentArea .mini-card').forEach(card => {
+      const role = card.dataset.role;
+      const lang = card.dataset.lang;
+      const relevant = card.dataset.relevant === 'true';
+
+      let visible = true;
+      if (!isStudent && role === 'admin') visible = false;
+      if (lang !== selectedLang) visible = false;
+      if (showRelevant && !relevant) visible = false;
+
+      card.style.display = visible ? 'block' : 'none';
+    });
+  }
+
+  // Placeholder for saving prioritized categories
+  saveBtn.addEventListener('click', () => {
+    const cats = document.getElementById('categoryInput').value.trim();
+    if (cats) {
+      alert('Prioritized categories saved: ' + cats);
+    } else {
+      alert('Please enter at least one category.');
+    }
+  });
+
+  // Initial filter on load
+  filterContent();
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <title>Login & Dashboard</title>
 <style>
   body {font-family: Arial, sans-serif; margin:0; display:flex; justify-content:center; align-items:center; height:100vh; background:#f5f5f5;}
