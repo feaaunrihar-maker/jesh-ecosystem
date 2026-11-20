@@ -111,6 +111,14 @@
     }
     .mod-tile.mod-active { border: 2px solid var(--primary); background: var(--primary-soft); }
 
+    /* ================= NON-INTRUSIVE MONETIZATION / AD SLOT ================= */
+    #monetizationAdSlot {
+      background: linear-gradient(90deg, #FFFBEB, #FEF3C7);
+      border: 1px solid #FDE68A; border-radius: 14px;
+      padding: 10px 14px; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+
     /* ================= CHAT & LEARNING UI ================= */
     .chat-box {
       height: 320px; overflow-y: auto; padding: 12px; background: #F8FAFC;
@@ -247,6 +255,16 @@
       <!-- SAFE MODE BANNER (IF ?safe=1) -->
       <div id="safeModeAlert" class="card hidden" style="background:#FEF3C7;border-color:#F59E0B;color:#92400E;">
         <strong>🛡️ Safe Mode Active (?safe=1):</strong> Dynamic extensions paused. Core platform running in verified safe mode.
+      </div>
+
+      <!-- MONETIZATION / SPONSOR & ADSENSE SLOT (CONTROLLED FROM ADMIN VAULT) -->
+      <div id="monetizationAdSlot" class="hidden">
+        <div style="font-size:12px;color:#92400E;">
+          <span style="background:#F59E0B;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;margin-right:6px;">AD</span>
+          <strong id="adBannerText">Sponsored: Free Digital India, Python & AI Spoken English Mastery!</strong>
+        </div>
+        <a id="adBannerBtn" href="#" target="_blank" rel="noopener" style="background:#0F172A;color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">Explore →</a>
+        <div id="adsenseContainer" style="width:100%;"></div>
       </div>
 
       <!-- TAB 1: HOME (360° ADAPTIVE MODULES) -->
@@ -500,14 +518,14 @@
               <p style="font-size:12px;color:#94A3B8;">100% Autonomous Mode • Students: <strong id="admTotalStudents">0</strong></p>
             </div>
             <div style="display:flex;gap:8px;">
-              <button class="btn-emerald btn-sm" onclick="runAdminRDScanner()">🔍 R&D Scan</button>
+              <button class="btn-emerald btn-sm" onclick="runSelfInspectionAudit()">🔍 Self-Check & Upgrade Scan</button>
               <button class="btn-outline btn-sm" style="color:#0F172A;" onclick="switchFooterTab('home')">Exit Admin</button>
             </div>
           </div>
 
           <!-- 1. AUTONOMOUS CO-ARCHITECT (100% AUTO-DEPLOY TO GITHUB) -->
           <div class="card" style="border:2px solid #10B981;">
-            <strong style="display:block;font-size:16px;margin-bottom:4px;">💬 Co-Architect — 100% Autonomous Auto-Deploy</strong>
+            <strong style="display:block;font-size:16px;margin-bottom:4px;">💬 Co-Architect — 100% Autonomous Self-Upgrader</strong>
             <p style="font-size:12px;color:#94A3B8;margin-bottom:8px;">अपनी भाषा में बदलाव लिखें — सिस्टम खुद कोड बनाएगा, GitHub SHA जांचेगा, बैकअप लेगा और 30 सेकंड में लाइव कर देगा!</p>
             <textarea id="coArchitectPrompt" rows="3" placeholder="उदा. Add a Dark Mode toggle button in the header, या होम स्क्रीन पर एक गणित क्विज़ कार्ड जोड़ें..."></textarea>
 
@@ -524,7 +542,46 @@
             <div id="coArchitectStatus" style="margin-top:10px;font-size:12px;color:#A7F3D0;white-space:pre-line;"></div>
           </div>
 
-          <!-- 2. SEARCH HELP FOR CREDENTIALS (STUDENT PIN RECOVERY) -->
+          <!-- 2. MONETIZATION & ADS MANAGER (READY FOR 2-3 DAYS LATER) -->
+          <div class="card" style="border:1px solid #F59E0B;">
+            <strong style="display:block;margin-bottom:6px;">💰 Monetization & AdSense Manager (1-Click Enable Anytime)</strong>
+            <p style="font-size:12px;color:#94A3B8;margin-bottom:8px;">जब आप 2–3 दिन बाद विज्ञापन चालू करना चाहें, बस ENABLE_ADS को TRUE करें या AdSense Client ID डालें।</p>
+            <div class="grid-2">
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">ENABLE_ADS (TRUE / FALSE)</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <select id="vault_ENABLE_ADS">
+                    <option value="FALSE">FALSE (Paused Now)</option>
+                    <option value="TRUE">TRUE (Live Ads ON)</option>
+                  </select>
+                  <button class="btn-amber btn-sm" onclick="saveAdminVaultKey('ENABLE_ADS')">Apply</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">ADSENSE_CLIENT_ID (ca-pub-...)</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_ADSENSE_CLIENT_ID" type="text" placeholder="ca-pub-xxxxxxxxxxxxxxxx" />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('ADSENSE_CLIENT_ID')">Save</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">AD_BANNER_TITLE</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_AD_BANNER_TITLE" type="text" placeholder="Sponsored banner text..." />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('AD_BANNER_TITLE')">Save</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">AD_BANNER_LINK</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_AD_BANNER_LINK" type="text" placeholder="https://..." />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('AD_BANNER_LINK')">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. SEARCH HELP FOR CREDENTIALS (STUDENT PIN RECOVERY) -->
           <div class="card">
             <strong style="display:block;margin-bottom:8px;">🔑 Search Help for Credentials (Student PIN Lookup & Reset)</strong>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
@@ -535,9 +592,9 @@
             <div id="admPinResultBox" style="font-size:13px;color:#34D399;font-weight:700;"></div>
           </div>
 
-          <!-- 3. API & VOICE VAULT -->
+          <!-- 4. API, GITHUB & VOICE VAULT -->
           <div class="card">
-            <strong style="display:block;margin-bottom:8px;">🔐 API & ElevenLabs Voice Vault</strong>
+            <strong style="display:block;margin-bottom:8px;">🔐 API, GitHub & ElevenLabs Voice Vault</strong>
             <div class="grid-2">
               <div>
                 <label style="font-size:11px;color:#94A3B8;">GROQ_API_KEY</label>
@@ -554,17 +611,17 @@
                 </div>
               </div>
               <div>
+                <label style="font-size:11px;color:#94A3B8;">GITHUB_TOKEN (Required for Auto-Deploy)</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_GITHUB_TOKEN" type="password" placeholder="ghp_..." />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('GITHUB_TOKEN')">Save</button>
+                </div>
+              </div>
+              <div>
                 <label style="font-size:11px;color:#94A3B8;">ELEVENLABS_API_KEY (Voice Clone)</label>
                 <div style="display:flex;gap:6px;margin-top:4px;">
                   <input id="vault_ELEVENLABS_API_KEY" type="password" placeholder="xi-api-key..." />
                   <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('ELEVENLABS_API_KEY')">Save</button>
-                </div>
-              </div>
-              <div>
-                <label style="font-size:11px;color:#94A3B8;">BRAND_NAME</label>
-                <div style="display:flex;gap:6px;margin-top:4px;">
-                  <input id="vault_BRAND_NAME" type="text" placeholder="Jesh AI Ecosystem" />
-                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('BRAND_NAME')">Save</button>
                 </div>
               </div>
             </div>
@@ -719,10 +776,26 @@
       renderStoryWords("Consistent practice every day turns curious students into confident leaders.");
       runAcademySandbox();
 
+      // Dynamic Config & Monetization Loader
       fetch(API_URL).then(r => r.json()).then(data => {
-        if (data && data.config && data.config.brandName) {
-          document.getElementById('uiBrandTitle').textContent = data.config.brandName;
-          document.title = data.config.brandName;
+        if (data && data.config) {
+          if (data.config.brandName) {
+            document.getElementById('uiBrandTitle').textContent = data.config.brandName;
+            document.title = data.config.brandName;
+          }
+          if (data.config.ads && data.config.ads.enabled) {
+            const slot = document.getElementById('monetizationAdSlot');
+            slot.classList.remove('hidden');
+            if (data.config.ads.title) document.getElementById('adBannerText').textContent = data.config.ads.title;
+            if (data.config.ads.link) document.getElementById('adBannerBtn').href = data.config.ads.link;
+            if (data.config.ads.adsenseId && data.config.ads.adsenseId.startsWith('ca-pub-')) {
+              const s = document.createElement('script');
+              s.async = true;
+              s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${data.config.ads.adsenseId}`;
+              s.crossOrigin = 'anonymous';
+              document.head.appendChild(s);
+            }
+          }
         }
       }).catch(() => {});
     });
@@ -1434,7 +1507,7 @@
       box.textContent = res.message || '✅ Request logged! Your teacher/admin will check Alerts and assist you shortly.';
     }
 
-    // ==================== SINGLE-ADMIN & 100% AUTONOMOUS AUTO-DEPLOY ====================
+    // ==================== SINGLE-ADMIN & 100% AUTONOMOUS SELF-UPGRADER ====================
     function handleSecretAdminTap() {
       logoTapCounter++;
       clearTimeout(logoTapTimer);
@@ -1497,12 +1570,14 @@
       const val = document.getElementById('vault_' + key).value.trim();
       if (!val) return alert('Enter a value first.');
       const res = await postBackend({ action: 'UPDATE_CONFIG', adminPass: ADMIN_PASSWORD, key, value: val });
-      alert(res.success ? `✅ ${key} saved securely!` : (res.message || 'Failed to save key.'));
+      alert(res.success ? `✅ ${key} saved & applied!` : (res.message || 'Failed to save key.'));
     }
 
-    async function runAdminRDScanner() {
-      const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASSWORD }, 9000);
-      alert(res.message || 'R&D Scan triggered.');
+    async function runSelfInspectionAudit() {
+      const status = document.getElementById('coArchitectStatus');
+      status.textContent = '🔍 Running Autonomous System Self-Check & UX Audit...';
+      const res = await postBackend({ action: 'SELF_AUDIT', adminPass: ADMIN_PASSWORD }, 10000);
+      status.textContent = res.message || 'Audit completed.';
     }
 
     function mountSavedPlugins() {
@@ -1520,7 +1595,6 @@
       } catch (e) {}
     }
 
-    // 100% AUTONOMOUS SELF-ARCHITECT (FETCHES LATEST SHA, BACKS UP, GENERATES & PUSHES TO GITHUB)
     async function runAutonomousCoArchitect() {
       const prompt = document.getElementById('coArchitectPrompt').value.trim();
       if (!prompt) return alert('कृपया लिखें कि आप क्या बदलाव या नया फीचर चाहते हैं।');
@@ -1534,7 +1608,7 @@
       const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASSWORD, filePath: 'index.html' }, 9000);
       if (!fileRes.success || !fileRes.content) {
         btn.disabled = false;
-        status.textContent = '❌ GitHub fetch failed: ' + (fileRes.message || 'Check GITHUB_TOKEN in Admin Vault');
+        status.textContent = '❌ GitHub fetch failed: ' + (fileRes.message || 'Save GITHUB_TOKEN in Vault below first!');
         return;
       }
 
@@ -1555,7 +1629,6 @@
       const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
       const widgetHtml = wMatch ? wMatch[1].trim() : `<div class="card"><strong>✨ ${prompt}</strong><p style="font-size:13px;margin-top:4px;">${stripStars(aiRes.reply)}</p></div>`;
 
-      // Also mount immediately in local preview
       const plugins = JSON.parse(localStorage.getItem('JESH_DYNAMIC_PLUGINS') || '[]');
       plugins.push(widgetHtml);
       localStorage.setItem('JESH_DYNAMIC_PLUGINS', JSON.stringify(plugins));
@@ -1567,7 +1640,7 @@
         return;
       }
 
-      status.textContent = '3️⃣ Auto-Deploying directly to GitHub (with fresh SHA)...';
+      status.textContent = '3️⃣ Auto-Deploying directly to GitHub (with fresh SHA & Backup)...';
       const marker = 'id="dynamicExtensionsZone">';
       const updatedHtml = fileRes.content.replace(marker, `${marker}\n<!-- AUTO-DEPLOYED: ${prompt.slice(0, 40)} -->\n${widgetHtml}`);
 
@@ -1583,7 +1656,7 @@
       if (pushRes.success) {
         status.textContent = '🎉 LIVE ON GITHUB! ' + (pushRes.message || 'Changes will reflect for all students in ~30 seconds.');
       } else {
-        status.textContent = '⚠️ GitHub Push message: ' + (pushRes.message || 'Check GITHUB_TOKEN / Repo permissions');
+        status.textContent = '⚠️ GitHub Push message: ' + (pushRes.message || 'Check GITHUB_TOKEN permissions');
       }
     }
 
