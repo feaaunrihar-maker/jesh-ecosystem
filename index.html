@@ -299,6 +299,96 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login & Dashboard</title>
+<style>
+  body {font-family: Arial, sans-serif; margin:0; display:flex; justify-content:center; align-items:center; height:100vh; background:#f5f5f5;}
+  .login-container, .dashboard {background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); width:320px;}
+  .login-container h2, .dashboard h2 {margin-top:0; text-align:center;}
+  .form-group {margin-bottom:15px;}
+  .form-group label {display:block; margin-bottom:5px; font-weight:bold;}
+  .form-group input {width:100%; padding:8px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px;}
+  .btn-primary {background:#0069d9; color:#fff; border:none; padding:10px 15px; width:100%; border-radius:4px; cursor:pointer;}
+  .btn-primary:hover {background:#0053b3;}
+  .card {border:1px solid #e0e0e0; border-radius:6px; padding:15px; margin-top:20px; background:#fafafa;}
+  .mini-card {font-size:0.9rem; color:#555;}
+  .hidden {display:none;}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="login-container" id="loginPage">
+    <h2>Login</h2>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter username">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password">
+    </div>
+    <button class="btn-primary" id="loginBtn">Log In</button>
+  </div>
+
+  <div class="dashboard hidden" id="dashboardPage">
+    <h2>Welcome, <span id="displayUser"></span></h2>
+
+    <div class="card" id="githubCard">
+      <h3>10 Useful GitHub Repositories</h3>
+      <p class="mini-card">Here are ten curated repositories that help students learn and build projects.</p>
+      <ul class="mini-card">
+        <li>Repo 1</li>
+        <li>Repo 2</li>
+        <li>Repo 3</li>
+        <li>Repo 4</li>
+        <li>Repo 5</li>
+        <li>Repo 6</li>
+        <li>Repo 7</li>
+        <li>Repo 8</li>
+        <li>Repo 9</li>
+        <li>Repo 10</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const loginBtn = document.getElementById('loginBtn');
+  const loginPage = document.getElementById('loginPage');
+  const dashboardPage = document.getElementById('dashboardPage');
+  const displayUser = document.getElementById('displayUser');
+  const githubCard = document.getElementById('githubCard');
+
+  loginBtn.addEventListener('click', () => {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value; // In real app, validate securely
+
+    if (!username) {
+      alert('Please enter a username.');
+      return;
+    }
+
+    // Simple role check: "admin" gets admin rights, everything else is student
+    const isAdmin = username.toLowerCase() === 'admin';
+
+    // Hide login, show dashboard
+    loginPage.classList.add('hidden');
+    dashboardPage.classList.remove('hidden');
+    displayUser.textContent = username;
+
+    // Show or hide the GitHub card based on role
+    if (!isAdmin) {
+      githubCard.classList.add('hidden');
+    }
+  });
+</script>
+
+</body>
+</html>
 <style>
   body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
   .login-container, .app-container {max-width:400px; margin:50px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
