@@ -298,7 +298,138 @@
       </section>
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
-      <div id="dynamicExtensionsZone"></div>
+      <div id="dynamicExtensionsZone">
+<!-- Student Login / Register Modal -->
+<div id="studentAuthModal" class="card">
+  <h3>Student Login / Register</h3>
+  <label for="stuAuthPin">6‑Digit PIN</label>
+  <input type="password" id="stuAuthPin" maxlength="6" placeholder="Enter 6‑digit PIN"
+         pattern="\\d{6}" class="mini-card" autocomplete="off">
+  <button id="stuLoginBtn" class="btn-primary">Login / Register</button>
+
+  <!-- Forgot PIN / Message Admin -->
+  <button id="forgotPinBtn" class="btn-primary" style="margin-top:8px;">
+    📩 Forgot PIN / Message Admin
+  </button>
+
+  <!-- Hidden Forgot PIN Form -->
+  <div id="forgotPinForm" class="mini-card" style="display:none; margin-top:12px;">
+    <label for="forgotContact">Mobile or Email</label>
+    <input type="text" id="forgotContact" placeholder="e.g. +1234567890 or user@example.com">
+    <label for="forgotMessage" style="margin-top:4px;">Optional Message</label>
+    <textarea id="forgotMessage" rows="2" placeholder="Your message (optional)"></textarea>
+    <button id="sendForgotBtn" class="btn-primary" style="margin-top:8px;">Send Request</button>
+    <div id="forgotResult" style="margin-top:6px; font-size:0.9em;"></div>
+  </div>
+</div>
+
+<!-- Admin Alerts Tab -->
+<div id="tab-alerts" class="card">
+  <h3>Admin Alerts</h3>
+
+  <!-- Student PIN Lookup & Reset Card -->
+  <div class="card mini-card" style="margin-top:12px; padding:12px;">
+    <h4>🔑 Student PIN Lookup & Reset</h4>
+    <label for="adminContact">Student Mobile / Email</label>
+    <input type="text" id="adminContact" placeholder="e.g. +1234567890 or user@example.com">
+    <label for="adminNewPin" style="margin-top:4px;">Optional New 6‑Digit PIN</label>
+    <input type="password" id="adminNewPin" maxlength="6" placeholder="Leave blank to only view"
+           pattern="\\d{6}" class="mini-card" autocomplete="off">
+    <button id="adminPinBtn" class="btn-primary" style="margin-top:8px;">Check / Reset PIN</button>
+    <div id="adminPinResult" style="margin-top:6px; font-size:0.9em;"></div>
+  </div>
+</div>
+
+<script>
+// Utility: enforce numeric 6‑digit input
+function enforceSixDigitNumeric(el) {
+  el.addEventListener('input', () => {
+    // Remove non‑digits
+    el.value = el.value.replace(/\D/g, '');
+    // Trim to 6 characters
+    if (el.value.length > 6) el.value = el.value.slice(0, 6);
+  });
+}
+
+// Apply to PIN fields
+enforceSixDigitNumeric(document.getElementById('stuAuthPin'));
+enforceSixDigitNumeric(document.getElementById('adminNewPin'));
+
+// ---------- Student Forgot PIN Flow ----------
+const forgotBtn = document.getElementById('forgotPinBtn');
+const forgotForm = document.getElementById('forgotPinForm');
+const sendForgotBtn = document.getElementById('sendForgotBtn');
+const forgotResult = document.getElementById('forgotResult');
+
+forgotBtn.addEventListener('click', () => {
+  forgotForm.style.display = forgotForm.style.display === 'none' ? 'block' : 'none';
+});
+
+sendForgotBtn.addEventListener('click', async () => {
+  const contact = document.getElementById('forgotContact').value.trim();
+  const message = document.getElementById('forgotMessage').value.trim();
+
+  if (!contact) {
+    forgotResult.textContent = '❗ Please enter a mobile number or email.';
+    return;
+  }
+
+  try {
+    const resp = await postBackend({
+      action: 'FORGOT_PIN',
+      contact,
+      message
+    });
+    forgotResult.textContent = resp.success
+      ? '✅ Request sent. Admin will contact you shortly.'
+      : `❌ ${resp.error || 'Failed to send request.'}`;
+  } catch (e) {
+    forgotResult.textContent = '❌ Unexpected error.';
+    console.error(e);
+  }
+});
+
+// ---------- Admin PIN Lookup / Reset ----------
+const adminPinBtn = document.getElementById('adminPinBtn');
+const adminPinResult = document.getElementById('adminPinResult');
+const ADMIN_PASS = 'YOUR_ADMIN_PASSWORD'; // <-- replace with secure handling
+
+adminPinBtn.addEventListener('click', async () => {
+  const contact = document.getElementById('adminContact').value.trim();
+  const newPin = document.getElementById('adminNewPin').value.trim();
+
+  if (!contact) {
+    adminPinResult.textContent = '❗ Provide student mobile or email.';
+    return;
+  }
+  if (newPin && newPin.length !== 6) {
+    adminPinResult.textContent = '❗ New PIN must be exactly 6 digits.';
+    return;
+  }
+
+  try {
+    const resp = await postBackend({
+      action: 'ADMIN_STUDENT_PIN',
+      adminPass: ADMIN_PASS,
+      contact,
+      newPin: newPin || undefined
+    });
+
+    if (resp.success) {
+      if (newPin) {
+        adminPinResult.textContent = `✅ PIN reset successfully.`;
+      } else {
+        adminPinResult.textContent = `✅ Current PIN: ${resp.currentPin}`;
+      }
+    } else {
+      adminPinResult.textContent = `❌ ${resp.error || 'Operation failed.'}`;
+    }
+  } catch (e) {
+    adminPinResult.textContent = '❌ Unexpected error.';
+    console.error(e);
+  }
+});
+</script></div>
     </div>
   </main>
 
