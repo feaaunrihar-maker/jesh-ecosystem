@@ -328,6 +328,104 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ultra‑Clean Mobile UI</title>
+<style>
+  /* Basic reset */
+  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+  html, body { height:100%; font-family:Arial,Helvetica,sans-serif; overflow-x:hidden; }
+
+  /* Layout containers */
+  .header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#fff; border-bottom:1px solid #e0e0e0; }
+  .header .logo { font-size:1.2rem; font-weight:bold; }
+  .header .badge { background:#ffeb3b; padding:4px 8px; border-radius:12px; font-size:0.9rem; }
+  .header .icons { display:flex; gap:12px; }
+  .header .icons button { background:none; border:none; font-size:1.2rem; cursor:pointer; }
+
+  .content { padding:16px; padding-bottom:80px; /* space for bottom nav */ }
+  .card, .mini-card { background:#fff; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); padding:16px; margin-bottom:16px; font-size:16px; }
+  .btn-primary { background:#1976d2; color:#fff; border:none; border-radius:6px; padding:12px 16px; font-size:16px; cursor:pointer; width:100%; }
+
+  /* Bottom navigation */
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:64px; background:#fff; border-top:1px solid #e0e0e0; display:flex; justify-content:space-around; align-items:center; z-index:1000; }
+  .bottom-nav button { background:none; border:none; font-size:0.9rem; color:#555; display:flex; flex-direction:column; align-items:center; cursor:pointer; }
+  .bottom-nav button.active { color:#1976d2; }
+
+  /* Mobile specific tweaks */
+  @media (max-width:768px) {
+    .header .tab-bar { display:none; }          /* hide horizontal tabs */
+    .header { padding:8px 12px; }               /* compact header */
+    .bottom-nav { height:72px; }                /* larger touch targets */
+    .bottom-nav button { font-size:0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">MyApp</div>
+  <div class="badge">XP ⭐ 7‑Day Streak</div>
+  <div class="icons">
+    <button aria-label="Search">🔍</button>
+    <button aria-label="Notifications">🔔</button>
+    <button aria-label="Settings">⚙️</button>
+  </div>
+  <!-- Horizontal tabs (hidden on mobile) -->
+  <nav class="tab-bar" style="position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:24px;">
+    <a href="#">Feed</a>
+    <a href="#">AI Tutor</a>
+    <a href="#">Voice & Lingo</a>
+    <a href="#">Studio & Courses</a>
+  </nav>
+</header>
+
+<main class="content">
+  <section class="card">
+    <h2>Welcome Back!</h2>
+    <p>Here’s your daily feed. Scroll, tap, learn.</p>
+  </section>
+
+  <section class="mini-card">
+    <h3>Chat with AI Tutor</h3>
+    <input type="text" placeholder="Ask a question…" style="width:100%; padding:12px; font-size:16px; margin-top:8px;">
+  </section>
+
+  <section class="card">
+    <h3>Voice & Lingo Session</h3>
+    <div style="background:#f5f5f5; height:180px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+      <span>📹 Avatar Video Call Placeholder</span>
+    </div>
+  </section>
+
+  <button class="btn-primary">Start Learning</button>
+</main>
+
+<nav class="bottom-nav">
+  <button class="active" data-target="feed"><span>📜</span><span>Feed</span></button>
+  <button data-target="tutor"><span>🤖</span><span>AI Tutor</span></button>
+  <button data-target="voice"><span>🗣️</span><span>Voice & Lingo</span></button>
+  <button data-target="studio"><span>🎓</span><span>Studio</span></button>
+</nav>
+
+<script>
+  // Simple navigation state toggle (demo purpose)
+  const navButtons = document.querySelectorAll('.bottom-nav button');
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      navButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // In a real app you'd switch views here.
+    });
+  });
+</script>
+
+</body>
+</html>
+```
 <div id="student-auth-widget">
   <!-- Login / Register Button (injected into #hook-navbar) -->
   <script>
