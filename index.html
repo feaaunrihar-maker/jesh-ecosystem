@@ -300,6 +300,107 @@
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
 <style>
+    .dashboard { max-width: 800px; margin: auto; padding: 1rem; font-family: Arial, sans-serif; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff; }
+    .card h3 { margin-top: 0; }
+    .mini-card { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 6px; margin-top: 0.5rem; }
+    .btn-primary { background: #0069d9; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+    .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+  </style>
+
+  <div class="dashboard">
+    <h2>📚 10 Useful GitHub Repositories</h2>
+
+    <div id="repo-list">
+      <!-- Cards will be injected by JS -->
+    </div>
+
+    <h2>🚀 Student Media Quota</h2>
+    <div class="mini-card">
+      <span>Videos generated today: <span id="video-count">0</span>/2</span>
+      <button class="btn-primary" id="btn-video">Generate Video</button>
+    </div>
+    <div class="mini-card">
+      <span>Images generated today: <span id="image-count">0</span>/5</span>
+      <button class="btn-primary" id="btn-image">Generate Image</button>
+    </div>
+  </div>
+
+  <script>
+    // ----- Repository Data -----
+    const repos = [
+      { name: "freeCodeCamp", desc: "Learn web development for free.", url: "https://github.com/freeCodeCamp/freeCodeCamp" },
+      { name: "awesome-python", desc: "A curated list of awesome Python frameworks.", url: "https://github.com/vinta/awesome-python" },
+      { name: "30-seconds-of-code", desc: "Short JavaScript snippets.", url: "https://github.com/30-seconds/30-seconds-of-code" },
+      { name: "public-apis", desc: "Free APIs for development.", url: "https://github.com/public-apis/public-apis" },
+      { name: "TensorFlow", desc: "Machine learning library.", url: "https://github.com/tensorflow/tensorflow" },
+      { name: "React", desc: "A JavaScript library for building UI.", url: "https://github.com/facebook/react" },
+      { name: "Django", desc: "High‑level Python web framework.", url: "https://github.com/django/django" },
+      { name: "Bootstrap", desc: "Popular CSS framework.", url: "https://github.com/twbs/bootstrap" },
+      { name: "Node.js", desc: "JavaScript runtime.", url: "https://github.com/nodejs/node" },
+      { name: "VSCode", desc: "Source‑code editor.", url: "https://github.com/microsoft/vscode" }
+    ];
+
+    // Render repo cards
+    const repoContainer = document.getElementById('repo-list');
+    repos.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h3>${r.name}</h3>
+        <p>${r.desc}</p>
+        <a href="${r.url}" target="_blank" class="btn-primary">Open Repo</a>
+      `;
+      repoContainer.appendChild(card);
+    });
+
+    // ----- Quota Logic -----
+    const QUOTA = { video: 2, image: 5 };
+    const STORAGE_KEY = 'studentQuota';
+
+    function loadQuota() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      const today = new Date().toISOString().slice(0, 10);
+      if (data.date !== today) {
+        // reset for new day
+        return { date: today, video: 0, image: 0 };
+      }
+      return data;
+    }
+
+    function saveQuota(q) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(q));
+    }
+
+    let quota = loadQuota();
+    updateUI();
+
+    function updateUI() {
+      document.getElementById('video-count').textContent = quota.video;
+      document.getElementById('image-count').textContent = quota.image;
+      document.getElementById('btn-video').disabled = quota.video >= QUOTA.video;
+      document.getElementById('btn-image').disabled = quota.image >= QUOTA.image;
+    }
+
+    document.getElementById('btn-video').addEventListener('click', () => {
+      if (quota.video < QUOTA.video) {
+        quota.video++;
+        saveQuota(quota);
+        alert('Video generated! 🎬');
+        updateUI();
+      }
+    });
+
+    document.getElementById('btn-image').addEventListener('click', () => {
+      if (quota.image < QUOTA.image) {
+        quota.image++;
+        saveQuota(quota);
+        alert('Image generated! 🖼️');
+        updateUI();
+      }
+    });
+  </script>
+<style>
     .card {
       border: 1px solid #ddd;
       border-radius: 8px;
