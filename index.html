@@ -299,6 +299,114 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<style>
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .mini-card {
+      background: #f9f9f9;
+      border-left: 4px solid #0066ff;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .btn-primary {
+      background: #0066ff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #0052cc;
+    }
+    .high-contrast {
+      color: #000;
+      background: #fff;
+    }
+    .admin-section {
+      max-width: 600px;
+      margin: auto;
+    }
+    .search-input {
+      width: calc(100% - 110px);
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+    }
+  </style>
+
+  <div class="admin-section card high-contrast" id="adminAuthTool">
+    <h2>🔍 Search Help for Credentials</h2>
+    <div>
+      <input type="text" id="searchQuery" class="search-input" placeholder="Enter Name, Email or StudentID">
+      <button class="btn-primary" onclick="searchStudent()">Search</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+
+  <script>
+    // Ensure only admins can see the tool (backend will also enforce)
+    function checkAdminAccess() {
+      google.script.run.withSuccessHandler(function(isAdmin){
+        if (!isAdmin) {
+          document.getElementById('adminAuthTool').style.display = 'none';
+        }
+      }).authAdmin();
+    }
+
+    function searchStudent() {
+      const query = document.getElementById('searchQuery').value.trim();
+      if (!query) return alert('Please enter a search term.');
+      google.script.run
+        .withSuccessHandler(renderResults)
+        .withFailureHandler(err => alert('Search failed: ' + err.message))
+        .searchStudent(query);
+    }
+
+    function renderResults(students) {
+      const container = document.getElementById('searchResults');
+      container.innerHTML = '';
+      if (!students || students.length === 0) {
+        container.innerHTML = '<p>No matching student found.</p>';
+        return;
+      }
+      students.forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'card mini-card';
+        card.innerHTML = `
+          <p><strong>StudentID:</strong> ${s.studentId}</p>
+          <p><strong>Name:</strong> ${s.name}</p>
+          <p><strong>Email:</strong> ${s.email}</p>
+          <p><strong>Status:</strong> ${s.accountStatus}</p>
+          <button class="btn-primary" onclick="generateTempPin('${s.studentId}', this)">Generate Temporary PIN & Unlock</button>
+          <div class="temp-pin-display" style="margin-top:0.5rem;"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function generateTempPin(studentId, btn) {
+      btn.disabled = true;
+      google.script.run
+        .withSuccessHandler(pin => {
+          const display = btn.parentElement.querySelector('.temp-pin-display');
+          display.innerHTML = `<strong>Temporary PIN:</strong> ${pin} (share with student)`;
+          btn.disabled = false;
+        })
+        .withFailureHandler(err => {
+          alert('Failed to generate PIN: ' + err.message);
+          btn.disabled = false;
+        })
+        .createTempPinAndUnlock(studentId);
+    }
+
+    // Initial admin check
+    checkAdminAccess();
+  </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
