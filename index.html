@@ -327,7 +327,109 @@
         <div id="hook-tab-panels"></div>
       </div>
 
-      <div id="dynamicExtensionsZone"></div>
+      <div id="dynamicExtensionsZone">
+<style>
+    .widget-container {
+      max-width: 800px;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+    }
+    .phase-header {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .phase-content {
+      display: none;
+      margin-top: 0.5rem;
+    }
+    .phase-card {
+      margin-bottom: 1rem;
+    }
+  </style>
+
+  <div class="widget-container">
+    <div class="card phase-card">
+      <div class="phase-header" data-target="phase1">
+        <h3>Phase 1 – Core Backend & Vault</h3>
+        <button class="btn-primary">Show</button>
+      </div>
+      <div class="phase-content" id="phase1">
+        <ul class="mini-card">
+          <li>Single‑Admin Lock for full control.</li>
+          <li>Active vs Last‑Input Vault with event‑sourcing.</li>
+          <li>Student Data Firewall & real‑time Alerts.</li>
+          <li>Hybrid Search (keyword + semantic).</li>
+          <li>Mindset Vault for personalized coaching.</li>
+          <li>Safe GitHub Push (LIVE) for continuous backup.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card phase-card">
+      <div class="phase-header" data-target="phase2">
+        <h3>Phase 2 – Admin Command Center</h3>
+        <button class="btn-primary">Show</button>
+      </div>
+      <div class="phase-content" id="phase2">
+        <ul class="mini-card">
+          <li>Self‑Architect Impact Preview.</li>
+          <li>AI Behavior Controls (temperature, top‑K, …).</li>
+          <li>Smart Prompt Router.</li>
+          <li>48‑hour Opportunity Radar.</li>
+          <li>Theme Studio & Game Arena.</li>
+          <li>UPI Hub (Planned) for Indian payments.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card phase-card">
+      <div class="phase-header" data-target="phase3">
+        <h3>Phase 3 – JeshLingo, JeshRead & Academy</h3>
+        <button class="btn-primary">Show</button>
+      </div>
+      <div class="phase-content" id="phase3">
+        <ul class="mini-card">
+          <li>20+ languages, including China & Africa.</li>
+          <li>Voice Pronunciation Coach (Web Speech API).</li>
+          <li>Micro‑courses (Python, HTML, C++, Finance, …).</li>
+          <li>QR Certificates (Planned).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card phase-card">
+      <div class="phase-header" data-target="phase4">
+        <h3>Phase 4 – JeshLive Avatar & Voice Clone (Planned)</h3>
+        <button class="btn-primary">Show</button>
+      </div>
+      <div class="phase-content" id="phase4">
+        <ul class="mini-card">
+          <li>Photo upload + 10‑sec voice clone.</li>
+          <li>Live video/voice call tutoring.</li>
+          <li>Official Mentor Avatar.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle phase details
+    document.querySelectorAll('.phase-header').forEach(header => {
+      const btn = header.querySelector('button');
+      const targetId = header.getAttribute('data-target');
+      const content = document.getElementById(targetId);
+
+      header.addEventListener('click', (e) => {
+        // Prevent button click from bubbling twice
+        if (e.target !== btn) e.stopPropagation();
+        const isOpen = content.style.display === 'block';
+        content.style.display = isOpen ? 'none' : 'block';
+        btn.textContent = isOpen ? 'Show' : 'Hide';
+      });
+    });
+  </script></div>
     </section>
 
     <!-- ==================== ADMIN COMMAND CENTER (NO-CODE CO-ARCHITECT) ==================== -->
