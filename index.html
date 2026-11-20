@@ -328,6 +328,48 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+<div class="card" style="max-width: 500px; margin: 20px auto; padding: 20px;">
+    <h2>Master Vision Blueprint</h2>
+    <ol>
+      <li>Core Goal: 100% safe, self‑healing, no‑code AI learning ecosystem for mobile, tablet, and laptop users.</li>
+      <li>Addictive Learning Feed: Reels, XP, daily streaks, viral friend invites.</li>
+      <li>AI Tutor & Practice: Chat‑style mentor, voice speaking practice, read‑along coach, adaptive lessons in 20+ languages.</li>
+      <li>Academy & Media: Micro‑courses with QR certificates, AI image/video studio, JeshLive cartoon & custom face/voice‑clone tutor.</li>
+      <li>Monetization & Control: AdSense/Sponsor banners, 48‑hour improvement proposals reviewed by Admin.</li>
+    </ol>
+    <button class="btn-primary" id="saveBlueprintBtn">Save Blueprint</button>
+    <div id="saveStatus" style="margin-top:10px; font-weight:bold;"></div>
+  </div>
+
+  <script>
+    (function() {
+      const blueprint = {
+        coreGoal: "Fast, 100% safe, self-healing, no-code AI learning ecosystem for mobile, tablet, and laptop users.",
+        learningFeed: "Instagram/Facebook‑style bite‑sized reels, XP, daily streaks, viral friend invite sharing.",
+        tutor: "ChatGPT/Claude‑style mentor with artifacts, voice practice, read‑along coach, adaptive lessons in 20+ languages.",
+        academy: "Micro‑courses (Python, HTML/CSS, C++, CCC, CSC, Finance) with QR certificates, AI Image/Video Studio, JeshLive cartoon & custom face/voice‑clone video‑call tutor.",
+        monetization: "AdSense/Sponsor ad banners and scheduled 48‑hour improvement proposals reviewed by Admin."
+      };
+
+      const btn = document.getElementById('saveBlueprintBtn');
+      const statusDiv = document.getElementById('saveStatus');
+
+      btn.addEventListener('click', () => {
+        try {
+          const data = {
+            ...blueprint,
+            savedAt: new Date().toISOString()
+          };
+          localStorage.setItem('masterBlueprint', JSON.stringify(data));
+          statusDiv.textContent = "✅ Blueprint saved successfully!";
+          statusDiv.style.color = "green";
+        } catch (e) {
+          statusDiv.textContent = "❌ Failed to save blueprint.";
+          statusDiv.style.color = "red";
+        }
+      });
+    })();
+  </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
