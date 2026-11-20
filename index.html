@@ -328,6 +328,212 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+<style>
+    /* Simple overlay for the modal */
+    .jesh-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .jesh-modal {
+      max-width: 90%;
+      width: 340px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .jesh-question {
+      margin-bottom: 1rem;
+    }
+    .jesh-options button {
+      margin: 0.25rem 0;
+      width: 100%;
+    }
+    .jesh-hidden { display: none; }
+  </style>
+
+  <!-- Modal (hidden by default) -->
+  <div id="jeshLevelModal" class="jesh-modal-overlay jesh-hidden">
+    <div class="jesh-modal card">
+      <h3 style="margin-top:0;">Quick Level Check</h3>
+      <div id="jeshQuestionContainer"></div>
+      <div style="text-align:right; margin-top:1rem;">
+        <button id="jeshSkipBtn" class="btn-primary">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      // ----- 1. QUICK LEVEL CHECK POPUP -----
+      const levelKey = 'JESH_LEVEL_VERIFIED';
+      const modal = document.getElementById('jeshLevelModal');
+      const qContainer = document.getElementById('jeshQuestionContainer');
+      const skipBtn = document.getElementById('jeshSkipBtn');
+
+      const questions = [
+        {
+          text: "How comfortable are you reading short English sentences?",
+          options: [
+            {label:"Very comfortable (C1)", value:"C1"},
+            {label:"Somewhat comfortable (B1)", value:"B1"},
+            {label:"Not comfortable (A1)", value:"A1"}
+          ]
+        },
+        {
+          text: "Can you hold a 5‑minute conversation in English?",
+          options: [
+            {label:"Easily (C1)", value:"C1"},
+            {label:"With some pauses (B1)", value:"B1"},
+            {label:"Hardly (A1)", value:"A1"}
+          ]
+        },
+        {
+          text: "How well do you understand English movies without subtitles?",
+          options: [
+            {label:"Almost everything (C1)", value:"C1"},
+            {label:"Main ideas (B1)", value:"B1"},
+            {label:"Very little (A1)", value:"A1"}
+          ]
+        }
+      ];
+
+      let answers = [];
+
+      function showModal(){
+        modal.classList.remove('jesh-hidden');
+        renderQuestion(0);
+      }
+
+      function hideModal(){
+        modal.classList.add('jesh-hidden');
+      }
+
+      function renderQuestion(index){
+        const q = questions[index];
+        qContainer.innerHTML = `
+          <div class="jesh-question"><strong>Q${index+1}.</strong> ${q.text}</div>
+          <div class="jesh-options">
+            ${q.options.map(opt=>`
+              <button class="btn-primary" data-value="${opt.value}">${opt.label}</button>
+            `).join('')}
+          </div>
+        `;
+        // attach listeners
+        qContainer.querySelectorAll('button').forEach(btn=>{
+          btn.addEventListener('click',()=> {
+            answers.push(btn.dataset.value);
+            if(index+1 < questions.length){
+              renderQuestion(index+1);
+            } else {
+              finalizeLevel();
+            }
+          });
+        });
+      }
+
+      function finalizeLevel(){
+        // simple majority vote
+        const counts = answers.reduce((acc,val)=>{acc[val]=(acc[val]||0)+1;return acc;}, {});
+        const level = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+        localStorage.setItem(levelKey, level);
+        hideModal();
+        console.log('Level set to', level);
+      }
+
+      skipBtn.addEventListener('click',()=>{
+        // default to A1 if skipped
+        localStorage.setItem(levelKey, 'A1');
+        hideModal();
+        console.log('Level skipped – default A1');
+      });
+
+      // Show modal only on first visit
+      if(!localStorage.getItem(levelKey)){
+        // slight defer to let page render
+        setTimeout(showModal, 200);
+      }
+
+      // ----- 2. INSTANT TAB SWITCHING & PRE‑CACHE -----
+      // Simulated content cache (in real use replace with fetch calls)
+      const contentCache = {
+        tabs: {
+          home: '<h2>Home Content</h2><p>Welcome back!</p>',
+          lessons: '<h2>Lessons</h2><p>Here are your lessons.</p>',
+          profile: '<h2>Profile</h2><p>Student info.</p>'
+        },
+        lessons: {
+          // lessonId: html
+          lesson1: '<div class="mini-card">Lesson 1 preview...</div>',
+          lesson2: '<div class="mini-card">Lesson 2 preview...</div>'
+        }
+      };
+
+      // Pre‑load cache (simulated async)
+      function preloadCache(){
+        // In a real scenario you would fetch JSON/HTML and store it.
+        // Here we just resolve immediately.
+        return Promise.resolve();
+      }
+
+      // Switch content instantly
+      function switchTab(tabId){
+        const target = document.getElementById('jeshMainContent');
+        if(contentCache.tabs[tabId]){
+          target.innerHTML = contentCache.tabs[tabId];
+        }
+      }
+
+      // Attach listeners to tab buttons & nav icons
+      function initTabListeners(){
+        document.querySelectorAll('.tab-btn, .nav-icon').forEach(el=>{
+          const tabId = el.dataset.tab;
+          if(tabId){
+            el.addEventListener('click', (e)=>{
+              e.preventDefault();
+              switchTab(tabId);
+            });
+          }
+        });
+      }
+
+      // Lesson cards open instantly (demo: just log)
+      function initLessonCardListeners(){
+        document.querySelectorAll('.lesson-card').forEach(card=>{
+          const lessonId = card.dataset.lesson;
+          card.addEventListener('click', (e)=>{
+            e.preventDefault();
+            const content = contentCache.lessons[lessonId] || '<p>Lesson not found.</p>';
+            const modal = document.createElement('div');
+            modal.className = 'jesh-modal-overlay';
+            modal.innerHTML = `<div class="jesh-modal card">${content}<br><button class="btn-primary" style="margin-top:1rem;">Close</button></div>`;
+            modal.querySelector('button').addEventListener('click',()=>modal.remove());
+            document.body.appendChild(modal);
+          });
+        });
+      }
+
+      // Initialize after preload
+      preloadCache().then(()=>{
+        initTabListeners();
+        initLessonCardListeners();
+        // Optional: load default tab
+        if(!document.getElementById('jeshMainContent')){
+          const container = document.createElement('div');
+          container.id = 'jeshMainContent';
+          container.style.padding = '1rem';
+          document.body.appendChild(container);
+        }
+        switchTab('home');
+      });
+
+    })();
+  </script>
 <div class="card" id="quest-widget">
   <h2 class="mini-card">📜 Interactive Quest Engine</h2>
   <div id="quest-list">
