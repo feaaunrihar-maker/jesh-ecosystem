@@ -300,6 +300,81 @@
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
 <style>
+  body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
+  .login-container, .app-container {max-width:400px; margin:50px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+  .card {background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:15px; margin-bottom:15px;}
+  .mini-card {background:#fafafa; border:1px solid #ddd; border-radius:4px; padding:10px; margin:5px 0;}
+  .btn-primary {background:#0069d9; color:#fff; border:none; padding:10px 15px; border-radius:4px; cursor:pointer;}
+  .btn-primary:hover {background:#0053ba;}
+  .hidden {display:none;}
+</style>
+
+<div id="loginScreen" class="login-container">
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username" style="width:100%;padding:8px;margin-bottom:10px;">
+  <select id="roleSelect" style="width:100%;padding:8px;margin-bottom:10px;">
+    <option value="student">Student</option>
+    <option value="admin">Admin</option>
+  </select>
+  <button class="btn-primary" onclick="login()">Login</button>
+</div>
+
+<div id="appScreen" class="app-container hidden">
+  <h2>Welcome, <span id="userName"></span>!</h2>
+
+  <div class="card">
+    <h3>General Resources</h3>
+    <div class="mini-card">Resource A</div>
+    <div class="mini-card">Resource B</div>
+  </div>
+
+  <div class="card github-card">
+    <h3>10 Useful GitHub Repositories</h3>
+    <ul>
+      <li>Repo 1</li>
+      <li>Repo 2</li>
+      <li>Repo 3</li>
+      <li>Repo 4</li>
+      <li>Repo 5</li>
+      <li>Repo 6</li>
+      <li>Repo 7</li>
+      <li>Repo 8</li>
+      <li>Repo 9</li>
+      <li>Repo 10</li>
+    </ul>
+  </div>
+
+  <button class="btn-primary" onclick="logout()">Logout</button>
+</div>
+
+<script>
+function login() {
+  const username = document.getElementById('username').value.trim() || 'User';
+  const role = document.getElementById('roleSelect').value; // 'student' or 'admin'
+
+  // Show app, hide login
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+
+  // Set greeting
+  document.getElementById('userName').textContent = username + ' (' + role + ')';
+
+  // Hide GitHub cards for students
+  if (role === 'student') {
+    const githubCards = document.querySelectorAll('.github-card');
+    githubCards.forEach(c => c.classList.add('hidden'));
+  }
+}
+
+function logout() {
+  // Reset UI
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('username').value = '';
+  document.getElementById('roleSelect').value = 'student';
+}
+</script>
+<style>
     .dashboard { max-width: 800px; margin: auto; padding: 1rem; font-family: Arial, sans-serif; }
     .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff; }
     .card h3 { margin-top: 0; }
