@@ -340,6 +340,167 @@
 
         <div id="dynamicExtensionsZone">
 <style>
+    /* Card wrapper */
+    .card {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+    /* Full‑screen call container */
+    .dark-studio.fullscreen-call {
+      position: fixed;
+      inset: 0;
+      height: 100dvh;               /* true viewport height */
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      padding: 10px;
+      background: #000;
+      color: #fff;
+    }
+
+    /* Grid that holds the video tiles */
+    .split-call-grid {
+      flex: 1;
+      min-height: 0;               /* allow grid to shrink inside flex column */
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (orientation: landscape) {
+      .split-call-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+      }
+    }
+
+    @media (orientation: portrait) {
+      .split-call-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+    }
+
+    .call-tile {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #222;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .call-tile video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Bottom control bar */
+    .call-controls {
+      flex-shrink: 0;
+      z-index: 10;
+      padding: 6px 0;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(0,0,0,.6);
+      border-radius: 6px;
+    }
+
+    .btn-primary {
+      background: #0069d9;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: #0053ba;
+    }
+
+    /* Caption box */
+    #avatarReplyCaption {
+      max-height: 84px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,.1);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+  </style>
+
+  <div class="card">
+    <div class="dark-studio fullscreen-call">
+      <div class="split-call-grid">
+        <div class="call-tile" id="localTile">
+          <video id="localVideo" autoplay muted playsinline></video>
+        </div>
+        <div class="call-tile" id="remoteTile">
+          <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+      </div>
+
+      <div id="avatarReplyCaption"></div>
+
+      <div class="call-controls">
+        <button class="btn-primary" id="startCallBtn">Start Call</button>
+        <button class="btn-primary" id="muteBtn">Mute</button>
+        <button class="btn-primary" id="camOffBtn">Cam Off</button>
+        <button class="btn-primary" id="endCallBtn">End Call</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Demo placeholders for media streams (replace with real WebRTC logic)
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+
+    // Simple mock: show a placeholder image when no stream
+    const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="100%" height="100%" fill="#555"/><text x="50%" y="50%" fill="#fff" font-size="24" text-anchor="middle" dy=".3em">Video</text></svg>'
+    );
+
+    localVideo.src = placeholder;
+    remoteVideo.src = placeholder;
+
+    // Caption handling
+    const captionBox = document.getElementById('avatarReplyCaption');
+
+    function setCaption(rawText) {
+      const cleanText = rawText.replace(/\*\*/g, '');
+      captionBox.textContent = cleanText;
+      speak(cleanText);
+    }
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Example usage – you can replace this with real AI reply logic
+    setCaption('**Hello!** Welcome to the adaptive video‑call demo. This caption will scroll if it gets too long, and the **stars** are removed.');
+
+    // Button actions (stubbed)
+    document.getElementById('startCallBtn').addEventListener('click', () => alert('Start Call clicked'));
+    document.getElementById('muteBtn').addEventListener('click', () => alert('Mute toggled'));
+    document.getElementById('camOffBtn').addEventListener('click', () => alert('Camera toggled'));
+    document.getElementById('endCallBtn').addEventListener('click', () => alert('End Call clicked'));
+  </script>
+<style>
   .card { 
     border: 1px solid #ddd; 
     border-radius: 8px; 
