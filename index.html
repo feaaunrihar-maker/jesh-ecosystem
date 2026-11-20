@@ -340,6 +340,189 @@
 
         <div id="dynamicExtensionsZone">
 <style>
+    /* Core widget styling */
+    .card {
+      max-width: 380px;
+      margin: 1rem auto;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.15);
+      background: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      background: #0069d9;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #0053b3; }
+
+    /* Fullscreen call adjustments */
+    .dark-studio.fullscreen-call {
+      padding-bottom: 24px !important;
+      z-index: 99999 !important;
+    }
+
+    /* Avatar canvas overlay */
+    #avatarWarpCanvas {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      border: 1px solid #ddd;
+      margin-top: 0.5rem;
+    }
+    #avatarWarpCanvas::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 62%; /* default lipY = 0.62 */
+      width: 30px; height: 30px;
+      margin-left: -15px; margin-top: -15px;
+      border: 2px solid rgba(255,0,0,.6);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+  </style>
+
+  <div class="card">
+    <h3>Studio Ghibli Avatar & Voice Upgrade</h3>
+
+    <label>
+      Gender / Style:
+      <select id="avatarStyleSelect">
+        <option value="female">Female – Soft</option>
+        <option value="male">Male – Heroic</option>
+        <option value="nonbinary">Non‑binary – Whimsical</option>
+      </select>
+    </label>
+
+    <button id="generateAvatarBtn" class="btn-primary">Generate Ghibli Avatar</button>
+
+    <canvas id="avatarWarpCanvas" width="300" height="300"></canvas>
+
+    <hr/>
+
+    <button id="recordVoiceBtn" class="btn-primary">Record 15‑sec Voice Model</button>
+    <audio id="voicePlayback" controls style="display:none; margin-top:0.5rem;"></audio>
+  </div>
+
+  <script>
+    /* ---------- 1. Fullscreen Call UI Fix ---------- */
+    (function() {
+      const videoContainer = document.getElementById('videoCallContainer');
+      if (!videoContainer) return;
+
+      const header = document.getElementById('mainAppHeader');
+      const footer = document.getElementById('studentBottomFooter');
+
+      const observer = new MutationObserver(mutations => {
+        mutations.forEach(m => {
+          if (m.attributeName === 'class') {
+            const isFull = videoContainer.classList.contains('fullscreen-call');
+            if (header) header.style.display = isFull ? 'none' : '';
+            if (footer) footer.style.display = isFull ? 'none' : '';
+          }
+        });
+      });
+      observer.observe(videoContainer, { attributes: true });
+    })();
+
+    /* ---------- 2. Ghibli Avatar Generator ---------- */
+    async function applyGhibliCartoonFilter(genderStyle) {
+      const promptMap = {
+        female: 'portrait of a gentle female character in Studio Ghibli style, soft lighting',
+        male:   'portrait of a brave male character in Studio Ghibli style, vibrant colors',
+        nonbinary: 'portrait of a whimsical non‑binary character in Studio Ghibli style, pastel tones'
+      };
+      const prompt = promptMap[genderStyle] || promptMap.female;
+      const apiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+
+      try {
+        const resp = await fetch(apiUrl);
+        const blob = await resp.blob();
+        const imgUrl = URL.createObjectURL(blob);
+        drawAvatar(imgUrl, genderStyle);
+      } catch (e) {
+        console.error('Avatar fetch failed', e);
+      }
+    }
+
+    function drawAvatar(imgSrc, genderStyle) {
+      const canvas = document.getElementById('avatarWarpCanvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        // Clear & draw centered
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const scale = Math.min(canvas.width/img.width, canvas.height/img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        const x = (canvas.width - w) / 2;
+        const y = (canvas.height - h) / 2;
+        ctx.drawImage(img, x, y, w, h);
+
+        // Set lip target ring position (CSS ::after uses percentages)
+        const lipY = (genderStyle === 'female') ? 0.62 : (genderStyle === 'male' ? 0.62 : 0.62);
+        canvas.style.setProperty('--lipY', lipY);
+        // Update overlay via pseudo‑element – we use CSS variables
+        canvas.style.setProperty('background', 'transparent');
+        canvas.style.setProperty('position', 'relative');
+        canvas.style.setProperty('overflow', 'hidden');
+        // Force re‑flow for ::after to update
+        canvas.offsetHeight;
+      };
+      img.src = imgSrc;
+    }
+
+    document.getElementById('generateAvatarBtn').addEventListener('click', () => {
+      const style = document.getElementById('avatarStyleSelect').value;
+      applyGhibliCartoonFilter(style);
+    });
+
+    /* ---------- 3. Voice Recording & Instant Playback ---------- */
+    async function recordFifteenSecondVoiceModel() {
+      // Placeholder: use MediaRecorder API
+      if (!navigator.mediaDevices || !window.MediaRecorder) {
+        alert('Your browser does not support audio recording.');
+        return null;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      return new Promise(resolve => {
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          resolve(blob);
+        };
+        recorder.start();
+        setTimeout(() => recorder.stop(), 15000); // 15 seconds
+      });
+    }
+
+    async function playBackVoice(blob) {
+      const audioEl = document.getElementById('voicePlayback');
+      const url = URL.createObjectURL(blob);
+      audioEl.src = url;
+      audioEl.style.display = 'block';
+      audioEl.play();
+    }
+
+    document.getElementById('recordVoiceBtn').addEventListener('click', async () => {
+      const voiceBlob = await recordFifteenSecondVoiceModel();
+      if (voiceBlob) {
+        // If ElevenLabs integration is configured, replace this with its URL.
+        // For now we just playback the raw recording.
+        await playBackVoice(voiceBlob);
+      }
+    });
+  </script>
+<style>
     /* Card wrapper */
     .card {
       font-family: Arial, Helvetica, sans-serif;
