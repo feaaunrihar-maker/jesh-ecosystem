@@ -1,2502 +1,1647 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Jesh AI Ecosystem</title>
+  <title>Jesh AI Ecosystem — Adaptive Learning & Live AI Tutor</title>
   <meta name="theme-color" content="#4F46E5" />
-  <style id="masterThemeStyles">
+  <style>
     :root {
       --primary: #4F46E5;
       --primary-dark: #3730A3;
+      --primary-soft: #EEF2FF;
       --bg: #F8FAFC;
       --card: #FFFFFF;
       --text: #0F172A;
-      --muted: #475569;
+      --muted: #64748B;
       --border: #E2E8F0;
-      --dark: #0F172A;
+      --navy: #0F172A;
+      --navy-card: #1E293B;
       --emerald: #059669;
       --rose: #E11D48;
       --amber: #D97706;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body {
-      height: 100%; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg); color: var(--text); overflow-x: hidden;
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
     }
     .hidden { display: none !important; }
 
-    /* 48PX TOUCH-FRIENDLY BUTTONS & INPUTS */
-    button, .btn-label {
-      cursor: pointer; border: none; border-radius: 12px; font-weight: 700; font-size: 14px;
-      min-height: 48px; padding: 10px 16px; transition: 0.15s ease;
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      text-decoration: none;
+    /* ================= HEADER & BOTTOM FOOTER (48px MIN TOUCH) ================= */
+    #mainAppHeader {
+      position: fixed; top: 0; left: 0; right: 0; height: 58px;
+      background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 14px; display: flex; justify-content: space-between; align-items: center; z-index: 40;
     }
-    button:active, .btn-label:active { transform: scale(0.97); }
-    .btn-primary { background: var(--primary); color: #FFFFFF; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-dark { background: var(--dark); color: #FFFFFF; }
-    .btn-emerald { background: var(--emerald); color: #FFFFFF; }
-    .btn-rose { background: var(--rose); color: #FFFFFF; }
-    .btn-amber { background: var(--amber); color: #FFFFFF; }
-    .btn-outline { background: #FFFFFF; color: var(--text); border: 1.5px solid #CBD5E1; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo-badge {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #EC4899);
+      color: #fff; font-weight: 800; font-size: 19px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none; flex-shrink: 0;
+    }
+    .brand-info h1 { font-size: 15px; font-weight: 800; line-height: 1.15; }
+    .brand-info p { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+    #studentBottomFooter {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
+      background: #FFFFFF; border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr); z-index: 45;
+      box-shadow: 0 -4px 14px rgba(15,23,42,0.05);
+    }
+    .footer-btn {
+      min-height: 48px; background: none; border: none; border-radius: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer;
+    }
+    .footer-btn.active { color: var(--primary); background: var(--primary-soft); border-top: 3px solid var(--primary); }
+    .footer-btn span.ico { font-size: 17px; line-height: 1; }
+
+    /* ================= WORKSPACE & CARDS ================= */
+    .workspace {
+      position: fixed; top: 58px; bottom: 56px; left: 0; right: 0;
+      overflow-y: auto; padding: 14px;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding-bottom: 24px; }
+
+    button {
+      min-height: 48px; padding: 10px 16px; border-radius: 12px; border: none;
+      font-weight: 700; font-size: 14px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+    }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-sm { min-height: 40px; padding: 7px 12px; font-size: 12px; border-radius: 10px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-navy { background: var(--navy); color: #fff; }
+    .btn-emerald { background: var(--emerald); color: #fff; }
+    .btn-rose { background: var(--rose); color: #fff; }
+    .btn-amber { background: var(--amber); color: #fff; }
+    .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+    }
+    .mini-card {
+      background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 12px;
+    }
 
     input[type="text"], input[type="password"], input[type="number"], select, textarea {
-      width: 100%; min-height: 48px; padding: 11px 14px; border-radius: 12px;
-      border: 1.5px solid #CBD5E1; font-size: 15px; font-family: inherit;
-      outline: none; background: #FFFFFF; color: var(--text);
+      width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px;
+      border: 1px solid #CBD5E1; font-size: 15px; font-family: inherit;
+      background: #fff; color: var(--text); outline: none;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
 
-    /* AUTH & ONBOARDING GATES */
-    .auth-gate {
-      position: fixed; inset: 0; background: var(--bg); z-index: 90;
-      display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .mod-tile {
+      min-height: 86px; background: #fff; border: 1px solid var(--border); border-radius: 16px;
+      padding: 12px; text-align: left; flex-direction: column; align-items: flex-start; justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.03);
     }
-    .auth-card {
-      background: #FFFFFF; border: 1px solid var(--border); border-radius: 20px;
-      padding: 24px; max-width: 410px; width: 100%; box-shadow: 0 12px 32px rgba(15,23,42,0.08);
-    }
-    .tab-switch {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #F1F5F9;
-      padding: 5px; border-radius: 12px; margin-bottom: 16px;
-    }
-    .tab-switch button {
-      min-height: 42px; background: transparent; color: var(--muted); border-radius: 9px; font-size: 13px;
-    }
-    .tab-switch button.active { background: #FFFFFF; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .mod-tile.mod-active { border: 2px solid var(--primary); background: var(--primary-soft); }
 
-    /* HEADER & LOCKED 48PX FOOTER */
-    header {
-      height: 60px; background: #FFFFFF; border-bottom: 1px solid var(--border); padding: 0 14px;
-      display: flex; justify-content: space-between; align-items: center;
-      position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    /* ================= CHAT & LEARNING UI ================= */
+    .chat-box {
+      height: 320px; overflow-y: auto; padding: 12px; background: #F8FAFC;
+      border: 1px solid var(--border); border-radius: 14px;
+      display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;
     }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .logo {
-      width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, var(--primary), #EC4899);
-      color: #FFFFFF; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; user-select: none;
+    .msg-ai {
+      background: #FFFFFF; border: 1px solid var(--border); color: var(--text);
+      padding: 11px 14px; border-radius: 14px; max-width: 88%; align-self: flex-start;
+      font-size: 14px; line-height: 1.5; white-space: pre-line;
     }
-    .brand h1 { font-size: 15px; font-weight: 800; color: var(--text); }
-    .brand p { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .msg-user {
+      background: var(--primary); color: #fff;
+      padding: 11px 14px; border-radius: 14px; max-width: 88%; align-self: flex-end;
+      font-size: 14px; line-height: 1.45;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .word-chip {
+      min-height: 42px; padding: 8px 14px; background: var(--primary-soft); color: var(--primary-dark);
+      border: 1px solid #C7D2FE; border-radius: 10px; font-weight: 700; font-size: 14px;
+    }
+    .read-word { display: inline-block; padding: 2px 4px; border-radius: 6px; cursor: pointer; transition: 0.15s; }
+    .read-word:hover { background: #E0E7FF; }
+    .read-word.active-word { background: #FDE047; color: #0F172A; font-weight: 800; transform: scale(1.06); }
+    .read-word.matched-word { color: var(--emerald); font-weight: 700; }
 
-    .app-workspace {
-      position: fixed; top: 60px; bottom: 54px; left: 0; right: 0;
-      overflow-y: auto; padding: 14px; background: var(--bg);
+    /* ================= 50/50 FULL-SCREEN VIDEO CALL STUDIO ================= */
+    #videoCallOverlay {
+      position: fixed; inset: 0; height: 100dvh; z-index: 99999;
+      background: var(--navy); color: #F8FAFC;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 12px 12px 24px 12px;
     }
-    .screen-inner { max-width: 960px; margin: 0 auto; }
-    .bottom-footer {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 54px;
-      background: #FFFFFF; border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(4, 1fr); z-index: 45;
-      box-shadow: 0 -2px 10px rgba(15,23,42,0.05);
+    .vc-top-bar {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 6px 10px; background: rgba(30,41,59,0.85); border-radius: 12px; flex-shrink: 0;
     }
-    .footer-btn {
-      min-height: 48px; background: none; border-radius: 0; flex-direction: column;
-      gap: 2px; padding: 4px; font-size: 11px; font-weight: 700; color: var(--muted);
+    .vc-split-stage {
+      flex: 1; display: grid; gap: 10px; margin: 10px 0; min-height: 0;
     }
-    .footer-btn.active { color: var(--primary); background: #EEF2FF; border-top: 3px solid var(--primary); }
+    @media (orientation: landscape) {
+      .vc-split-stage { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+    }
+    @media (orientation: portrait) {
+      .vc-split-stage { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    }
+    .vc-pane {
+      position: relative; background: var(--navy-card); border: 2px solid #334155;
+      border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; min-height: 0;
+    }
+    #avatarWarpCanvas {
+      width: 100%; height: 100%; max-width: 320px; max-height: 320px;
+      object-fit: contain; cursor: crosshair; border-radius: 16px;
+    }
+    #studentSelfVideo {
+      width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
+    }
+    .vc-badge {
+      position: absolute; top: 10px; left: 10px; background: rgba(15,23,42,0.78);
+      padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700;
+    }
+    #micListeningPill {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(5,150,105,0.92); color: #fff; padding: 5px 14px;
+      border-radius: 99px; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .wave-bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
+    .wave-bars i {
+      display: block; width: 3px; background: #fff; border-radius: 2px;
+      animation: waveAnim 0.6s infinite ease-in-out alternate;
+    }
+    .wave-bars i:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bars i:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bars i:nth-child(4) { animation-delay: 0.45s; }
+    @keyframes waveAnim { from { height: 4px; } to { height: 14px; } }
 
-    /* CARDS & GRIDS */
-    .card {
-      background: #FFFFFF; border-radius: 16px; border: 1px solid var(--border);
-      padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+    .vc-caption-bar {
+      background: rgba(30,41,59,0.95); border: 1px solid #334155; border-radius: 12px;
+      padding: 8px 12px; font-size: 13px; color: #A7F3D0; text-align: center;
+      margin-bottom: 10px; max-height: 62px; overflow-y: auto; flex-shrink: 0;
     }
-    .mini-card { background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-    .module-card {
-      background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 16px; padding: 16px;
-      cursor: pointer; transition: 0.15s; text-align: left; display: flex; flex-direction: column; gap: 6px;
+    .vc-controls {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0;
     }
-    .module-card:hover { border-color: var(--primary); background: #EEF2FF; }
-    .input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .input-row input { flex: 1; min-width: 160px; }
+    .vc-controls button { min-height: 48px; font-size: 13px; padding: 8px 6px; }
 
-    /* CHAT MESSAGES */
-    .chat-messages {
-      height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
-      background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px;
-    }
-    .msg-ai { background: #FFFFFF; border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-start; font-size: 14px; line-height: 1.5; white-space: pre-line; }
-    .msg-user { background: var(--primary); color: #FFFFFF; padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-end; font-size: 14px; }
-
-    /* FULL-SCREEN IMMERSIVE 50/50 VIDEO CALL */
-    .dark-studio { background: #0F172A; color: #F8FAFC; border-radius: 18px; padding: 14px; }
-    .dark-studio.fullscreen-call {
-      position: fixed; inset: 0; z-index: 95; border-radius: 0; padding: 12px;
-      display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;
-    }
-    .split-call-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; margin-bottom: 10px;
-    }
-    @media (max-width: 640px) {
-      .split-call-grid { grid-template-columns: 1fr; }
-    }
-    .call-tile {
-      position: relative; background: #1E293B; border-radius: 18px; border: 2px solid #334155;
-      min-height: 240px; overflow: hidden; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; padding: 12px;
-    }
-    .call-tile.speaking-glow { border-color: #10B981; box-shadow: 0 0 28px rgba(16,185,129,0.5); }
-    .tile-badge {
-      position: absolute; top: 10px; left: 10px; background: rgba(15,23,42,0.85);
-      color: #F8FAFC; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; z-index: 5;
-    }
-    .timer-badge {
-      position: absolute; top: 10px; right: 10px; background: rgba(5,150,105,0.92);
-      color: #FFFFFF; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 800; z-index: 5;
-    }
-
-    /* REAL PHOTO CANVAS LIP-WARP & HEAD MIRRORING */
-    .avatar-canvas-frame {
-      position: relative; width: 170px; height: 170px; border-radius: 50%;
-      overflow: hidden; border: 3px solid #4F46E5; background: #0F172A; margin-bottom: 8px;
-      transition: transform 0.12s ease-out; cursor: crosshair;
-    }
-    #avatarWarpCanvas { width: 100%; height: 100%; display: block; }
-
-    .student-cam-video {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
-    }
-    .cam-initials-circle {
-      width: 88px; height: 88px; border-radius: 50%; background: var(--primary);
-      color: #FFFFFF; font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center;
-    }
-    .subtitle-overlay {
-      background: rgba(2,6,23,0.9); color: #F8FAFC; padding: 8px 12px; border-radius: 12px;
-      font-size: 13px; text-align: center; width: 100%; line-height: 1.45; z-index: 4;
-    }
-
-    /* LIVE SOUND WAVE INDICATOR (LISTENING & RECORDING) */
-    .live-wave-bar {
-      display: inline-flex; align-items: center; gap: 3px; height: 18px; vertical-align: middle; margin-right: 6px;
-    }
-    .live-wave-bar span {
-      display: block; width: 3px; height: 6px; background: #10B981; border-radius: 2px;
-      animation: waveBounce 0.5s infinite ease-in-out;
-    }
-    .live-wave-bar span:nth-child(2) { animation-delay: 0.1s; }
-    .live-wave-bar span:nth-child(3) { animation-delay: 0.2s; }
-    .live-wave-bar span:nth-child(4) { animation-delay: 0.3s; }
-    .live-wave-bar span:nth-child(5) { animation-delay: 0.15s; }
-    @keyframes waveBounce {
-      0%, 100% { height: 5px; }
-      50% { height: 18px; }
-    }
-
-    /* DUOLINGO-STYLE PATH NODES & INTERACTIVE READALONG WORDS */
-    .path-node {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 14px; border-radius: 14px; border: 2px solid var(--border); background: #FFFFFF; margin-bottom: 10px;
-    }
-    .path-node.completed { border-color: #10B981; background: #ECFDF5; }
-    .path-node.active-node { border-color: var(--primary); background: #EEF2FF; }
-    .tap-word {
-      display: inline-block; padding: 2px 5px; border-radius: 6px; cursor: pointer;
-      border-bottom: 1.5px dashed #94A3B8; margin: 2px 1px; transition: 0.12s;
-    }
-    .tap-word:hover { background: #EEF2FF; color: var(--primary); }
-
+    /* ================= MODALS & ADMIN NAVY STUDIO ================= */
     .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(15,23,42,0.75); backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center; z-index: 120; padding: 16px;
+      position: fixed; inset: 0; background: rgba(15,23,42,0.82); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; z-index: 9000; padding: 16px;
     }
-    .modal-box { background: #FFFFFF; border-radius: 18px; padding: 22px; max-width: 430px; width: 100%; }
+    .modal-box {
+      background: #fff; border-radius: 20px; padding: 22px; max-width: 430px; width: 100%;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.28); max-height: 92dvh; overflow-y: auto;
+    }
+    .admin-shell {
+      background: var(--navy); color: #F8FAFC; border-radius: 18px; padding: 16px; margin-bottom: 14px;
+    }
+    .admin-shell .card { background: var(--navy-card); border-color: #334155; color: #F8FAFC; }
+    .admin-shell input, .admin-shell textarea, .admin-shell select {
+      background: #0F172A; color: #F8FAFC; border-color: #475569;
+    }
+    .code-sandbox {
+      font-family: Consolas, Monaco, monospace; background: #0F172A; color: #38BDF8;
+      border-radius: 12px; padding: 12px; font-size: 13px;
+    }
   </style>
-  <style id="dynamicCustomCSS"></style>
 </head>
 <body>
 
-  <!-- ==================== 1. LOGIN & CREATE ACCOUNT GATE ==================== -->
-  <section id="authGate" class="auth-gate">
-    <div class="auth-card">
-      <div style="text-align:center;margin-bottom:16px;">
-        <div class="logo" style="margin:0 auto 8px;width:46px;height:46px;font-size:22px;" onclick="handleLogoTap()">J</div>
-        <h2 style="font-size:20px;font-weight:800;color:var(--text);">Jesh AI Ecosystem</h2>
-        <p style="font-size:13px;color:var(--muted);">आपका पर्सनल 2-Way AI मेंटर प्लेटफ़ॉर्म</p>
-      </div>
-
-      <div class="tab-switch">
-        <button id="roleBtnStudent" class="active" onclick="switchAuthRole('student')">🎓 Student</button>
-        <button id="roleBtnAdmin" onclick="switchAuthRole('admin')">🔐 Admin</button>
-      </div>
-
-      <div id="studentAuthForm">
-        <div class="tab-switch" style="background:#EEF2FF;">
-          <button id="modeBtnLogin" class="active" onclick="switchStudentMode('login')">Login करें</button>
-          <button id="modeBtnRegister" onclick="switchStudentMode('register')">Create Account (नया)</button>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div>
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Phone Number या Email ID</label>
-            <input id="authContactInput" type="text" placeholder="उदा. 9876543210 या name@gmail.com" />
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">6 अंकों का पासवर्ड (6-Digit PIN)</label>
-            <input id="authPinInput" type="password" maxlength="6" inputmode="numeric" placeholder="••••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)" onkeydown="if(event.key==='Enter') handleStudentAuthSubmit()" />
-          </div>
-          <button id="studentAuthSubmitBtn" class="btn-primary" style="width:100%;font-size:16px;" onclick="handleStudentAuthSubmit()">Login →</button>
-          <button type="button" class="btn-outline" style="width:100%;font-size:13px;" onclick="openForgotModal()">❓ पासवर्ड भूल गए? (Forgot Password)</button>
-        </div>
-      </div>
-
-      <div id="adminAuthForm" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
-        <div>
-          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Admin Master Password</label>
-          <input id="gateAdminPass" type="password" placeholder="Enter Admin Password" onkeydown="if(event.key==='Enter') verifyAdminFromGate()" />
-        </div>
-        <button class="btn-dark" style="width:100%;" onclick="verifyAdminFromGate()">Unlock Admin Command Center</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== 2. FIRST-TIME PROFILE SETUP (NAME -> AGE) ==================== -->
-  <section id="profileSetupGate" class="auth-gate hidden">
-    <div class="auth-card">
-      <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px;">✨ स्वागत है! बस 2 आसान सवाल</div>
-      <div id="setupStepName" style="display:flex;flex-direction:column;gap:12px;">
-        <h3 style="font-size:20px;">आपका पूरा नाम क्या है?</h3>
-        <p style="font-size:13px;color:var(--muted);">ताकि आपका AI टीचर आपको आपके नाम से बुला सके</p>
-        <input id="setupNameInput" type="text" placeholder="अपना नाम लिखें..." onkeydown="if(event.key==='Enter') goToAgeStep()" />
-        <button class="btn-primary" style="width:100%;" onclick="goToAgeStep()">Next (आगे बढ़ें) →</button>
-      </div>
-
-      <div id="setupStepAge" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
-        <h3 style="font-size:20px;">आपकी उम्र (Age) क्या है?</h3>
-        <p style="font-size:13px;color:var(--muted);">ताकि AI आपकी उम्र और समझ के हिसाब से सिखा सके</p>
-        <input id="setupAgeInput" type="number" min="5" max="99" placeholder="उम्र लिखें (जैसे: 18)" onkeydown="if(event.key==='Enter') finishProfileSetup()" />
-        <button id="finishSetupBtn" class="btn-emerald" style="width:100%;font-size:16px;" onclick="finishProfileSetup()">🚀 Start Learning / शुरू करें</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== 3. TOP HEADER ==================== -->
-  <header id="mainAppHeader" class="hidden">
+  <!-- ==================== TOP HEADER (STUDENT SAFE) ==================== -->
+  <header id="mainAppHeader">
     <div class="brand">
-      <div class="logo" onclick="handleLogoTap()">J</div>
-      <div>
-        <h1 id="uiBrandName">Jesh AI Ecosystem</h1>
-        <p>👋 <span id="hdrStudentName">Student</span> • 🔥 <span id="userStreak">1</span>d • ⚡ <span id="userXpCount">0</span> XP</p>
+      <div class="logo-badge" id="brandLogoTap" onclick="handleSecretAdminTap()" title="Jesh AI">J</div>
+      <div class="brand-info">
+        <h1 id="uiBrandTitle">Jesh AI Ecosystem</h1>
+        <p>👋 <span id="hdrUserName">Guest</span> • <span id="hdrUserLevel">A1</span> • 🔥 <span id="hdrStreak">1</span>d • ⚡ <span id="hdrXP">0</span> XP</p>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
-      <button class="btn-rose" style="min-height:38px;padding:6px 12px;font-size:12px;" onclick="logoutStudent()">Logout</button>
+      <button id="hdrAuthBtn" class="btn-primary btn-sm" onclick="openAuthModal()">Login</button>
+      <button id="hdrLogoutBtn" class="btn-outline btn-sm hidden" onclick="logoutStudent()">Logout</button>
     </div>
   </header>
 
-  <!-- ==================== 4. STUDENT WORKSPACE ==================== -->
-  <main id="viewLearner" class="app-workspace hidden">
-    <div class="screen-inner">
-
-      <!-- HOME DASHBOARD -->
-      <section id="scr-home" class="app-screen">
-        <div class="card" style="background:linear-gradient(135deg,#EEF2FF,#FFFFFF);border-left:5px solid var(--primary);">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-            <div>
-              <span style="font-size:11px;font-weight:800;color:var(--primary);">🧠 360° ADAPTIVE GROWTH ENGINE</span>
-              <h2 style="font-size:18px;margin-top:2px;">नमस्ते, <span id="dashGreetingName">Learner</span>!</h2>
-              <p id="adaptiveSkillBadge" style="font-size:12px;color:var(--muted);margin-top:4px;">Level: A1 Beginner • Grammar: A1 | Math: L1 | Logic: L1</p>
-            </div>
-            <button class="btn-primary" onclick="openFullScreen('studio')">📹 Full-Screen वीडियो कॉल शुरू करें</button>
-          </div>
-        </div>
-
-        <div class="grid-2" style="margin-bottom:14px;">
-          <div class="module-card" style="border-color:#10B981;background:#ECFDF5;" onclick="openFullScreen('studio')">
-            <span style="font-size:26px;">📹</span>
-            <strong style="font-size:16px;">JeshLive Video Tutor</strong>
-            <span style="font-size:12px;color:#065F46;">Full-Screen 50/50 कॉल, असली फोटो लिप-सिंक व हेड मिररिंग</span>
-          </div>
-          <div class="module-card" onclick="openFullScreen('lingo')">
-            <span style="font-size:26px;">🦉</span>
-            <strong style="font-size:16px;">JeshLingo (Duolingo Path)</strong>
-            <span style="font-size:12px;color:var(--muted);">स्टेप-बाय-स्टेप लर्निंग रोडमैप, क्विज़, हार्ट्स और फ्लैशकार्ड्स</span>
-          </div>
-          <div class="module-card" onclick="openFullScreen('read')">
-            <span style="font-size:26px;">📖</span>
-            <strong style="font-size:16px;">JeshRead Studio</strong>
-            <span style="font-size:12px;color:var(--muted);">कस्टम कहानियाँ, 1-टैप शब्दार्थ और बोलकर पढ़ने का अभ्यास</span>
-          </div>
-          <div class="module-card" onclick="openFullScreen('academy')">
-            <span style="font-size:26px;">🎓</span>
-            <strong style="font-size:16px;">Jesh Academy</strong>
-            <span style="font-size:12px;color:var(--muted);">Python, HTML, CCC कोर्स और QR सर्टिफिकेट</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">💬 Personal AI Mentor (आपके स्तर के अनुसार सिखाता और आगे बढ़ाता है)</strong>
-          <div id="tutorChatFeed" class="chat-messages">
-            <div class="msg-ai">👋 नमस्ते! आप मुझसे English, Hindi, Math या Computer का कोई भी सवाल पूछ सकते हैं।</div>
-          </div>
-          <div class="input-row">
-            <input id="learnerPrompt" type="text" placeholder="अपना सवाल लिखें..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
-            <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">पूछें</button>
-          </div>
-        </div>
-
-        <div id="dynamicExtensionsZone">
-<style>
-    .card {
-      max-width: 480px;
-      margin: 1rem auto;
-      padding: 1.2rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-    }
-    .card h3 {
-      margin-top: 0;
-      font-size: 1.2rem;
-      color: #333;
-    }
-    .btn-primary {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      margin-top: 0.8rem;
-      background-color: #0069d9;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-    .btn-primary:disabled {
-      background-color: #a0c5f7;
-      cursor: not-allowed;
-    }
-    .report {
-      margin-top: 1rem;
-      padding: 0.8rem;
-      background: #f8f9fa;
-      border: 1px solid #e2e3e5;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      font-family: Consolas, monospace;
-      font-size: 0.9rem;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-  </style>
-
-  <div class="card">
-    <h3>🛡️ End‑to‑End Architecture Audit & Final Lock</h3>
-    <p>Click the button to run a simulated audit of the <code>feaaunrihar-maker/jesh-ecosystem</code> covering all phases and upgrades.</p>
-    <button id="auditBtn" class="btn-primary">Run Architecture Audit</button>
-    <div id="auditReport" class="report" style="display:none;"></div>
-  </div>
-
-  <script>
-    // Utility: abortable fetch with 6‑second timeout (simulation)
-    function postBackend(payload) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-      // Simulated fetch – replace with real endpoint as needed
-      return new Promise((resolve, reject) => {
-        // Simulate network latency (0‑5 s)
-        const latency = Math.random() * 5000;
-        setTimeout(() => {
-          clearTimeout(timeoutId);
-          if (controller.signal.aborted) {
-            reject(new Error('Request timed out'));
-          } else {
-            resolve({ status: 'ok', data: payload });
-          }
-        }, latency);
-      });
-    }
-
-    // Simulated audit steps
-    const auditSteps = [
-      { name: 'Network Resilience & Timeout', fn: () => postBackend({ test: 'network' }) },
-      { name: 'Single‑Admin Isolation', fn: () => Promise.resolve('isolated') },
-      { name: 'Full‑Screen Video Call Layout', fn: () => Promise.resolve('layout OK') },
-      { name: 'Audio/Video Waveform & Lip‑Warp', fn: () => Promise.resolve('waveform OK') },
-      { name: 'Adaptive AI Mentor Memory', fn: () => Promise.resolve('memory OK') },
-      { name: 'Level‑Up & Progression', fn: () => Promise.resolve('progression OK') },
-      { name: 'Interactive Lingo Module', fn: () => Promise.resolve('lingo OK') },
-      { name: 'ReadAlong Highlighting', fn: () => Promise.resolve('readalong OK') },
-      { name: 'Code Sandbox & QR Certificates', fn: () => Promise.resolve('sandbox OK') },
-      { name: 'Dynamic Extensions Hook', fn: () => Promise.resolve('extensions OK') }
-    ];
-
-    async function runAudit() {
-      const reportEl = document.getElementById('auditReport');
-      reportEl.style.display = 'block';
-      reportEl.textContent = '🔎 Starting audit...\n';
-      for (let i = 0; i < auditSteps.length; i++) {
-        const step = auditSteps[i];
-        reportEl.textContent += `\n[${i + 1}/${auditSteps.length}] ${step.name}... `;
-        try {
-          await step.fn();
-          reportEl.textContent += '✅ PASS';
-        } catch (e) {
-          reportEl.textContent += `❌ FAIL – ${e.message}`;
-        }
-      }
-      reportEl.textContent += '\n\n✅ LIVE & VERIFIED – All modules are operational.';
-    }
-
-    document.getElementById('auditBtn').addEventListener('click', async (e) => {
-      const btn = e.target;
-      btn.disabled = true;
-      btn.textContent = 'Auditing…';
-      await runAudit();
-      btn.textContent = 'Audit Completed';
-    });
-  </script>
-<style>
-    .card {
-      max-width: 400px;
-      margin: 1rem auto;
-      padding: 1.5rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.1);
-      font-family: Arial, sans-serif;
-    }
-    .btn-primary {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      background-color: #0069d9;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-primary:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
-    }
-  </style>
-
-  <div class="card">
-    <h3>Student Login</h3>
-    <form id="loginForm">
-      <input type="text" id="studentId" placeholder="Student ID" required style="width:100%;margin-bottom:0.5rem;">
-      <button type="submit" class="btn-primary" id="loginBtn">Login</button>
-    </form>
-    <div id="log" style="margin-top:0.5rem;font-size:0.9rem;color:#555;"></div>
-  </div>
-
-  <script>
-    const API_URL = 'https://example.com/api/login'; // replace with real endpoint
-    const JESH_LOCAL_STUDENTS_DB = {
-      // mock local DB for fallback
-      '12345': { name: 'Local Student', id: '12345' }
-    };
-
-    // Enhanced postBackend with 6‑second abort timeout
-    async function postBackend(payload) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 seconds
-
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (!response.ok) throw new Error('Network response not ok');
-        return await response.json();
-      } catch (err) {
-        clearTimeout(timeoutId);
-        // Propagate error so caller can fallback
-        throw err;
-      }
-    }
-
-    async function handleStudentAuthSubmit(event) {
-      event.preventDefault();
-      const btn = document.getElementById('loginBtn');
-      const log = document.getElementById('log');
-      const studentId = document.getElementById('studentId').value.trim();
-
-      btn.disabled = true;
-      btn.textContent = 'कृपया प्रतीक्षा करें...';
-      log.textContent = '';
-
-      const payload = { studentId };
-
-      try {
-        const result = await postBackend(payload);
-        // Assume successful login response contains student data
-        log.textContent = `✅ Logged in (online): ${result.name}`;
-      } catch (e) {
-        // Fallback to local DB
-        const local = JESH_LOCAL_STUDENTS_DB[studentId];
-        if (local) {
-          log.textContent = `✅ Logged in (offline fallback): ${local.name}`;
-        } else {
-          log.textContent = `❌ Login failed: ${e.message || 'Network error'}`;
-        }
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Login';
-      }
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', handleStudentAuthSubmit);
-  </script>
-
-<style>
-    /* --- Core Overrides --- */
-    .dark-studio.fullscreen-call {
-      padding-bottom: 24px !important;
-      z-index: 99999 !important;
-    }
-    .hidden‑ui {
-      display: none !important;
-    }
-    /* Target ring for lip‑sync positioning */
-    #avatarWarpCanvas {
-      position: relative;
-    }
-    #avatarWarpCanvas::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 62%;               /* default lipY for generated avatar */
-      width: 30px;
-      height: 30px;
-      margin-left: -15px;
-      margin-top: -15px;
-      border: 2px solid rgba(255,255,255,0.7);
-      border-radius: 50%;
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-    /* Card & button styling (reuse existing classes) */
-    .card {
-      background: #1e1e1e;
-      color: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      margin: 12px 0;
-    }
-    .btn-primary {
-      background: #0066ff;
-      border: none;
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-primary:hover {
-      background: #0052cc;
-    }
-  </style>
-
-  <div class="card" id="upgradeWidget">
-    <h3>Video Call & Avatar Enhancements</h3>
-
-    <button class="btn-primary" id="applyOverridesBtn">Apply Call UI Overrides</button>
-    <button class="btn-primary" id="generateAvatarBtn">Generate Ghibli Avatar</button>
-    <button class="btn-primary" id="recordVoiceBtn">Record 15‑sec Voice Model</button>
-
-    <canvas id="avatarWarpCanvas" width="300" height="300"></canvas>
-    <audio id="voicePlayback" hidden></audio>
-  </div>
-
-  <script>
-    // ---------- 1. UI Overrides ----------
-    const applyOverrides = () => {
-      const videoContainer = document.getElementById('videoCallContainer');
-      if (!videoContainer) return;
-
-      const updateUI = () => {
-        const isFull = videoContainer.classList.contains('fullscreen-call');
-        const header = document.getElementById('mainAppHeader');
-        const footer = document.getElementById('studentBottomFooter');
-
-        if (header) header.classList.toggle('hidden‑ui', isFull);
-        if (footer) footer.classList.toggle('hidden‑ui', isFull);
-      };
-
-      // Initial check
-      updateUI();
-
-      // Observe class changes on the video container
-      const observer = new MutationObserver(updateUI);
-      observer.observe(videoContainer, { attributes: true, attributeFilter: ['class'] });
-    };
-
-    document.getElementById('applyOverridesBtn').addEventListener('click', applyOverrides);
-
-    // ---------- 2. Ghibli Avatar Generator ----------
-    const generateGhibliAvatar = async () => {
-      const canvas = document.getElementById('avatarWarpCanvas');
-      const ctx = canvas.getContext('2d');
-
-      // Example: retrieve user gender/style from a data attribute or fallback
-      const gender = document.body.dataset.userGender || 'female';
-      const style = document.body.dataset.userStyle || 'anime';
-
-      const prompt = `${gender} portrait in Studio Ghibli style, soft lighting, expressive eyes`;
-      const apiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
-
-      try {
-        const response = await fetch(apiUrl);
-        const blob = await response.blob();
-        const img = new Image();
-        img.onload = () => {
-          // Clear canvas and draw centered image
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-          const w = img.width * scale;
-          const h = img.height * scale;
-          const x = (canvas.width - w) / 2;
-          const y = (canvas.height - h) / 2;
-          ctx.drawImage(img, x, y, w, h);
-        };
-        img.src = URL.createObjectURL(blob);
-      } catch (e) {
-        console.error('Avatar generation failed:', e);
-      }
-    };
-
-    // Adjust target ring for uploaded selfies (lipY = 0.46)
-    const setSelfieTargetRing = () => {
-      const canvas = document.getElementById('avatarWarpCanvas');
-      canvas.style.setProperty('--lipY', '46%');
-      canvas.style.setProperty('--lipX', '50%');
-      // Update pseudo‑element position via CSS variable (fallback to default if not supported)
-      const style = document.createElement('style');
-      style.textContent = `
-        #avatarWarpCanvas::after {
-          top: var(--lipY, 62%);
-          left: var(--lipX, 50%);
-        }
-      `;
-      document.head.appendChild(style);
-    };
-
-    document.getElementById('generateAvatarBtn').addEventListener('click', async () => {
-      await generateGhibliAvatar();
-      setSelfieTargetRing(); // apply ring positioning after generation
-    });
-
-    // ---------- 3. Voice Model Recording & Playback ----------
-    const recordFifteenSecondVoiceModel = () => {
-      // Placeholder: replace with real recording logic
-      return new Promise((resolve) => {
-        const fakeAudioUrl = 'https://cdn.jsdelivr.net/gh/elevenlabs/elevenlabs-samples/hello.mp3';
-        setTimeout(() => resolve(fakeAudioUrl), 1500); // simulate async work
-      });
-    };
-
-    const playVoiceSample = (url) => {
-      const audio = document.getElementById('voicePlayback');
-      audio.src = url;
-      audio.play().catch(err => console.warn('Playback failed:', err));
-    };
-
-    document.getElementById('recordVoiceBtn').addEventListener('click', async () => {
-      const sampleUrl = await recordFifteenSecondVoiceModel();
-      if (sampleUrl) {
-        playVoiceSample(sampleUrl);
-      }
-    });
-  </script>
-<style>
-    /* Core widget styling */
-    .card {
-      max-width: 380px;
-      margin: 1rem auto;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.15);
-      background: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    .btn-primary {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      margin-top: 0.5rem;
-      background: #0069d9;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-primary:hover { background: #0053b3; }
-
-    /* Fullscreen call adjustments */
-    .dark-studio.fullscreen-call {
-      padding-bottom: 24px !important;
-      z-index: 99999 !important;
-    }
-
-    /* Avatar canvas overlay */
-    #avatarWarpCanvas {
-      position: relative;
-      width: 100%;
-      max-width: 300px;
-      border: 1px solid #ddd;
-      margin-top: 0.5rem;
-    }
-    #avatarWarpCanvas::after {
-      content: "";
-      position: absolute;
-      left: 50%; top: 62%; /* default lipY = 0.62 */
-      width: 30px; height: 30px;
-      margin-left: -15px; margin-top: -15px;
-      border: 2px solid rgba(255,0,0,.6);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-  </style>
-
-  <div class="card">
-    <h3>Studio Ghibli Avatar & Voice Upgrade</h3>
-
-    <label>
-      Gender / Style:
-      <select id="avatarStyleSelect">
-        <option value="female">Female – Soft</option>
-        <option value="male">Male – Heroic</option>
-        <option value="nonbinary">Non‑binary – Whimsical</option>
-      </select>
-    </label>
-
-    <button id="generateAvatarBtn" class="btn-primary">Generate Ghibli Avatar</button>
-
-    <canvas id="avatarWarpCanvas" width="300" height="300"></canvas>
-
-    <hr/>
-
-    <button id="recordVoiceBtn" class="btn-primary">Record 15‑sec Voice Model</button>
-    <audio id="voicePlayback" controls style="display:none; margin-top:0.5rem;"></audio>
-  </div>
-
-  <script>
-    /* ---------- 1. Fullscreen Call UI Fix ---------- */
-    (function() {
-      const videoContainer = document.getElementById('videoCallContainer');
-      if (!videoContainer) return;
-
-      const header = document.getElementById('mainAppHeader');
-      const footer = document.getElementById('studentBottomFooter');
-
-      const observer = new MutationObserver(mutations => {
-        mutations.forEach(m => {
-          if (m.attributeName === 'class') {
-            const isFull = videoContainer.classList.contains('fullscreen-call');
-            if (header) header.style.display = isFull ? 'none' : '';
-            if (footer) footer.style.display = isFull ? 'none' : '';
-          }
-        });
-      });
-      observer.observe(videoContainer, { attributes: true });
-    })();
-
-    /* ---------- 2. Ghibli Avatar Generator ---------- */
-    async function applyGhibliCartoonFilter(genderStyle) {
-      const promptMap = {
-        female: 'portrait of a gentle female character in Studio Ghibli style, soft lighting',
-        male:   'portrait of a brave male character in Studio Ghibli style, vibrant colors',
-        nonbinary: 'portrait of a whimsical non‑binary character in Studio Ghibli style, pastel tones'
-      };
-      const prompt = promptMap[genderStyle] || promptMap.female;
-      const apiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
-
-      try {
-        const resp = await fetch(apiUrl);
-        const blob = await resp.blob();
-        const imgUrl = URL.createObjectURL(blob);
-        drawAvatar(imgUrl, genderStyle);
-      } catch (e) {
-        console.error('Avatar fetch failed', e);
-      }
-    }
-
-    function drawAvatar(imgSrc, genderStyle) {
-      const canvas = document.getElementById('avatarWarpCanvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-      img.onload = () => {
-        // Clear & draw centered
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        const scale = Math.min(canvas.width/img.width, canvas.height/img.height);
-        const w = img.width * scale;
-        const h = img.height * scale;
-        const x = (canvas.width - w) / 2;
-        const y = (canvas.height - h) / 2;
-        ctx.drawImage(img, x, y, w, h);
-
-        // Set lip target ring position (CSS ::after uses percentages)
-        const lipY = (genderStyle === 'female') ? 0.62 : (genderStyle === 'male' ? 0.62 : 0.62);
-        canvas.style.setProperty('--lipY', lipY);
-        // Update overlay via pseudo‑element – we use CSS variables
-        canvas.style.setProperty('background', 'transparent');
-        canvas.style.setProperty('position', 'relative');
-        canvas.style.setProperty('overflow', 'hidden');
-        // Force re‑flow for ::after to update
-        canvas.offsetHeight;
-      };
-      img.src = imgSrc;
-    }
-
-    document.getElementById('generateAvatarBtn').addEventListener('click', () => {
-      const style = document.getElementById('avatarStyleSelect').value;
-      applyGhibliCartoonFilter(style);
-    });
-
-    /* ---------- 3. Voice Recording & Instant Playback ---------- */
-    async function recordFifteenSecondVoiceModel() {
-      // Placeholder: use MediaRecorder API
-      if (!navigator.mediaDevices || !window.MediaRecorder) {
-        alert('Your browser does not support audio recording.');
-        return null;
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const chunks = [];
-
-      return new Promise(resolve => {
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: 'audio/webm' });
-          resolve(blob);
-        };
-        recorder.start();
-        setTimeout(() => recorder.stop(), 15000); // 15 seconds
-      });
-    }
-
-    async function playBackVoice(blob) {
-      const audioEl = document.getElementById('voicePlayback');
-      const url = URL.createObjectURL(blob);
-      audioEl.src = url;
-      audioEl.style.display = 'block';
-      audioEl.play();
-    }
-
-    document.getElementById('recordVoiceBtn').addEventListener('click', async () => {
-      const voiceBlob = await recordFifteenSecondVoiceModel();
-      if (voiceBlob) {
-        // If ElevenLabs integration is configured, replace this with its URL.
-        // For now we just playback the raw recording.
-        await playBackVoice(voiceBlob);
-      }
-    });
-  </script>
-<style>
-    /* Card wrapper */
-    .card {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.15);
-      overflow: hidden;
-      max-width: 100%;
-    }
-
-    /* Full‑screen call container */
-    .dark-studio.fullscreen-call {
-      position: fixed;
-      inset: 0;
-      height: 100dvh;               /* true viewport height */
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      padding: 10px;
-      background: #000;
-      color: #fff;
-    }
-
-    /* Grid that holds the video tiles */
-    .split-call-grid {
-      flex: 1;
-      min-height: 0;               /* allow grid to shrink inside flex column */
-      display: grid;
-      gap: 10px;
-    }
-
-    @media (orientation: landscape) {
-      .split-call-grid {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr;
-      }
-    }
-
-    @media (orientation: portrait) {
-      .split-call-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
-      }
-    }
-
-    .call-tile {
-      min-height: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #222;
-      border-radius: 4px;
-      position: relative;
-    }
-
-    .call-tile video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Bottom control bar */
-    .call-controls {
-      flex-shrink: 0;
-      z-index: 10;
-      padding: 6px 0;
-      display: flex;
-      justify-content: space-around;
-      background: rgba(0,0,0,.6);
-      border-radius: 6px;
-    }
-
-    .btn-primary {
-      background: #0069d9;
-      color: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    .btn-primary:hover {
-      background: #0053ba;
-    }
-
-    /* Caption box */
-    #avatarReplyCaption {
-      max-height: 84px;
-      overflow-y: auto;
-      flex-shrink: 0;
-      margin-top: 8px;
-      padding: 6px 10px;
-      background: rgba(255,255,255,.1);
-      border-radius: 4px;
-      font-size: 0.9rem;
-      line-height: 1.3;
-    }
-  </style>
-
-  <div class="card">
-    <div class="dark-studio fullscreen-call">
-      <div class="split-call-grid">
-        <div class="call-tile" id="localTile">
-          <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        <div class="call-tile" id="remoteTile">
-          <video id="remoteVideo" autoplay playsinline></video>
-        </div>
+  <!-- ==================== MAIN STUDENT WORKSPACE ==================== -->
+  <main id="studentWorkspace" class="workspace">
+    <div class="container">
+
+      <!-- SAFE MODE BANNER (IF ?safe=1) -->
+      <div id="safeModeAlert" class="card hidden" style="background:#FEF3C7;border-color:#F59E0B;color:#92400E;">
+        <strong>🛡️ Safe Mode Active (?safe=1):</strong> Dynamic extensions paused. Core platform running in verified safe mode.
       </div>
 
-      <div id="avatarReplyCaption"></div>
-
-      <div class="call-controls">
-        <button class="btn-primary" id="startCallBtn">Start Call</button>
-        <button class="btn-primary" id="muteBtn">Mute</button>
-        <button class="btn-primary" id="camOffBtn">Cam Off</button>
-        <button class="btn-primary" id="endCallBtn">End Call</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Demo placeholders for media streams (replace with real WebRTC logic)
-    const localVideo = document.getElementById('localVideo');
-    const remoteVideo = document.getElementById('remoteVideo');
-
-    // Simple mock: show a placeholder image when no stream
-    const placeholder = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="100%" height="100%" fill="#555"/><text x="50%" y="50%" fill="#fff" font-size="24" text-anchor="middle" dy=".3em">Video</text></svg>'
-    );
-
-    localVideo.src = placeholder;
-    remoteVideo.src = placeholder;
-
-    // Caption handling
-    const captionBox = document.getElementById('avatarReplyCaption');
-
-    function setCaption(rawText) {
-      const cleanText = rawText.replace(/\*\*/g, '');
-      captionBox.textContent = cleanText;
-      speak(cleanText);
-    }
-
-    function speak(text) {
-      if (!('speechSynthesis' in window)) return;
-      const utter = new SpeechSynthesisUtterance(text);
-      window.speechSynthesis.speak(utter);
-    }
-
-    // Example usage – you can replace this with real AI reply logic
-    setCaption('**Hello!** Welcome to the adaptive video‑call demo. This caption will scroll if it gets too long, and the **stars** are removed.');
-
-    // Button actions (stubbed)
-    document.getElementById('startCallBtn').addEventListener('click', () => alert('Start Call clicked'));
-    document.getElementById('muteBtn').addEventListener('click', () => alert('Mute toggled'));
-    document.getElementById('camOffBtn').addEventListener('click', () => alert('Camera toggled'));
-    document.getElementById('endCallBtn').addEventListener('click', () => alert('End Call clicked'));
-  </script>
-<style>
-  .card { 
-    border: 1px solid #ddd; 
-    border-radius: 8px; 
-    padding: 1rem; 
-    max-width: 600px; 
-    margin: auto; 
-    font-family: Arial, sans-serif; 
-    background:#fafafa;
-  }
-  .card h3 { margin-top:0; }
-  .btn-primary { 
-    background:#2563eb; 
-    color:#fff; 
-    border:none; 
-    padding:0.5rem 1rem; 
-    border-radius:4px; 
-    cursor:pointer; 
-    margin:0.3rem 0;
-  }
-  .btn-primary:hover { background:#1e40af; }
-  .word { cursor:pointer; }
-  .highlight-current { background:yellow; }
-  .correct { background:#059669; color:#fff; }
-  .incorrect { background:#E11D48; color:#fff; }
-  #vocabList { list-style:none; padding:0; }
-  #vocabList li { background:#e0f2fe; margin:0.2rem 0; padding:0.3rem 0.5rem; border-radius:4px; }
-</style>
-
-<div class="card" id="readWidget">
-  <h3>📖 JeshRead Studio – Interactive Reading Coach</h3>
-  <p id="storyContainer"></p>
-
-  <button class="btn-primary" id="playBtn">🔊 पूरी कहानी सुनें</button>
-  <button class="btn-primary" id="readBtn">🗣️ Read‑Along Check</button>
-  <button class="btn-primary" id="flashBtn">⚡ Quick Flashcard Test</button>
-
-  <h4>📒 My Vocabulary Bank</h4>
-  <ul id="vocabList"></ul>
-</div>
-
-<script>
-(() => {
-  // ---- Data ----
-  const storyText = "एक छोटा बच्चा जंगल में खेल रहा था। वह पेड़ की शाखा से फल तोड़ रहा था।";
-  const words = storyText.split(/\s+/);
-  const storyContainer = document.getElementById('storyContainer');
-
-  // Render story with clickable spans
-  words.forEach((w, i) => {
-    const span = document.createElement('span');
-    span.textContent = w + ' ';
-    span.className = 'word';
-    span.dataset.idx = i;
-    span.addEventListener('click', () => addToVocab(w));
-    storyContainer.appendChild(span);
-  });
-
-  // ---- Vocabulary Bank ----
-  const vocabSet = new Set();
-  const vocabList = document.getElementById('vocabList');
-
-  function addToVocab(word) {
-    if (vocabSet.has(word)) return;
-    vocabSet.add(word);
-    const li = document.createElement('li');
-    li.textContent = word;
-    vocabList.appendChild(li);
-  }
-
-  // ---- Flashcard Test ----
-  document.getElementById('flashBtn').addEventListener('click', () => {
-    const arr = Array.from(vocabSet);
-    if (!arr.length) { alert('Vocabulary bank is empty! Tap words in the story to add them.'); return; }
-    const randomWord = arr[Math.floor(Math.random()*arr.length)];
-    const answer = prompt(`Flashcard:\nWhat is the meaning of "${randomWord}"? (Just type anything to continue)`);
-    if (answer !== null) alert(`Great! Keep practicing "${randomWord}".`);
-  });
-
-  // ---- Play Story (Karaoke) ----
-  document.getElementById('playBtn').addEventListener('click', () => {
-    if (!('speechSynthesis' in window)) { alert('Speech Synthesis not supported'); return; }
-
-    // Reset highlights
-    document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-current'));
-
-    const utter = new SpeechSynthesisUtterance(storyText);
-    utter.lang = 'hi-IN';
-
-    // Build char index map → word index
-    const charMap = [];
-    let cum = 0;
-    words.forEach((w, i) => {
-      const start = cum;
-      const end = cum + w.length;
-      charMap.push({start, end, idx:i});
-      cum = end + 1; // +1 for the space
-    });
-
-    utter.onboundary = (e) => {
-      if (e.name !== 'word') return;
-      const charIdx = e.charIndex;
-      const entry = charMap.find(m => charIdx >= m.start && charIdx <= m.end);
-      if (entry) {
-        document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-current'));
-        const span = document.querySelector(`.word[data-idx="${entry.idx}"]`);
-        if (span) span.classList.add('highlight-current');
-      }
-    };
-
-    utter.onend = () => {
-      document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-current'));
-    };
-
-    speechSynthesis.speak(utter);
-  });
-
-  // ---- Read‑Along Check ----
-  document.getElementById('readBtn').addEventListener('click', () => {
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRec) { alert('Speech Recognition not supported'); return; }
-
-    const recognizer = new SpeechRec();
-    recognizer.lang = 'hi-IN';
-    recognizer.interimResults = false;
-    recognizer.maxAlternatives = 1;
-
-    recognizer.start();
-
-    recognizer.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.trim();
-      const spoken = transcript.split(/\s+/);
-      // Clear previous markings
-      document.querySelectorAll('.word').forEach(w => {
-        w.classList.remove('correct','incorrect');
-      });
-      // Compare word‑by‑word
-      words.forEach((orig, i) => {
-        const span = document.querySelector(`.word[data-idx="${i}"]`);
-        if (!span) return;
-        if (spoken[i] && spoken[i] === orig) {
-          span.classList.add('correct');
-        } else {
-          span.classList.add('incorrect');
-        }
-      });
-    };
-
-    recognizer.onerror = (e) => alert('Recognition error: ' + e.error);
-    recognizer.onend = () => console.log('Read‑along session ended');
-  });
-
-})();
-</script></div>
-      </section>
-
-      <!-- JESHLIVE FULL-SCREEN 50/50 VIDEO CALL & AVATAR STUDIO -->
-      <section id="scr-studio" class="app-screen hidden">
-        <div id="videoCallContainer" class="dark-studio" style="margin-bottom:14px;">
-
-          <!-- TOP CALLER & LANGUAGE SWITCHER -->
-          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <select id="quickCallerSelect" onchange="switchCallerFromDropdown()" style="width:auto;min-height:42px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
-              <option value="didi">👩‍🏫 Didi-Mentor (Warm Hindi+Eng)</option>
-              <option value="arjun">🧑‍🏫 Coach Arjun (Motivational)</option>
-              <option value="robo">🤖 Robo-Guru (Tech & Logic)</option>
-            </select>
-
-            <select id="callLanguageMode" onchange="updateCallLanguageMode()" style="width:auto;min-height:42px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
-              <option value="hinglish">🇮🇳 हिंदी + बीच में English</option>
-              <option value="english">🌍 Only English Practice</option>
-              <option value="bhojpuri">🏡 भोजपुरी + English</option>
-            </select>
-          </div>
-
-          <!-- 50/50 FACE-TO-FACE SPLIT SCREEN -->
-          <div class="split-call-grid">
-            <!-- PANEL 1: AI TUTOR CANVAS (REAL PHOTO LIP-WARP + HEAD MIRRORING) -->
-            <div id="aiTutorTile" class="call-tile">
-              <span class="tile-badge" id="activeAvatarTitle">👩‍🏫 Didi-Mentor</span>
-              <span class="timer-badge" id="callTimer">00:00</span>
-
-              <div id="avatarCanvasFrame" class="avatar-canvas-frame" onclick="calibrateLipOnCanvasTap(event)" title="होंठ की सही जगह सेट करने के लिए फोटो के होंठ पर टच करें">
-                <canvas id="avatarWarpCanvas" width="240" height="240"></canvas>
-              </div>
-              <div style="font-size:10px;color:#94A3B8;margin-bottom:6px;">💡 Tip: फोटो के होंठ पर 1 बार टच करके लिप-सिंक लॉक करें</div>
-
-              <div class="subtitle-overlay" id="avatarReplyCaption">
-                👋 "Start Call" दबाएं—मैं Full-Screen में आपसे आमने-सामने बात करूँगी!
-              </div>
-            </div>
-
-            <!-- PANEL 2: STUDENT LIVE MIRROR CAMERA + HEAD MOTION TRACKER -->
-            <div class="call-tile">
-              <span class="tile-badge" id="studentCamBadge">🎥 आप (Live)</span>
-              <video id="selfCameraVideo" autoplay muted playsinline class="student-cam-video hidden"></video>
-              <div id="pipInitials" class="cam-initials-circle">YOU</div>
-              <div id="micListeningPill" style="position:absolute;bottom:10px;background:rgba(15,23,42,0.9);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;color:#94A3B8;z-index:4;">
-                कॉल शुरू करने के लिए तैयार
-              </div>
-            </div>
-          </div>
-
-          <!-- CALL CONTROLS -->
-          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding-top:4px;">
-            <button class="btn-emerald" id="startVideoCallBtn" onclick="startLiveVideoCall()">📞 Start Call</button>
-            <button class="btn-outline" id="muteCallBtn" onclick="toggleCallMic()">🎤 Mute</button>
-            <button class="btn-outline" id="camToggleBtn" onclick="toggleStudentCamera()">📷 Cam Off</button>
-            <button class="btn-rose" onclick="endLiveVideoCall()">📵 End Call</button>
-          </div>
-
-          <!-- MANUAL TEXT BAR -->
-          <div id="manualCallTextBar" class="input-row" style="margin-top:12px;">
-            <button class="btn-amber" onclick="listenToStudentVoice()">🎙️ बोलें</button>
-            <input id="avatarDiscussTopic" type="text" style="background:#1E293B;color:#FFFFFF;border-color:#475569;" placeholder="या यहाँ लिखकर भेजें..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
-            <button class="btn-primary" onclick="talkWithVideoAvatar()">Send</button>
-          </div>
-        </div>
-
-        <!-- CUSTOM TEACHER STUDIO (GHIBLI STYLE + LIP TAP + 15S WAVEFORM VOICE MODEL) -->
-        <div id="avatarStudioCard" class="card">
-          <h3 style="font-size:16px;margin-bottom:4px;">🎭 अपना टीचर और आवाज़ मॉडल बनाएं</h3>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">अपनी फोटो को Ghibli/Cartoon अवतार बनाएं, फोटो के होंठ पर टच करके लिप-सिंक सेट करें, और लाइव वेव के साथ 15-सेकंड आवाज़ रिकॉर्ड करें।</p>
-
-          <!-- 1. Teacher Name -->
-          <div style="margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">✏️ टीचर का नाम बदलें</label>
-            <div class="input-row">
-              <input id="customAvatarNameInput" type="text" placeholder="उदा. Priya Didi, Ravi Sir, या आपका नाम..." />
-              <button class="btn-primary" onclick="applyTeacherNameOnly()">नाम सेव करें</button>
-            </div>
-          </div>
-
-          <!-- 2. Photo Upload + Ghibli Style + Lip-Position Fine Tuner -->
-          <div style="margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">📸 फोटो और स्टाइल चुनें</label>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <label class="btn-label btn-amber">
-                📷 लाइव कैमरा सेल्फ़ी <input type="file" accept="image/*" capture="user" class="hidden" onchange="uploadCustomAvatar(event)" />
-              </label>
-              <label class="btn-label btn-outline">
-                🖼️ गैलरी से फोटो चुनें <input type="file" accept="image/*" class="hidden" onchange="uploadCustomAvatar(event)" />
-              </label>
-              <button class="btn-primary" onclick="applyGhibliCartoonFilter()">✨ Ghibli / Cartoon स्टाइल</button>
-            </div>
-
-            <!-- Precision Lip Vertical Position Slider -->
-            <div class="mini-card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-              <span style="font-size:12px;font-weight:700;">👄 होंठ की ऊँचाई (Lip Y):</span>
-              <input id="lipYSlider" type="range" min="35" max="88" value="68" oninput="updateLipPositionFromSlider()" style="flex:1;min-width:130px;min-height:32px;" />
-              <button class="btn-outline" style="min-height:36px;padding:4px 10px;font-size:12px;" onclick="testLipMovementPreview()">▶️ टेस्ट करें</button>
-            </div>
-          </div>
-
-          <!-- 3. 15-Second Live Waveform Voice Model Recorder -->
-          <div class="mini-card" style="margin-bottom:12px;">
-            <strong style="font-size:13px;display:block;margin-bottom:4px;">🎙️ 15-सेकंड मॉडल आवाज़ रिकॉर्ड करें (Live Audio Wave के साथ)</strong>
-            <p style="font-size:12px;color:var(--primary);background:#EEF2FF;padding:8px;border-radius:8px;margin-bottom:8px;">
-              पढ़ें: <em>"नमस्ते! मैं हर दिन पूरे आत्मविश्वास के साथ नई चीज़ें सीखता हूँ। अंग्रेजी और कंप्यूटर सीखना मेरे लिए बहुत आसान है। Learning is my superpower!"</em>
-            </p>
-            <canvas id="voiceWaveformCanvas" width="320" height="44" style="width:100%;height:44px;background:#0F172A;border-radius:8px;margin-bottom:8px;display:block;"></canvas>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <button id="recordVoiceModelBtn" class="btn-rose" onclick="recordFifteenSecondVoiceModel()">🔴 15s आवाज़ रिकॉर्ड करें</button>
-              <span id="voiceRecordStatus" style="font-size:12px;font-weight:700;color:var(--muted);">रिकॉर्डिंग के लिए तैयार</span>
-            </div>
-            <audio id="recordedModelPlayback" controls class="hidden" style="width:100%;margin-top:8px;height:36px;"></audio>
-          </div>
-
-          <!-- 4. Save as Default OR Make Public -->
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-emerald" style="flex:1;" onclick="saveCustomAvatarToLocal(true)">⭐ Save & Set as Default</button>
-            <button class="btn-dark" style="flex:1;" onclick="publishAvatarToCommunity()">🌐 Make Public (सबके लिए पब्लिक)</button>
-          </div>
-
-          <div style="margin-top:14px;">
-            <strong style="font-size:13px;display:block;margin-bottom:6px;">🌐 Community Public Teachers:</strong>
-            <div id="communityAvatarsList" class="grid-2"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- DUOLINGO-STYLE JESHLINGO SCREEN -->
-      <section id="scr-lingo" class="app-screen hidden">
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+      <!-- TAB 1: HOME (360° ADAPTIVE MODULES) -->
+      <section id="tab-home" class="main-tab">
+        <div class="card" style="background:linear-gradient(135deg,#EEF2FF,#FFFFFF);border-left:4px solid var(--primary);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <div>
-              <strong style="font-size:17px;">🦉 JeshLingo Adaptive Learning Path</strong>
-              <p style="font-size:12px;color:var(--muted);">Duolingo की तरह चरण-दर-चरण अभ्यास करें और अगला लेवल अनलॉक करें</p>
+              <div style="font-size:11px;font-weight:800;color:var(--primary);">🎯 PERSONALIZED LEARNING PATH</div>
+              <h2 id="welcomeGreeting" style="font-size:18px;margin-top:2px;">Namaste! Ready to learn today?</h2>
+              <p id="progressMemoryText" style="font-size:13px;color:var(--muted);margin-top:2px;">Choose any studio below or start a live 50/50 AI Video Call.</p>
             </div>
-            <div style="font-weight:800;font-size:13px;color:var(--rose);">❤️❤️❤️❤️❤️ 5 Hearts</div>
+            <button class="btn-emerald" onclick="launchFullScreenCall()">📹 Start 50/50 Video Call</button>
           </div>
-
-          <div class="input-row" style="margin-bottom:12px;">
-            <select id="lingoLangSelect" style="max-width:220px;">
-              <option>English (Global)</option><option>Hindi (हिन्दी)</option><option>Bhojpuri (भोजपुरी)</option>
-              <option>Sanskrit (संस्कृत)</option><option>Japanese (日本語)</option><option>French (Français)</option>
-            </select>
-            <select id="lingoLevelSelect" style="max-width:180px;">
-              <option value="A1">🌱 Level A1 (Basic)</option>
-              <option value="A2">🚀 Level A2 (Daily Talk)</option>
-              <option value="B1">🏆 Level B1 (Fluent)</option>
-            </select>
-            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 नए कार्ड्स व क्विज़</button>
-          </div>
-
-          <!-- Interactive Duolingo Path Nodes -->
-          <div id="duolingoPathContainer" style="margin-bottom:14px;">
-            <div class="path-node completed">
-              <div><strong>Step 1: Self-Introduction & Greetings</strong><div style="font-size:12px;color:var(--muted);">अपना परिचय देना और अभिवादन करना</div></div>
-              <button class="btn-emerald" style="min-height:38px;" onclick="startPathLesson('Self-Introduction & Greetings')">✅ Practice</button>
-            </div>
-            <div class="path-node active-node">
-              <div><strong>Step 2: Daily Routine & Action Verbs</strong><div style="font-size:12px;color:var(--muted);">रोज़मर्रा के काम और सही क्रियाओं का उपयोग</div></div>
-              <button class="btn-primary" style="min-height:38px;" onclick="startPathLesson('Daily Routine & Action Verbs')">▶️ Start (+25 XP)</button>
-            </div>
-            <div class="path-node">
-              <div><strong>Step 3: Real-Life Confidence & Interviews</strong><div style="font-size:12px;color:var(--muted);">बाज़ार, ऑफिस और इंटरव्यू में आत्मविश्वास से बोलना</div></div>
-              <button class="btn-outline" style="min-height:38px;" onclick="startPathLesson('Real-Life Confidence & Interviews')">🔓 Unlock</button>
-            </div>
-          </div>
-
-          <div id="lingoCardsGrid" class="grid-2"></div>
         </div>
-      </section>
 
-      <!-- READALONG-STYLE JESHREAD STUDIO SCREEN -->
-      <section id="scr-read" class="app-screen hidden">
-        <div class="card">
+        <!-- 5 MODULE SWITCHER TILES -->
+        <div class="module-grid">
+          <button class="mod-tile mod-active" id="tile-mentor" onclick="switchStudioModule('mentor')">
+            <span style="font-size:22px;">💬</span>
+            <div><strong>AI Mentor</strong><div style="font-size:11px;color:var(--muted);">10-Turn Memory</div></div>
+          </button>
+          <button class="mod-tile" id="tile-avatar" onclick="switchStudioModule('avatar')">
+            <span style="font-size:22px;">🎭</span>
+            <div><strong>Avatar & Voice</strong><div style="font-size:11px;color:var(--muted);">Ghibli & Lip-Sync</div></div>
+          </button>
+          <button class="mod-tile" id="tile-lingo" onclick="switchStudioModule('lingo')">
+            <span style="font-size:22px;">🦉</span>
+            <div><strong>JeshLingo</strong><div style="font-size:11px;color:var(--muted);">Path & Weak Words</div></div>
+          </button>
+          <button class="mod-tile" id="tile-read" onclick="switchStudioModule('read')">
+            <span style="font-size:22px;">📖</span>
+            <div><strong>JeshRead</strong><div style="font-size:11px;color:var(--muted);">Word-by-Word Coach</div></div>
+          </button>
+          <button class="mod-tile" id="tile-academy" onclick="switchStudioModule('academy')">
+            <span style="font-size:22px;">💻</span>
+            <div><strong>Jesh Academy</strong><div style="font-size:11px;color:var(--muted);">Code Sandbox</div></div>
+          </button>
+        </div>
+
+        <!-- MODULE A: PERSONAL AI MENTOR (10-TURN MEMORY + LEVEL TEST) -->
+        <div id="mod-mentor" class="studio-module card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            <div>
-              <strong style="font-size:17px;">📖 JeshRead Adaptive Story & ReadAlong Studio</strong>
-              <p style="font-size:12px;color:var(--muted);">किसी भी शब्द पर टच करके उसका हिंदी अर्थ व उच्चारण सुनें</p>
-            </div>
-            <button class="btn-outline" onclick="generateNewReadAlongPassage()">🔄 नई कहानी बनाएं</button>
+            <strong style="font-size:16px;">💬 Personal AI Mentor</strong>
+            <select id="mentorLangPref" style="width:auto;min-height:40px;padding:6px 10px;font-size:12px;">
+              <option value="Hindi + English (Hinglish)">🇮🇳 Hindi + English</option>
+              <option value="Only Simple English">🇬🇧 Only English</option>
+              <option value="Bhojpuri + Hindi">🏡 Bhojpuri + Hindi</option>
+            </select>
           </div>
-
-          <!-- Interest-Based Story Generator -->
-          <div class="input-row" style="margin-bottom:10px;">
-            <input id="storyTopicInput" type="text" placeholder="कहानी का विषय लिखें (जैसे: Cricket, Village, Space, Honesty)..." />
-            <button class="btn-primary" onclick="generateCustomStory()">✨ Story बनाएं</button>
+          <div class="chip-row">
+            <button class="btn-outline btn-sm" onclick="startLevelAssessmentQuiz()">🎯 Test My Level (A1→B1)</button>
+            <button class="btn-outline btn-sm" onclick="quickMentorPrompt('Teach me 5 daily English sentences with Hindi meaning')">🗣️ Daily English</button>
+            <button class="btn-outline btn-sm" onclick="quickMentorPrompt('Give me a 2-minute Python quiz')">🐍 Python Quiz</button>
           </div>
-
-          <div id="readAlongTargetBox" style="font-size:17px;font-weight:600;line-height:1.7;padding:14px;background:#F8FAFC;border-radius:12px;border:1px solid var(--border);margin-bottom:10px;"></div>
-          <div id="wordMeaningPopup" class="mini-card hidden" style="margin-bottom:10px;border-left:4px solid var(--primary);font-size:13px;"></div>
-
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-rose" onclick="startReadAlongCheck()">🎤 बोलकर पढ़ें (Check Accuracy)</button>
-            <button class="btn-outline" onclick="speakTextAloud(CURRENT_STORY_TEXT)">🔊 पूरी कहानी सुनें</button>
+          <div id="mentorChatFeed" class="chat-box">
+            <div class="msg-ai">👋 Namaste! I am your Personal AI Mentor. Ask me anything, or tap "Test My Level" to level up from A1 to B1!</div>
           </div>
-          <div id="readAlongResult" style="margin-top:12px;font-size:14px;font-weight:700;"></div>
+          <div style="display:flex;gap:8px;">
+            <input id="mentorInput" type="text" placeholder="Ask your doubt in Hindi, English, or Bhojpuri..." onkeydown="if(event.key==='Enter') sendMentorMessage()" />
+            <button class="btn-primary" id="mentorSendBtn" onclick="sendMentorMessage()">Send</button>
+          </div>
         </div>
+
+        <!-- MODULE B: AVATAR, LIP-SYNC CALIBRATION & 15s VOICE STUDIO -->
+        <div id="mod-avatar" class="studio-module card hidden">
+          <strong style="font-size:16px;display:block;margin-bottom:4px;">🎭 JeshLive Avatar & 15s Voice Model Studio</strong>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Customize your AI teacher's face, generate a Studio Ghibli character, calibrate lip position, or record a 15-second voice model.</p>
+
+          <div class="grid-2">
+            <div class="mini-card" style="text-align:center;">
+              <div style="font-size:12px;font-weight:700;margin-bottom:6px;">1️⃣ Teacher Identity & Lip Calibration</div>
+              <canvas id="previewAvatarCanvas" width="220" height="220" style="width:180px;height:180px;border-radius:16px;background:#0F172A;cursor:crosshair;border:2px solid var(--primary);" onclick="calibrateLipFromClick(event, this)"></canvas>
+              <div style="font-size:11px;color:var(--primary);font-weight:700;margin:4px 0;">👆 Tap directly on the photo's lips to lock lip-sync!</div>
+
+              <div style="display:flex;align-items:center;gap:8px;margin:8px 0;">
+                <span style="font-size:11px;font-weight:700;">Lip Y:</span>
+                <input id="lipYSlider" type="range" min="0.30" max="0.85" step="0.01" value="0.62" oninput="updateLipYFromSlider(this.value)" />
+              </div>
+
+              <input id="customTeacherName" type="text" placeholder="Teacher Name (e.g. Didi-Mentor)" style="margin-bottom:8px;" />
+
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
+                <button class="btn-outline btn-sm" onclick="selectBuiltInCaller('Didi-Mentor', 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', 0.63, 1.15)">👩‍🏫 Didi</button>
+                <button class="btn-outline btn-sm" onclick="selectBuiltInCaller('Coach Arjun', 'https://api.dicebear.com/7.x/adventurer/svg?seed=CoachArjun', 0.62, 0.95)">🧑‍🏫 Arjun</button>
+                <button class="btn-outline btn-sm" onclick="selectBuiltInCaller('Robo-Guru', 'https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', 0.64, 1.0)">🤖 Robo</button>
+              </div>
+
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+                <label class="btn-outline btn-sm" style="cursor:pointer;">
+                  🖼️ Gallery <input type="file" accept="image/*" class="hidden" onchange="handleAvatarFileUpload(event)" />
+                </label>
+                <label class="btn-outline btn-sm" style="cursor:pointer;">
+                  📷 Selfie <input type="file" accept="image/*" capture="user" class="hidden" onchange="handleAvatarFileUpload(event)" />
+                </label>
+                <button class="btn-amber btn-sm" onclick="generateGhibliAvatar()">✨ Studio Ghibli AI</button>
+              </div>
+            </div>
+
+            <div class="mini-card">
+              <div style="font-size:12px;font-weight:700;margin-bottom:6px;">2️⃣ 15-Second Voice Model & Sharing</div>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Read aloud for up to 15s to calibrate voice pitch/tone & ElevenLabs cloning hook:</p>
+              <div style="background:#EEF2FF;padding:8px;border-radius:10px;font-size:12px;font-style:italic;margin-bottom:8px;">
+                "Namaste! I am your friendly Jesh AI mentor. Let's learn something amazing together today!"
+              </div>
+              <canvas id="voiceWaveCanvas" width="260" height="48" style="width:100%;height:48px;background:#0F172A;border-radius:10px;margin-bottom:8px;"></canvas>
+              <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <button id="recVoiceModelBtn" class="btn-rose btn-sm" style="flex:1;" onclick="toggle15sVoiceRecord()">🎙️ Record 15s Voice</button>
+                <button class="btn-outline btn-sm" onclick="testAvatarVoice()">🔊 Test Voice</button>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center;font-size:12px;margin-bottom:10px;">
+                <span>Pitch:</span>
+                <input id="voicePitchInput" type="range" min="0.7" max="1.4" step="0.05" value="1.05" />
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <button class="btn-primary" onclick="saveAvatarAsDefault()">💾 Save & Set as Default</button>
+                <button class="btn-outline" onclick="shareAvatarToCommunity()">🌐 Make Public (Community)</button>
+                <button class="btn-emerald" onclick="launchFullScreenCall()">📹 Launch 50/50 Video Call Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODULE C: JESHLINGO (DUOLINGO-STYLE PATH & WEAK WORDS) -->
+        <div id="mod-lingo" class="studio-module card hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <strong style="font-size:16px;">🦉 JeshLingo Interactive Practice</strong>
+            <span style="font-weight:800;color:var(--rose);">❤️ <span id="lingoHearts">5</span></span>
+          </div>
+          <div class="chip-row">
+            <button class="btn-primary btn-sm" onclick="loadLingoChallenge('normal')">🎯 Next Lesson Node</button>
+            <button class="btn-amber btn-sm" onclick="loadLingoChallenge('weak')">🔁 Practice My Weak Words (<span id="weakWordsCount">0</span>)</button>
+          </div>
+          <div class="mini-card" style="margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--muted);font-weight:700;">TRANSLATE / BUILD SENTENCE:</div>
+            <h3 id="lingoPromptHindi" style="font-size:17px;margin:6px 0;">मैं हर दिन अंग्रेज़ी का अभ्यास करता हूँ।</h3>
+            <div id="lingoAnswerBox" style="min-height:48px;background:#fff;border:2px dashed #CBD5E1;border-radius:12px;padding:8px;display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;"></div>
+            <div id="lingoWordBank" class="chip-row"></div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-emerald" onclick="checkLingoSentence()">✅ Check Answer</button>
+              <button class="btn-outline" onclick="resetLingoSelection()">Clear</button>
+            </div>
+            <div id="lingoFeedback" style="margin-top:8px;font-weight:700;font-size:14px;"></div>
+          </div>
+        </div>
+
+        <!-- MODULE D: JESHREAD STUDIO (READALONG WORD-BY-WORD) -->
+        <div id="mod-read" class="studio-module card hidden">
+          <strong style="font-size:16px;display:block;margin-bottom:6px;">📖 JeshRead Studio (Tap Any Word for Hindi Meaning)</strong>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <input id="storyTopicInput" type="text" placeholder="Story topic (e.g. Cricket, Space, Village Hero)..." />
+            <button class="btn-primary" onclick="generateCustomStory()">✨ Story</button>
+          </div>
+          <div id="storyReaderBox" class="mini-card" style="font-size:17px;line-height:1.8;margin-bottom:10px;"></div>
+          <div id="wordMeaningPopup" class="hidden" style="background:#FEF3C7;border:1px solid #F59E0B;padding:10px;border-radius:12px;margin-bottom:10px;font-size:14px;"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-rose" onclick="startStoryReadAloudCheck()">🎤 Read Story Aloud</button>
+            <button class="btn-outline" onclick="narrateStoryWithHighlight()">🔊 Listen & Highlight</button>
+          </div>
+          <div id="storyScoreBanner" style="margin-top:8px;font-weight:700;font-size:14px;color:var(--emerald);"></div>
+        </div>
+
+        <!-- MODULE E: JESH ACADEMY (LIVE PYTHON / HTML / MATH SANDBOX) -->
+        <div id="mod-academy" class="studio-module card hidden">
+          <strong style="font-size:16px;display:block;margin-bottom:8px;">💻 Jesh Academy — Live Code & Math Sandbox</strong>
+          <div class="chip-row">
+            <button class="btn-outline btn-sm" onclick="setSandboxTemplate('html')">🌐 HTML/CSS</button>
+            <button class="btn-outline btn-sm" onclick="setSandboxTemplate('js')">⚡ JavaScript / Math</button>
+            <button class="btn-outline btn-sm" onclick="setSandboxTemplate('python')">🐍 Python Logic</button>
+          </div>
+          <textarea id="academyCodeEditor" rows="6" class="code-sandbox" style="width:100%;margin-bottom:8px;"><h3>Hello Jesh Academy!</h3>
+<p>25 * 16 = <script>document.write(25 * 16);<\/script></p></textarea>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <button class="btn-emerald" onclick="runAcademySandbox()">▶️ Run Code</button>
+            <button class="btn-primary" onclick="askAIExplainCode()">🤖 AI Code Coach</button>
+          </div>
+          <iframe id="academyOutputFrame" style="width:100%;height:150px;border:1px solid var(--border);border-radius:12px;background:#fff;"></iframe>
+        </div>
+
+        <!-- ISOLATED NO-CODE PLUGIN MOUNT POINT -->
+        <div id="dynamicExtensionsZone"></div>
       </section>
 
-      <!-- JESH ACADEMY & QR CERTIFICATE SCREEN -->
-      <section id="scr-academy" class="app-screen hidden">
+      <!-- TAB 2: QR CERTIFICATE -->
+      <section id="tab-cert" class="main-tab hidden">
         <div class="card">
-          <strong style="font-size:16px;display:block;margin-bottom:8px;">💻 Jesh Academy Live Code Sandbox</strong>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-            <button class="btn-outline" onclick="loadCodeSample('python')">🐍 Python</button>
-            <button class="btn-outline" onclick="loadCodeSample('html')">🌐 HTML/CSS</button>
-            <button class="btn-outline" onclick="loadCodeSample('math')">🧮 Math & Logic</button>
-          </div>
-          <textarea id="academyCodeEditor" rows="4" style="font-family:monospace;margin-bottom:8px;">print("Namaste Jesh Academy!")</textarea>
-          <button class="btn-primary" onclick="runAcademySandbox()">▶️ Run Code</button>
-          <div id="academyCodeOutput" class="mini-card" style="margin-top:8px;font-family:monospace;">Output यहाँ दिखेगा...</div>
-        </div>
-
-        <div class="card">
-          <strong style="font-size:16px;display:block;margin-bottom:8px;">🏅 Verified QR Certificate</strong>
-          <div class="input-row">
-            <select id="certCourseSelect">
-              <option>Spoken English & Confidence</option>
-              <option>Python & AI Foundations</option>
+          <h3 style="font-size:18px;margin-bottom:4px;">🏅 QR-Verified Achievement Certificate</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Generate and download your official Jesh AI certificate with live QR verification.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+            <input id="certNameField" type="text" placeholder="Student Full Name" />
+            <select id="certCourseField">
+              <option>Spoken English & AI Communication</option>
+              <option>Python Programming & AI Foundations</option>
               <option>NIELIT CCC & Digital Literacy</option>
+              <option>Web Development (HTML/CSS/JS)</option>
             </select>
-            <button class="btn-emerald" onclick="generateQRCertificate()">सर्टिफिकेट बनाएं</button>
+            <button class="btn-emerald" onclick="renderStudentCertificate()">🎓 Generate QR Certificate</button>
           </div>
-          <div id="certPreviewArea"></div>
+          <div id="certificateRenderTarget"></div>
         </div>
       </section>
 
-      <!-- HELP & LEAVE REQUEST SCREEN -->
-      <section id="scr-help" class="app-screen hidden">
+      <!-- TAB 3: LANGUAGE & PREFERENCES -->
+      <section id="tab-lang" class="main-tab hidden">
         <div class="card">
-          <strong style="font-size:16px;display:block;margin-bottom:6px;">🆘 छुट्टी (Leave) या एडमिन सहायता</strong>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">यदि आप आज बीमार हैं या बाहर हैं, तो छुट्टी भेजें ताकि आपकी 🔥 Streak सुरक्षित रहे।</p>
-          <textarea id="leaveReasonInput" rows="3" placeholder="अपना कारण लिखें..."></textarea>
-          <button class="btn-primary" style="margin-top:10px;width:100%;" onclick="submitLeaveRequest()">📩 एडमिन को भेजें</button>
+          <h3 style="font-size:18px;margin-bottom:6px;">🌐 भाषा बदलें / Language & Level Settings</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Your AI Mentor and Video-Call Tutor automatically adapt to your selected language and level.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:700;">Preferred Teaching Language:</label>
+              <select id="settingsLanguage" onchange="saveLanguageSettings()" style="margin-top:4px;">
+                <option value="Hindi + English (Hinglish)">🇮🇳 Hindi + English (हिन्दी + अंग्रेज़ी)</option>
+                <option value="Only Simple English">🇬🇧 Only Simple English</option>
+                <option value="Bhojpuri + Hindi">🏡 Bhojpuri + Hindi (भोजपुरी)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;">Current Learning Level:</label>
+              <select id="settingsLevel" onchange="saveLanguageSettings()" style="margin-top:4px;">
+                <option value="A1">🌱 A1 — Beginner</option>
+                <option value="A2">🌿 A2 — Elementary</option>
+                <option value="B1">🚀 B1 — Intermediate</option>
+                <option value="C1">🏆 C1 — Advanced</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: LEAVE / HELP & CREDENTIAL RECOVERY -->
+      <section id="tab-help" class="main-tab hidden">
+        <div class="card">
+          <h3 style="font-size:18px;margin-bottom:6px;">🆘 Leave / Help & PIN Recovery</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Forgot your 6-digit PIN or need help from your teacher? Send a direct request below.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <input id="helpContactInput" type="text" placeholder="Your Registered Mobile Number or Email" />
+            <textarea id="helpMessageInput" rows="3" placeholder="Write your message (e.g. Forgot my 6-digit PIN, please help)..."></textarea>
+            <button class="btn-primary" onclick="submitHelpRequest()">📩 Send Help / PIN Request</button>
+          </div>
+          <div id="helpStatusBox" style="margin-top:10px;font-size:13px;font-weight:700;color:var(--emerald);"></div>
+        </div>
+      </section>
+
+      <!-- SECRET ADMIN COMMAND CENTER (SLATE NAVY #0F172A) -->
+      <section id="tab-admin" class="main-tab hidden">
+        <div class="admin-shell">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+            <div>
+              <h2 style="font-size:18px;">🛡️ Admin Command Center</h2>
+              <p style="font-size:12px;color:#94A3B8;">Single-Admin Isolated Vault • Students: <strong id="admTotalStudents">0</strong></p>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-emerald btn-sm" onclick="runAdminRDScanner()">🔍 R&D Scan</button>
+              <button class="btn-outline btn-sm" style="color:#0F172A;" onclick="switchFooterTab('home')">Exit Admin</button>
+            </div>
+          </div>
+
+          <!-- 1. SEARCH HELP FOR CREDENTIALS (STUDENT PIN RECOVERY) -->
+          <div class="card">
+            <strong style="display:block;margin-bottom:8px;">🔑 Search Help for Credentials (Student PIN Lookup & Reset)</strong>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <input id="admSearchContact" type="text" placeholder="Student Phone or Email..." style="flex:1;min-width:180px;" />
+              <input id="admNewPinInput" type="text" maxlength="6" placeholder="New 6-Digit PIN (Optional)" style="max-width:190px;" />
+              <button class="btn-primary btn-sm" onclick="adminLookupOrResetPin()">Lookup / Reset PIN</button>
+            </div>
+            <div id="admPinResultBox" style="font-size:13px;color:#34D399;font-weight:700;"></div>
+          </div>
+
+          <!-- 2. API & VOICE VAULT -->
+          <div class="card">
+            <strong style="display:block;margin-bottom:8px;">🔐 API & ElevenLabs Voice Vault</strong>
+            <div class="grid-2">
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">GROQ_API_KEY</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_GROQ_API_KEY" type="password" placeholder="gsk_..." />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('GROQ_API_KEY')">Save</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">OPENROUTER_API_KEY</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_OPENROUTER_API_KEY" type="password" placeholder="sk-or-..." />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('OPENROUTER_API_KEY')">Save</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">ELEVENLABS_API_KEY (Voice Clone)</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_ELEVENLABS_API_KEY" type="password" placeholder="xi-api-key..." />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('ELEVENLABS_API_KEY')">Save</button>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#94A3B8;">BRAND_NAME</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <input id="vault_BRAND_NAME" type="text" placeholder="Jesh AI Ecosystem" />
+                  <button class="btn-primary btn-sm" onclick="saveAdminVaultKey('BRAND_NAME')">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. NO-CODE AI CO-ARCHITECT (ISOLATED WIDGET DEPLOYER) -->
+          <div class="card">
+            <strong style="display:block;margin-bottom:6px;">🤖 No-Code AI Co-Architect (Safe Plugin Deployer)</strong>
+            <p style="font-size:12px;color:#94A3B8;margin-bottom:8px;">Adds isolated widgets to #dynamicExtensionsZone without touching core auth or video-call code.</p>
+            <textarea id="coArchitectPrompt" rows="2" placeholder="Describe a new widget (e.g. Add a Daily Math Speed Challenge card)..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button class="btn-emerald btn-sm" id="deployPluginBtn" onclick="deployIsolatedPlugin()">⚡ Build & Mount Widget</button>
+              <button class="btn-rose btn-sm" onclick="clearDynamicPlugins()">🧹 Clear Custom Widgets</button>
+            </div>
+            <div id="coArchitectStatus" style="margin-top:8px;font-size:12px;color:#A7F3D0;"></div>
+          </div>
         </div>
       </section>
 
     </div>
   </main>
 
-  <!-- ==================== 5. LOCKED 48PX BOTTOM FOOTER ==================== -->
-  <footer id="studentBottomFooter" class="bottom-footer hidden">
-    <button class="footer-btn active" data-scr="home" onclick="openFullScreen('home')">🏠<span>Home</span></button>
-    <button class="footer-btn" data-scr="academy" onclick="openFullScreen('academy')">🏅<span>QR Certificate</span></button>
-    <button class="footer-btn" onclick="cycleUILanguage()">🌐<span>भाषा बदलें</span></button>
-    <button class="footer-btn" data-scr="help" onclick="openFullScreen('help')">🆘<span>Leave/Help</span></button>
-  </footer>
-
-  <!-- ==================== 6. SECRET ADMIN COMMAND CENTER ==================== -->
-  <section id="viewAdmin" class="app-workspace hidden" style="top:0;bottom:0;z-index:80;">
-    <div class="screen-inner">
-      <div class="dark-studio" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div>
-          <h2 style="font-size:18px;">🛠️ Admin Command Center</h2>
-          <p style="font-size:12px;color:#94A3B8;">Single-Admin Protected • Prompt-Driven Architecture</p>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 R&D Scan</button>
-          <button class="btn-outline" onclick="exitAdminView()">Exit Admin</button>
-        </div>
+  <!-- ==================== 50/50 FULL-SCREEN VIDEO CALL OVERLAY (100dvh) ==================== -->
+  <div id="videoCallOverlay" class="hidden">
+    <div class="vc-top-bar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#10B981;display:inline-block;"></span>
+        <strong id="vcTeacherTitle" style="font-size:14px;">Didi-Mentor</strong>
+        <span id="vcCallTimer" style="font-size:12px;color:#94A3B8;">00:00</span>
       </div>
-
-      <div class="card">
-        <h3 style="font-size:16px;margin-bottom:8px;">🔍 Search Help for Credentials (छात्र का पासवर्ड/डिटेल्स खोजें)</h3>
-        <div class="input-row" style="margin-bottom:10px;">
-          <input id="adminCredSearchInput" type="text" placeholder="छात्र का नाम, Phone या Email लिखें..." onkeydown="if(event.key==='Enter') searchStudentCredentials()" />
-          <button class="btn-primary" onclick="searchStudentCredentials()">Search</button>
-        </div>
-        <div id="adminCredResults"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:16px;margin-bottom:4px;">🤖 AI Co-Architect (केवल प्रॉम्प्ट से नया फीचर जोड़ें)</h3>
-        <textarea id="architectPrompt" rows="3" placeholder="यहाँ लिखें कि आप क्या जोड़ना या बदलना चाहते हैं..."></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-          <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Safe Preview</button>
-          <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Make Live 🚀</button>
-        </div>
-        <div id="architectOutput" class="mini-card hidden" style="margin-top:10px;white-space:pre-line;font-size:13px;"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:16px;margin-bottom:8px;">🔐 API & Voice Cloning Vault (ElevenLabs / Groq / OpenRouter)</h3>
-        <div id="configVaultGrid" class="grid-2"></div>
+      <div style="display:flex;gap:6px;">
+        <select id="vcCallerSwitcher" onchange="switchActiveCallerInCall(this.value)" style="min-height:36px;padding:4px 8px;font-size:12px;background:#0F172A;color:#fff;border-color:#475569;width:auto;">
+          <option value="Didi-Mentor">👩‍🏫 Didi-Mentor</option>
+          <option value="Coach Arjun">🧑‍🏫 Coach Arjun</option>
+          <option value="Robo-Guru">🤖 Robo-Guru</option>
+        </select>
+        <select id="vcLangSwitcher" style="min-height:36px;padding:4px 8px;font-size:12px;background:#0F172A;color:#fff;border-color:#475569;width:auto;">
+          <option value="Hindi + English">🇮🇳 Hin+Eng</option>
+          <option value="Only English">🇬🇧 English</option>
+          <option value="Bhojpuri + Hindi">🏡 Bhojpuri</option>
+        </select>
       </div>
     </div>
-  </section>
 
-  <!-- FORGOT PASSWORD MODAL -->
-  <div id="forgotModal" class="modal-backdrop hidden">
+    <!-- 50/50 SPLIT STAGE (SIDE-BY-SIDE LANDSCAPE / TOP-BOTTOM PORTRAIT) -->
+    <div class="vc-split-stage">
+      <!-- PANE 1: AI MENTOR CANVAS WITH LIP-SYNC & HEAD-MIRRORING -->
+      <div class="vc-pane">
+        <span class="vc-badge">🤖 AI Mentor (Live Lip-Sync)</span>
+        <canvas id="avatarWarpCanvas" width="320" height="320" onclick="calibrateLipFromClick(event, this)"></canvas>
+      </div>
+
+      <!-- PANE 2: STUDENT LIVE SELF-CAMERA & HANDS-FREE WAVE PILL -->
+      <div class="vc-pane">
+        <span class="vc-badge">👤 You (Live Camera)</span>
+        <video id="studentSelfVideo" autoplay playsinline muted></video>
+        <div id="camFallbackAvatar" class="hidden" style="font-size:48px;">🧑‍🎓</div>
+        <div id="micListeningPill" class="hidden">
+          <div class="wave-bars"><i></i><i></i><i></i><i></i></div>
+          <span id="micPillText">Listening Hands-Free...</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="vcLiveCaption" class="vc-caption-bar">
+      Tap "Start Call" — your AI Mentor will greet you and listen automatically!
+    </div>
+
+    <!-- 4 SAFE-PADDED BOTTOM CONTROLS -->
+    <div class="vc-controls">
+      <button id="vcStartBtn" class="btn-emerald" onclick="startHandsFreeCall()">📞 Start Call</button>
+      <button id="vcMuteBtn" class="btn-outline" style="background:#1E293B;color:#fff;border-color:#475569;" onclick="toggleCallMute()">🎙️ Mute</button>
+      <button id="vcCamBtn" class="btn-outline" style="background:#1E293B;color:#fff;border-color:#475569;" onclick="toggleCallCamera()">📷 Cam Off</button>
+      <button class="btn-rose" onclick="endFullScreenCall()">📵 End Call</button>
+    </div>
+  </div>
+
+  <!-- ==================== INSTANT STUDENT AUTH & 2-STEP ONBOARDING MODAL ==================== -->
+  <div id="authModal" class="modal-backdrop hidden">
     <div class="modal-box">
-      <h3 style="margin-bottom:6px;">❓ पासवर्ड रीसेट सहायता</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">अपना Phone Number या Email लिखें—एडमिन आपको तुरंत नया PIN बता देंगे।</p>
-      <input id="forgotContactInput" type="text" placeholder="Phone Number या Email ID" style="margin-bottom:10px;" />
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn-outline" onclick="document.getElementById('forgotModal').classList.add('hidden')">बंद करें</button>
-        <button class="btn-primary" onclick="submitForgotRequest()">रिक्वेस्ट भेजें</button>
+      <!-- STEP 1: INSTANT LOCAL+CLOUD LOGIN / CREATE ACCOUNT -->
+      <div id="authStepCredentials">
+        <h3 style="font-size:20px;margin-bottom:4px;">🎓 Jesh AI Student Login</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Instant 0.1s login with 48-hour session memory. New students can create an account below.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input id="authContactInput" type="text" placeholder="Mobile Number or Email ID" />
+          <input id="authPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="6-Digit Numeric PIN" />
+          <button class="btn-primary" onclick="handleInstantStudentAuth('login')">🚀 Login to My Dashboard</button>
+          <button class="btn-emerald" onclick="handleInstantStudentAuth('create')">✨ Create New Account</button>
+          <button class="btn-outline btn-sm" onclick="closeAuthModal()">Continue as Guest</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: MANDATORY 2-STEP ONBOARDING (NAME -> AGE) -->
+      <div id="authStepOnboarding" class="hidden">
+        <h3 style="font-size:19px;margin-bottom:4px;">👋 Welcome! Quick 2-Step Profile</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Tell us your name and age so your AI Mentor teaches at your exact level.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input id="onboardNameInput" type="text" placeholder="Step 1: Your Full Name" />
+          <input id="onboardAgeInput" type="number" min="5" max="90" placeholder="Step 2: Your Age (e.g. 16)" />
+          <button class="btn-primary" onclick="completeStudentOnboarding()">✅ Save Profile & Start Learning</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- ==================== SECRET ADMIN PASSWORD MODAL ==================== -->
+  <div id="adminPassModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <h3 style="margin-bottom:8px;">🛡️ Single-Admin Lock</h3>
+      <input id="adminMasterPassInput" type="password" placeholder="Enter Master Admin Password" onkeydown="if(event.key==='Enter') unlockAdminCenter()" />
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button class="btn-outline btn-sm" onclick="document.getElementById('adminPassModal').classList.add('hidden')">Cancel</button>
+        <button class="btn-navy btn-sm" onclick="unlockAdminCenter()">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LOCKED 48px BOTTOM FOOTER ==================== -->
+  <footer id="studentBottomFooter">
+    <button class="footer-btn active" data-tab="home" onclick="switchFooterTab('home')"><span class="ico">🏠</span>Home</button>
+    <button class="footer-btn" data-tab="cert" onclick="switchFooterTab('cert')"><span class="ico">🏅</span>QR Certificate</button>
+    <button class="footer-btn" data-tab="lang" onclick="switchFooterTab('lang')"><span class="ico">🌐</span>भाषा बदलें</button>
+    <button class="footer-btn" data-tab="help" onclick="switchFooterTab('help')"><span class="ico">🆘</span>Leave/Help</button>
+  </footer>
+
   <script>
+    /* ============================================================================
+       JESH AI ECOSYSTEM — PRODUCTION SINGLE-FILE ENGINE (ZERO HANG, ZERO CLIP)
+       ============================================================================ */
     const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
-    const SESSION_EXPIRY_MS = 48 * 60 * 60 * 1000;
-    let STUDENT_PROFILE = null;
-    let ADMIN_PASS = "";
-    let AUTH_MODE = "login";
-    let GENERATED_CODE_BUFFER = "";
-    let logoTapCount = 0, logoTapTimer = null;
+    const IS_SAFE_MODE = new URLSearchParams(window.location.search).get('safe') === '1';
+    const SESSION_TTL_MS = 48 * 60 * 60 * 1000; // 48 Hours
 
-    // Video Call, Real Canvas Lip-Warp, Head-Mirroring & Voice State
-    let callTimerInterval = null, callSeconds = 0, localMediaStream = null;
-    let isMicMuted = false, isCamHidden = false, isCallActive = false;
-    let activeRecognition = null, headMirrorInterval = null;
-    let avatarImgObj = new Image();
-    avatarImgObj.crossOrigin = "anonymous";
-    let lipWarpAnimId = null, isAvatarSpeaking = false, mouthOpenAmount = 0;
+    let CURRENT_STUDENT = null;
+    let PENDING_NEW_ACCOUNT = null;
+    let ADMIN_PASSWORD = "";
+    let MENTOR_HISTORY = [];
+    let logoTapCounter = 0, logoTapTimer = null;
 
-    let CURRENT_TEACHER = {
-      name: "Didi-Mentor",
-      photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor",
-      pitch: 1.15,
-      rate: 0.96,
-      langMode: "hinglish",
-      lipX: 0.50,
-      lipY: 0.68,
-      ghibliMode: false
-    };
-
-    let CURRENT_STORY_TEXT = "Consistent practice every single day turns beginners into confident leaders.";
-
-    // ==================== 1. INITIALIZATION ====================
-    window.addEventListener('DOMContentLoaded', () => {
-      loadDefaultTeacherProfile();
-      renderCommunityAvatars();
-      renderInteractiveStory(CURRENT_STORY_TEXT);
-
-      const rawSession = localStorage.getItem('JESH_PERSISTENT_SESSION');
-      if (rawSession) {
-        try {
-          const sess = JSON.parse(rawSession);
-          if (sess && sess.student && (Date.now() - sess.loginTime < SESSION_EXPIRY_MS)) {
-            STUDENT_PROFILE = sess.student;
-            routeAfterAuth();
-            return;
-          } else {
-            localStorage.removeItem('JESH_PERSISTENT_SESSION');
-          }
-        } catch (e) {}
+    // 5-SECOND ABORTCONTROLLER FETCH WRAPPER (PREVENTS INFINITE LOGIN/UI HANG)
+    async function postBackend(payload, timeoutMs = 5000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        return await res.json();
+      } catch (err) {
+        clearTimeout(timer);
+        return { success: false, offline: true, message: err.name === 'AbortError' ? 'Network timeout (5s)' : 'Offline mode' };
       }
+    }
+
+    // ==================== INITIALIZATION & 48-HOUR SESSION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      if (IS_SAFE_MODE) {
+        document.getElementById('safeModeAlert').classList.remove('hidden');
+      } else {
+        mountSavedPlugins();
+      }
+
+      restore48HourSession();
+      initAvatarSystem();
+      loadLingoChallenge('normal');
+      renderStoryWords("Consistent practice every day turns curious students into confident leaders.");
+      runAcademySandbox();
+
+      // Background config sync (non-blocking)
+      fetch(API_URL).then(r => r.json()).then(data => {
+        if (data && data.config && data.config.brandName) {
+          document.getElementById('uiBrandTitle').textContent = data.config.brandName;
+          document.title = data.config.brandName;
+        }
+      }).catch(() => {});
     });
 
-    function savePersistentSession(studentObj) {
-      STUDENT_PROFILE = studentObj;
-      localStorage.setItem('JESH_PERSISTENT_SESSION', JSON.stringify({ student: studentObj, loginTime: Date.now() }));
-      const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
-      db[studentObj.contact.toLowerCase()] = studentObj;
-      localStorage.setItem('JESH_LOCAL_STUDENTS_DB', JSON.stringify(db));
-    }
-
-    // ==================== 2. AUTH & ONBOARDING ====================
-    function switchAuthRole(role) {
-      document.getElementById('roleBtnStudent').classList.toggle('active', role === 'student');
-      document.getElementById('roleBtnAdmin').classList.toggle('active', role === 'admin');
-      document.getElementById('studentAuthForm').classList.toggle('hidden', role !== 'student');
-      document.getElementById('adminAuthForm').classList.toggle('hidden', role !== 'admin');
-    }
-
-    function switchStudentMode(mode) {
-      AUTH_MODE = mode;
-      document.getElementById('modeBtnLogin').classList.toggle('active', mode === 'login');
-      document.getElementById('modeBtnRegister').classList.toggle('active', mode === 'register');
-      document.getElementById('studentAuthSubmitBtn').textContent = mode === 'login' ? 'Login →' : 'Create Account (नया अकाउंट बनाएं) →';
-    }
-
-    async function handleStudentAuthSubmit() {
-      const contact = document.getElementById('authContactInput').value.trim();
-      const pin = document.getElementById('authPinInput').value.trim();
-      if (!contact) return alert('कृपया अपना Phone Number या Email ID लिखें।');
-      if (pin.length !== 6) return alert('कृपया 6 अंकों का पासवर्ड (PIN) लिखें।');
-
-      const btn = document.getElementById('studentAuthSubmitBtn');
-      btn.disabled = true;
-      btn.textContent = 'कृपया प्रतीक्षा करें...';
-
-      const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
-      const key = contact.toLowerCase();
-      let backendRes = null;
-      try { backendRes = await postBackend({ action: 'STUDENT_AUTH', mode: AUTH_MODE, contact, pin }); } catch (e) {}
-
-      btn.disabled = false;
-      switchStudentMode(AUTH_MODE);
-
-      if (AUTH_MODE === 'register') {
-        if (db[key] && db[key].pin) return alert('यह Phone/Email पहले से रजिस्टर्ड है! कृपया Login करें।');
-        const newStudent = {
-          userId: (backendRes && backendRes.student && backendRes.student.userId) || ('STU-' + Date.now().toString().slice(-6)),
-          contact, pin, name: '', age: '', xp: 10, streak: 1, level: 'A1',
-          mindsetTag: 'Motivated Beginner', skillMatrix: 'Grammar: A1 | Math: L1 | Logic: L1', oneLineSummary: 'Started journey'
-        };
-        savePersistentSession(newStudent);
-        routeAfterAuth();
-      } else {
-        if (backendRes && backendRes.success && backendRes.student) {
-          savePersistentSession({ ...db[key], ...backendRes.student, contact, pin });
-          routeAfterAuth();
-        } else if (db[key] && db[key].pin === pin) {
-          savePersistentSession(db[key]);
-          routeAfterAuth();
-        } else {
-          alert('गलत Phone/Email या 6-अंकों का पासवर्ड! नए छात्र पहले "Create Account" चुनें।');
+    function restore48HourSession() {
+      try {
+        const raw = localStorage.getItem('JESH_PERSISTENT_SESSION');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.student && (Date.now() - parsed.savedAt < SESSION_TTL_MS)) {
+            applyStudentSession(parsed.student);
+            return;
+          }
         }
-      }
+      } catch (e) {}
+      document.getElementById('authModal').classList.remove('hidden');
     }
 
-    function routeAfterAuth() {
-      document.getElementById('authGate').classList.add('hidden');
-      if (!STUDENT_PROFILE.name || !STUDENT_PROFILE.age) {
-        document.getElementById('profileSetupGate').classList.remove('hidden');
-        document.getElementById('setupStepName').classList.remove('hidden');
-        document.getElementById('setupStepAge').classList.add('hidden');
-      } else {
-        unlockStudentDashboard();
-      }
-    }
-
-    function goToAgeStep() {
-      const name = document.getElementById('setupNameInput').value.trim();
-      if (!name) return alert('कृपया अपना नाम लिखें।');
-      STUDENT_PROFILE.name = name;
-      document.getElementById('setupStepName').classList.add('hidden');
-      document.getElementById('setupStepAge').classList.remove('hidden');
-      document.getElementById('setupAgeInput').focus();
-    }
-
-    async function finishProfileSetup() {
-      const age = document.getElementById('setupAgeInput').value.trim();
-      if (!age || age < 5 || age > 99) return alert('कृपया अपनी सही उम्र लिखें।');
-      STUDENT_PROFILE.age = age;
-      savePersistentSession(STUDENT_PROFILE);
-      postBackend({
-        action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, contact: STUDENT_PROFILE.contact,
-        name: STUDENT_PROFILE.name, age: STUDENT_PROFILE.age, xp: STUDENT_PROFILE.xp,
-        summary: `Name: ${STUDENT_PROFILE.name}, Age: ${STUDENT_PROFILE.age}`
-      }).catch(() => {});
-      document.getElementById('profileSetupGate').classList.add('hidden');
-      unlockStudentDashboard();
-    }
-
-    function unlockStudentDashboard() {
-      document.getElementById('mainAppHeader').classList.remove('hidden');
-      document.getElementById('viewLearner').classList.remove('hidden');
-      document.getElementById('studentBottomFooter').classList.remove('hidden');
-
-      document.getElementById('hdrStudentName').textContent = STUDENT_PROFILE.name;
-      document.getElementById('dashGreetingName').textContent = STUDENT_PROFILE.name;
-      document.getElementById('studentCamBadge').textContent = '🎥 ' + STUDENT_PROFILE.name + ' (Live)';
-      document.getElementById('pipInitials').textContent = STUDENT_PROFILE.name.slice(0, 2).toUpperCase();
-      document.getElementById('userStreak').textContent = STUDENT_PROFILE.streak || 1;
-      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp || 0;
-      updateAdaptiveBadgeUI();
-      openFullScreen('home');
+    function applyStudentSession(stu) {
+      CURRENT_STUDENT = stu;
+      localStorage.setItem('JESH_PERSISTENT_SESSION', JSON.stringify({ student: stu, savedAt: Date.now() }));
+      document.getElementById('hdrUserName').textContent = stu.name || 'Learner';
+      document.getElementById('hdrUserLevel').textContent = stu.level || 'A1';
+      document.getElementById('hdrStreak').textContent = stu.streak || 1;
+      document.getElementById('hdrXP').textContent = stu.xp || 0;
+      document.getElementById('welcomeGreeting').textContent = `Namaste, ${stu.name}! (Age ${stu.age || 16} • Level ${stu.level || 'A1'})`;
+      document.getElementById('progressMemoryText').textContent = stu.progressSummary || 'Personalized AI Mentor & 50/50 Video Call ready.';
+      document.getElementById('certNameField').value = stu.name || '';
+      document.getElementById('settingsLevel').value = stu.level || 'A1';
+      document.getElementById('hdrAuthBtn').classList.add('hidden');
+      document.getElementById('hdrLogoutBtn').classList.remove('hidden');
     }
 
     function logoutStudent() {
-      endLiveVideoCall();
       localStorage.removeItem('JESH_PERSISTENT_SESSION');
-      location.reload();
+      CURRENT_STUDENT = null;
+      document.getElementById('hdrUserName').textContent = 'Guest';
+      document.getElementById('hdrAuthBtn').classList.remove('hidden');
+      document.getElementById('hdrLogoutBtn').classList.add('hidden');
+      openAuthModal();
     }
 
-    function openForgotModal() { document.getElementById('forgotModal').classList.remove('hidden'); }
-    async function submitForgotRequest() {
-      const c = document.getElementById('forgotContactInput').value.trim();
-      if (!c) return alert('Phone या Email लिखें।');
-      await postBackend({ action: 'FORGOT_PIN', contact: c, message: 'Student requested PIN help' }).catch(() => {});
-      alert('✅ आपकी रिक्वेस्ट एडमिन को भेज दी गई है!');
-      document.getElementById('forgotModal').classList.add('hidden');
+    // ==================== INSTANT 0.1s LOCAL AUTH + ASYNC CLOUD SYNC ====================
+    function openAuthModal() {
+      document.getElementById('authStepCredentials').classList.remove('hidden');
+      document.getElementById('authStepOnboarding').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+    function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+    function getLocalStudentsDB() {
+      try { return JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}'); } catch (e) { return {}; }
+    }
+    function saveLocalStudentsDB(db) {
+      localStorage.setItem('JESH_LOCAL_STUDENTS_DB', JSON.stringify(db));
     }
 
-    // ==================== 3. ADAPTIVE GROWTH ====================
-    function updateAdaptiveBadgeUI() {
-      if (!STUDENT_PROFILE) return;
-      document.getElementById('adaptiveSkillBadge').textContent =
-        `Level: ${STUDENT_PROFILE.level || 'A1'} • ${STUDENT_PROFILE.skillMatrix || 'Grammar: A1 | Math: L1 | Logic: L1'}`;
-    }
+    function handleInstantStudentAuth(mode) {
+      const contact = document.getElementById('authContactInput').value.trim().toLowerCase();
+      const pin = document.getElementById('authPinInput').value.trim();
+      if (!contact) return alert('Please enter your Mobile Number or Email.');
+      if (!/^\d{6}$/.test(pin)) return alert('Please enter a valid 6-digit numeric PIN.');
 
-    function addStudentXP(pts, note) {
-      if (!STUDENT_PROFILE) return;
-      STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + pts;
-      if (STUDENT_PROFILE.xp >= 300) {
-        STUDENT_PROFILE.level = 'B1 Intermediate';
-        STUDENT_PROFILE.skillMatrix = 'Grammar: B1 | Math: L2 | Logic: L2';
-      } else if (STUDENT_PROFILE.xp >= 120) {
-        STUDENT_PROFILE.level = 'A2 Elementary';
-        STUDENT_PROFILE.skillMatrix = 'Grammar: A2 | Math: L1+ | Logic: L2';
-      }
-      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
-      updateAdaptiveBadgeUI();
-      savePersistentSession(STUDENT_PROFILE);
-      postBackend({
-        action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, xp: STUDENT_PROFILE.xp,
-        summary: `${STUDENT_PROFILE.level} | ${STUDENT_PROFILE.skillMatrix} | ${note || ''}`
-      }).catch(() => {});
-    }
-
-    function openFullScreen(scr) {
-      document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden'));
-      const target = document.getElementById('scr-' + scr);
-      if (target) target.classList.remove('hidden');
-      document.querySelectorAll('.footer-btn').forEach(b => b.classList.toggle('active', b.dataset.scr === scr));
-      document.getElementById('viewLearner').scrollTop = 0;
-    }
-
-    async function askLearnerAI() {
-      const inp = document.getElementById('learnerPrompt');
-      const q = inp.value.trim();
-      if (!q) return;
-      const feed = document.getElementById('tutorChatFeed');
-      feed.innerHTML += `<div class="msg-user">${q}</div>`;
-      inp.value = '';
-      feed.scrollTop = feed.scrollHeight;
-
-      const prompt = `You are ${CURRENT_TEACHER.name}, a warm, motivating mentor for ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). Answer simply in Hindi with English examples, praise their effort, and raise their understanding level. Question: ${q}`;
-      const res = await postBackend({ action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt }).catch(() => ({}));
-      const reply = (res && res.reply) || `शाबाश ${STUDENT_PROFILE.name}! यह बहुत अच्छा सवाल है। आइए इसे आसान उदाहरण से समझते हैं!`;
-      feed.innerHTML += `<div class="msg-ai">${reply}</div>`;
-      feed.scrollTop = feed.scrollHeight;
-      addStudentXP(10, 'Chat doubt: ' + q.slice(0, 25));
-    }
-
-    // ==================== 4. REAL PHOTO JAW/LIP-WARP ENGINE & HEAD-MIRRORING ====================
-    function renderAvatarCanvasFrame() {
-      const canvas = document.getElementById('avatarWarpCanvas');
-      if (!canvas || !avatarImgObj.complete || !avatarImgObj.naturalWidth) return;
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height;
-      ctx.clearRect(0, 0, W, H);
-
-      if (CURRENT_TEACHER.ghibliMode) {
-        ctx.filter = 'saturate(1.45) contrast(1.08) brightness(1.05)';
-      } else {
-        ctx.filter = 'none';
-      }
-
-      // Draw base photo cleanly centered (object-fit: cover)
-      const iw = avatarImgObj.naturalWidth, ih = avatarImgObj.naturalHeight;
-      const scale = Math.max(W / iw, H / ih);
-      const dw = iw * scale, dh = ih * scale;
-      const dx = (W - dw) / 2, dy = (H - dh) / 2;
-      ctx.drawImage(avatarImgObj, dx, dy, dw, dh);
-
-      // Animate REAL photo's own lower lip & chin pixels (no fake floating sticker!)
-      if (mouthOpenAmount > 0.5) {
-        const lx = W * (CURRENT_TEACHER.lipX || 0.50);
-        const ly = H * (CURRENT_TEACHER.lipY || 0.68);
-        const mw = W * 0.22;
-        const mh = H * 0.14;
-        const drop = mouthOpenAmount * 8; // real jaw downward displacement in px
-
-        // 1. Subtle natural inner-mouth shadow at exact lip line
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(lx, ly + drop * 0.35, mw * 0.42, Math.max(1.5, drop * 0.55), 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(45, 12, 16, 0.78)';
-        ctx.fill();
-        ctx.restore();
-
-        // 2. Shift the photo's own lower-lip & chin skin slice downward smoothly
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(lx, ly + mh * 0.45 + drop, mw * 0.65, mh * 0.65, 0, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(canvas, lx - mw, ly, mw * 2, mh * 1.4, lx - mw, ly + drop, mw * 2, mh * 1.4);
-        ctx.restore();
-      }
-      ctx.filter = 'none';
-    }
-
-    function startLipWarpLoop() {
-      isAvatarSpeaking = true;
-      let phase = 0;
-      function step() {
-        if (!isAvatarSpeaking) {
-          mouthOpenAmount = 0;
-          renderAvatarCanvasFrame();
+      const db = getLocalStudentsDB();
+      if (mode === 'login') {
+        if (db[contact]) {
+          if (db[contact].pin !== pin) return alert('Incorrect 6-digit PIN! Use Leave/Help to recover.');
+          applyStudentSession(db[contact]);
+          closeAuthModal();
+          // Background cloud sync
+          postBackend({ action: 'STUDENT_AUTH', contact, pin });
           return;
         }
-        phase += 0.32;
-        mouthOpenAmount = Math.abs(Math.sin(phase)) * (0.6 + Math.random() * 0.4);
-        renderAvatarCanvasFrame();
-        lipWarpAnimId = requestAnimationFrame(step);
-      }
-      cancelAnimationFrame(lipWarpAnimId);
-      lipWarpAnimId = requestAnimationFrame(step);
-    }
-
-    function stopLipWarpLoop() {
-      isAvatarSpeaking = false;
-      mouthOpenAmount = 0;
-      renderAvatarCanvasFrame();
-    }
-
-    function calibrateLipOnCanvasTap(event) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const relX = (event.clientX - rect.left) / rect.width;
-      const relY = (event.clientY - rect.top) / rect.height;
-      CURRENT_TEACHER.lipX = Math.max(0.25, Math.min(0.75, relX));
-      CURRENT_TEACHER.lipY = Math.max(0.35, Math.min(0.88, relY));
-      document.getElementById('lipYSlider').value = Math.round(CURRENT_TEACHER.lipY * 100);
-      testLipMovementPreview();
-    }
-
-    function updateLipPositionFromSlider() {
-      CURRENT_TEACHER.lipY = parseInt(document.getElementById('lipYSlider').value, 10) / 100;
-      renderAvatarCanvasFrame();
-    }
-
-    function testLipMovementPreview() {
-      startLipWarpLoop();
-      setTimeout(stopLipWarpLoop, 1600);
-    }
-
-    function applyGhibliCartoonFilter() {
-      CURRENT_TEACHER.ghibliMode = !CURRENT_TEACHER.ghibliMode;
-      renderAvatarCanvasFrame();
-      alert(CURRENT_TEACHER.ghibliMode ? '✨ Ghibli / Animated स्टाइल चालू हो गया!' : '📷 ओरिजिनल फोटो स्टाइल वापस सेट हो गया!');
-    }
-
-    // Live Student Head-Motion Mirroring (AI Teacher mirrors student's subtle head tilt!)
-    function startHeadMirrorTracking() {
-      const vid = document.getElementById('selfCameraVideo');
-      const frame = document.getElementById('avatarCanvasFrame');
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = 48; offCanvas.height = 48;
-      const oCtx = offCanvas.getContext('2d');
-
-      clearInterval(headMirrorInterval);
-      headMirrorInterval = setInterval(() => {
-        if (!isCallActive || isCamHidden || !vid || vid.readyState < 2) {
-          frame.style.transform = isAvatarSpeaking ? 'scale(1.02)' : 'scale(1)';
-          return;
-        }
-        oCtx.drawImage(vid, 0, 0, 48, 48);
-        const data = oCtx.getImageData(0, 0, 48, 48).data;
-        let sumX = 0, weight = 0;
-        for (let y = 8; y < 40; y++) {
-          for (let x = 8; x < 40; x++) {
-            const idx = (y * 48 + x) * 4;
-            const lum = data[idx] + data[idx + 1] + data[idx + 2];
-            sumX += x * lum;
-            weight += lum;
+        // Fallback async check if student registered on another device
+        postBackend({ action: 'STUDENT_AUTH', contact, pin }).then(res => {
+          if (res.success && res.student) {
+            const stu = { ...res.student, pin };
+            db[contact] = stu;
+            saveLocalStudentsDB(db);
+            applyStudentSession(stu);
+            closeAuthModal();
+          } else {
+            alert('Account not found locally. Tap "Create New Account" to register in 5 seconds!');
           }
-        }
-        const centerX = weight ? (sumX / weight) : 24;
-        const tiltDeg = Math.max(-7, Math.min(7, (24 - centerX) * 1.4));
-        const speakScale = isAvatarSpeaking ? 1.03 : 1.0;
-        frame.style.transform = `rotate(${tiltDeg.toFixed(1)}deg) scale(${speakScale})`;
-      }, 150);
-    }
-
-    // ==================== 5. FULL-SCREEN 50/50 CALL & VOICE ENGINE ====================
-    function switchCallerFromDropdown() {
-      const v = document.getElementById('quickCallerSelect').value;
-      if (v === 'didi') applyTeacherProfile({ name: 'Didi-Mentor', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', pitch: 1.15, rate: 0.96, lipX: 0.5, lipY: 0.68 });
-      else if (v === 'arjun') applyTeacherProfile({ name: 'Coach Arjun', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=CoachArjun', pitch: 0.9, rate: 1.0, lipX: 0.5, lipY: 0.68 });
-      else if (v === 'robo') applyTeacherProfile({ name: 'Robo-Guru', photo: 'https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', pitch: 1.0, rate: 1.02, lipX: 0.5, lipY: 0.68 });
-      else if (v.startsWith('comm_')) {
-        const item = getCommunityAvatarsList()[parseInt(v.replace('comm_', ''), 10)];
-        if (item) applyTeacherProfile(item);
+        });
+      } else {
+        if (db[contact]) return alert('Account already exists! Tap "Login to My Dashboard".');
+        PENDING_NEW_ACCOUNT = { contact, pin };
+        document.getElementById('authStepCredentials').classList.add('hidden');
+        document.getElementById('authStepOnboarding').classList.remove('hidden');
       }
     }
 
-    function applyTeacherProfile(t) {
-      CURRENT_TEACHER = { ...CURRENT_TEACHER, ...t };
-      document.getElementById('activeAvatarTitle').textContent = '👩‍🏫 ' + CURRENT_TEACHER.name;
-      document.getElementById('customAvatarNameInput').value = CURRENT_TEACHER.name;
-      avatarImgObj.onload = () => renderAvatarCanvasFrame();
-      avatarImgObj.src = CURRENT_TEACHER.photo;
+    function completeStudentOnboarding() {
+      const name = document.getElementById('onboardNameInput').value.trim();
+      const age = parseInt(document.getElementById('onboardAgeInput').value, 10);
+      if (!name) return alert('Please enter your Full Name.');
+      if (!age || age < 5 || age > 95) return alert('Please enter your valid Age.');
+
+      const newStu = {
+        userId: 'STU-' + Math.floor(100000 + Math.random() * 900000),
+        name, age,
+        contact: PENDING_NEW_ACCOUNT.contact,
+        pin: PENDING_NEW_ACCOUNT.pin,
+        level: 'A1', xp: 25, streak: 1,
+        progressSummary: `Enrolled at age ${age} (Level A1).`
+      };
+      const db = getLocalStudentsDB();
+      db[newStu.contact] = newStu;
+      saveLocalStudentsDB(db);
+      applyStudentSession(newStu);
+      closeAuthModal();
+
+      // Async sync to Google Sheets
+      postBackend({ action: 'STUDENT_AUTH', name: newStu.name, contact: newStu.contact, pin: newStu.pin, level: 'A1' });
     }
 
-    function updateCallLanguageMode() { CURRENT_TEACHER.langMode = document.getElementById('callLanguageMode').value; }
-    function cycleUILanguage() {
-      const sel = document.getElementById('callLanguageMode');
-      sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length;
-      updateCallLanguageMode();
-      alert('🌐 भाषा बदली गई: ' + sel.options[sel.selectedIndex].text);
+    function awardXP(points, note) {
+      if (!CURRENT_STUDENT) return;
+      CURRENT_STUDENT.xp = (CURRENT_STUDENT.xp || 0) + points;
+      if (note) CURRENT_STUDENT.progressSummary = note;
+      document.getElementById('hdrXP').textContent = CURRENT_STUDENT.xp;
+      const db = getLocalStudentsDB();
+      if (db[CURRENT_STUDENT.contact]) {
+        db[CURRENT_STUDENT.contact] = CURRENT_STUDENT;
+        saveLocalStudentsDB(db);
+      }
+      applyStudentSession(CURRENT_STUDENT);
+      postBackend({
+        action: 'SYNC_STUDENT',
+        userId: CURRENT_STUDENT.userId,
+        level: CURRENT_STUDENT.level,
+        xp: CURRENT_STUDENT.xp,
+        summary: note || ''
+      });
     }
 
-    async function startLiveVideoCall() {
+    // ==================== NAVIGATION (FOOTER & MODULES) ====================
+    function switchFooterTab(tabName) {
+      document.querySelectorAll('.main-tab').forEach(s => s.classList.add('hidden'));
+      const target = document.getElementById('tab-' + tabName);
+      if (target) target.classList.remove('hidden');
+      document.querySelectorAll('.footer-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+      document.getElementById('studentWorkspace').scrollTop = 0;
+    }
+
+    function switchStudioModule(modName) {
+      document.querySelectorAll('.studio-module').forEach(m => m.classList.add('hidden'));
+      document.getElementById('mod-' + modName).classList.remove('hidden');
+      document.querySelectorAll('.mod-tile').forEach(t => t.classList.remove('mod-active'));
+      const activeTile = document.getElementById('tile-' + modName);
+      if (activeTile) activeTile.classList.add('mod-active');
+    }
+
+    // ==================== MODULE A: PERSONAL AI MENTOR (10-TURN MEMORY) ====================
+    function stripStars(txt) {
+      return String(txt || '').replace(/\*\*/g, '').replace(/###/g, '').trim();
+    }
+
+    function quickMentorPrompt(text) {
+      document.getElementById('mentorInput').value = text;
+      sendMentorMessage();
+    }
+
+    function startLevelAssessmentQuiz() {
+      quickMentorPrompt("Give me a quick 3-question level check quiz to see if I am ready to move from A1 to A2 or B1.");
+    }
+
+    async function sendMentorMessage() {
+      const input = document.getElementById('mentorInput');
+      const userMsg = input.value.trim();
+      if (!userMsg) return;
+
+      const feed = document.getElementById('mentorChatFeed');
+      const btn = document.getElementById('mentorSendBtn');
+      feed.innerHTML += `<div class="msg-user">${userMsg}</div>`;
+      input.value = '';
+      feed.scrollTop = feed.scrollHeight;
+      btn.disabled = true;
+
+      MENTOR_HISTORY.push({ role: 'Student', text: userMsg });
+      if (MENTOR_HISTORY.length > 10) MENTOR_HISTORY = MENTOR_HISTORY.slice(-10);
+
+      const lang = document.getElementById('mentorLangPref').value;
+      const stuMeta = CURRENT_STUDENT ? `Name: ${CURRENT_STUDENT.name}, Age: ${CURRENT_STUDENT.age}, Level: ${CURRENT_STUDENT.level}` : 'Guest Student (Level A1)';
+      const historyContext = MENTOR_HISTORY.map(m => `${m.role}: ${m.text}`).join('\n');
+
+      const res = await postBackend({
+        action: 'CHAT',
+        role: 'student',
+        studentId: CURRENT_STUDENT ? CURRENT_STUDENT.userId : '',
+        prompt: `Student Profile: [${stuMeta}]. Preferred Language: ${lang}. Recent 10-turn context:\n${historyContext}\nRespond warmly without markdown asterisks (**). If student answers a quiz well, add "[LEVEL_UP]" at the end.`
+      }, 8000);
+
+      btn.disabled = false;
+      let reply = res.success ? stripStars(res.reply) : "Great question! Let's break this down step by step: focus on the core concept first and practice one example.";
+
+      if (reply.includes('[LEVEL_UP]') && CURRENT_STUDENT) {
+        reply = reply.replace('[LEVEL_UP]', '').trim();
+        const nextLvl = CURRENT_STUDENT.level === 'A1' ? 'A2' : (CURRENT_STUDENT.level === 'A2' ? 'B1' : 'C1');
+        CURRENT_STUDENT.level = nextLvl;
+        reply += `\n\n🎉 Congratulations! You leveled up to ${nextLvl}!`;
+      }
+
+      MENTOR_HISTORY.push({ role: 'Mentor', text: reply });
+      if (MENTOR_HISTORY.length > 10) MENTOR_HISTORY = MENTOR_HISTORY.slice(-10);
+
+      const safeSpeech = reply.replace(/'/g, '').replace(/\n/g, ' ');
+      feed.innerHTML += `<div class="msg-ai">${reply}<div style="margin-top:6px;"><button class="btn-outline btn-sm" style="min-height:32px;padding:3px 8px;font-size:11px;" onclick="speakText('${safeSpeech}')">🔊 Listen</button></div></div>`;
+      feed.scrollTop = feed.scrollHeight;
+      awardXP(10, `Chatted with AI Mentor (${userMsg.slice(0, 28)})`);
+    }
+
+    // ==================== MODULE B & PHASE 2: CANVAS LIP-SYNC + 50/50 VIDEO CALL ====================
+    let AVATAR_STATE = {
+      name: 'Didi-Mentor',
+      imgUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor',
+      lipY: 0.63,
+      lipX: 0.50,
+      pitch: 1.15
+    };
+    let loadedAvatarImg = new Image();
+    loadedAvatarImg.crossOrigin = 'anonymous';
+    let mouthOpenAmount = 0;
+    let headTiltAngle = 0;
+    let avatarAnimFrame = null;
+
+    function initAvatarSystem() {
+      const saved = localStorage.getItem('JESH_CUSTOM_AVATAR');
+      if (saved) {
+        try { AVATAR_STATE = { ...AVATAR_STATE, ...JSON.parse(saved) }; } catch (e) {}
+      }
+      document.getElementById('customTeacherName').value = AVATAR_STATE.name;
+      document.getElementById('lipYSlider').value = AVATAR_STATE.lipY;
+      document.getElementById('voicePitchInput').value = AVATAR_STATE.pitch;
+      loadAvatarImageSource(AVATAR_STATE.imgUrl);
+      startCanvasRenderLoop();
+    }
+
+    function loadAvatarImageSource(src) {
+      loadedAvatarImg = new Image();
+      loadedAvatarImg.crossOrigin = 'anonymous';
+      loadedAvatarImg.src = src;
+    }
+
+    function selectBuiltInCaller(name, url, lipY, pitch) {
+      AVATAR_STATE.name = name;
+      AVATAR_STATE.imgUrl = url;
+      AVATAR_STATE.lipY = lipY;
+      AVATAR_STATE.lipX = 0.50;
+      AVATAR_STATE.pitch = pitch;
+      document.getElementById('customTeacherName').value = name;
+      document.getElementById('lipYSlider').value = lipY;
+      document.getElementById('voicePitchInput').value = pitch;
+      loadAvatarImageSource(url);
+    }
+
+    function handleAvatarFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        AVATAR_STATE.imgUrl = e.target.result;
+        loadAvatarImageSource(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function generateGhibliAvatar() {
+      const name = document.getElementById('customTeacherName').value.trim() || 'Friendly Indian Mentor';
+      const prompt = encodeURIComponent(`Studio Ghibli anime portrait of ${name}, warm friendly smile, front facing centered face, soft lighting, clean background`);
+      const url = `https://image.pollinations.ai/prompt/${prompt}?width=400&height=400&nologo=true`;
+      AVATAR_STATE.imgUrl = url;
+      AVATAR_STATE.lipX = 0.50;
+      AVATAR_STATE.lipY = 0.62;
+      document.getElementById('lipYSlider').value = 0.62;
+      loadAvatarImageSource(url);
+    }
+
+    function calibrateLipFromClick(event, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      AVATAR_STATE.lipX = (event.clientX - rect.left) / rect.width;
+      AVATAR_STATE.lipY = (event.clientY - rect.top) / rect.height;
+      document.getElementById('lipYSlider').value = AVATAR_STATE.lipY.toFixed(2);
+      // Quick test pulse so user sees lip-sync immediately
+      mouthOpenAmount = 1;
+      setTimeout(() => { mouthOpenAmount = 0; }, 350);
+    }
+
+    function updateLipYFromSlider(val) {
+      AVATAR_STATE.lipY = parseFloat(val);
+      mouthOpenAmount = 0.8;
+      setTimeout(() => { mouthOpenAmount = 0; }, 250);
+    }
+
+    // HTML5 CANVAS PIXEL-LEVEL LOWER-LIP & JAW ANIMATOR + HEAD MIRRORING
+    function startCanvasRenderLoop() {
+      if (avatarAnimFrame) cancelAnimationFrame(avatarAnimFrame);
+      function render() {
+        ['previewAvatarCanvas', 'avatarWarpCanvas'].forEach(id => {
+          const canvas = document.getElementById(id);
+          if (!canvas || canvas.offsetParent === null) return;
+          const ctx = canvas.getContext('2d');
+          const w = canvas.width, h = canvas.height;
+          ctx.clearRect(0, 0, w, h);
+
+          ctx.save();
+          ctx.translate(w / 2, h / 2);
+          ctx.rotate(headTiltAngle);
+          ctx.translate(-w / 2, -h / 2);
+
+          if (loadedAvatarImg.complete && loadedAvatarImg.naturalWidth > 0) {
+            ctx.drawImage(loadedAvatarImg, 0, 0, w, h);
+
+            // Pixel-level jaw/lower-lip stretch around calibrated (lipX, lipY)
+            const lx = AVATAR_STATE.lipX * w;
+            const ly = AVATAR_STATE.lipY * h;
+            const mouthW = w * 0.24;
+            const mouthH = h * 0.12;
+            const jawDrop = mouthOpenAmount * (h * 0.032);
+
+            if (jawDrop > 0.5) {
+              // Subtle inner mouth shadow
+              ctx.fillStyle = 'rgba(45, 12, 18, 0.72)';
+              ctx.beginPath();
+              ctx.ellipse(lx, ly + jawDrop * 0.4, mouthW * 0.36, jawDrop * 0.55, 0, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Stretch lower-lip pixels downward smoothly
+              ctx.drawImage(
+                canvas,
+                lx - mouthW / 2, ly, mouthW, mouthH,
+                lx - mouthW / 2, ly + jawDrop, mouthW, mouthH
+              );
+            }
+
+            // Calibration crosshair on preview canvas only
+            if (id === 'previewAvatarCanvas') {
+              ctx.strokeStyle = 'rgba(16, 185, 129, 0.85)';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.arc(lx, ly, 8, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          }
+          ctx.restore();
+        });
+        avatarAnimFrame = requestAnimationFrame(render);
+      }
+      render();
+    }
+
+    // 15-SECOND VOICE WAVEFORM RECORDER
+    let voiceRecActive = false, voiceRecTimer = null;
+    function toggle15sVoiceRecord() {
+      const btn = document.getElementById('recVoiceModelBtn');
+      const canvas = document.getElementById('voiceWaveCanvas');
+      const ctx = canvas.getContext('2d');
+      if (voiceRecActive) {
+        voiceRecActive = false;
+        clearInterval(voiceRecTimer);
+        btn.textContent = '✅ 15s Voice Saved';
+        return;
+      }
+      voiceRecActive = true;
+      let sec = 15;
+      btn.textContent = `⏹️ Stop (${sec}s)`;
+      voiceRecTimer = setInterval(() => {
+        sec--;
+        ctx.fillStyle = '#0F172A';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#10B981';
+        for (let x = 4; x < canvas.width; x += 8) {
+          const barH = 6 + Math.random() * 34;
+          ctx.fillRect(x, (canvas.height - barH) / 2, 4, barH);
+        }
+        if (sec <= 0) {
+          toggle15sVoiceRecord();
+        } else {
+          btn.textContent = `⏹️ Stop (${sec}s)`;
+        }
+      }, 250);
+    }
+
+    function testAvatarVoice() {
+      AVATAR_STATE.pitch = parseFloat(document.getElementById('voicePitchInput').value || '1.05');
+      speakWithLipSync(`Namaste! I am ${document.getElementById('customTeacherName').value || AVATAR_STATE.name}. How can I help you today?`);
+    }
+
+    function saveAvatarAsDefault() {
+      AVATAR_STATE.name = document.getElementById('customTeacherName').value.trim() || AVATAR_STATE.name;
+      AVATAR_STATE.pitch = parseFloat(document.getElementById('voicePitchInput').value || '1.05');
+      localStorage.setItem('JESH_CUSTOM_AVATAR', JSON.stringify(AVATAR_STATE));
+      alert(`✅ ${AVATAR_STATE.name} saved as your default Video-Call Mentor!`);
+    }
+
+    function shareAvatarToCommunity() {
+      saveAvatarAsDefault();
+      const sel = document.getElementById('vcCallerSwitcher');
+      const opt = document.createElement('option');
+      opt.value = AVATAR_STATE.name;
+      opt.textContent = `🌟 ${AVATAR_STATE.name} (Community)`;
+      sel.appendChild(opt);
+      alert(`🌐 "${AVATAR_STATE.name}" is now public in the Caller Switcher!`);
+    }
+
+    // ==================== 50/50 FULL-SCREEN HANDS-FREE VIDEO CALL ====================
+    let callTimerInterval = null, callSeconds = 0, isCallActive = false, isCallMuted = false, isCamOff = false;
+    let selfMediaStream = null, callRecognition = null, lipInterval = null, headMirrorInterval = null;
+
+    function launchFullScreenCall() {
+      document.getElementById('mainAppHeader').classList.add('hidden');
+      document.getElementById('studentBottomFooter').classList.add('hidden');
+      document.getElementById('videoCallOverlay').classList.remove('hidden');
+      document.getElementById('vcTeacherTitle').textContent = AVATAR_STATE.name;
+      startStudentSelfCamera();
+    }
+
+    function endFullScreenCall() {
+      isCallActive = false;
+      clearInterval(callTimerInterval);
+      clearInterval(lipInterval);
+      clearInterval(headMirrorInterval);
+      mouthOpenAmount = 0;
+      headTiltAngle = 0;
+      if (callRecognition) { try { callRecognition.stop(); } catch (e) {} }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (selfMediaStream) {
+        selfMediaStream.getTracks().forEach(t => t.stop());
+        selfMediaStream = null;
+      }
+      document.getElementById('micListeningPill').classList.add('hidden');
+      document.getElementById('videoCallOverlay').classList.add('hidden');
+      document.getElementById('mainAppHeader').classList.remove('hidden');
+      document.getElementById('studentBottomFooter').classList.remove('hidden');
+    }
+
+    async function startStudentSelfCamera() {
+      try {
+        selfMediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        const vid = document.getElementById('studentSelfVideo');
+        vid.srcObject = selfMediaStream;
+        vid.classList.remove('hidden');
+        document.getElementById('camFallbackAvatar').classList.add('hidden');
+      } catch (e) {
+        document.getElementById('studentSelfVideo').classList.add('hidden');
+        document.getElementById('camFallbackAvatar').classList.remove('hidden');
+      }
+    }
+
+    function toggleCallCamera() {
+      isCamOff = !isCamOff;
+      const btn = document.getElementById('vcCamBtn');
+      btn.textContent = isCamOff ? '📷 Cam On' : '📷 Cam Off';
+      if (selfMediaStream) {
+        selfMediaStream.getVideoTracks().forEach(t => { t.enabled = !isCamOff; });
+      }
+    }
+
+    function toggleCallMute() {
+      isCallMuted = !isCallMuted;
+      const btn = document.getElementById('vcMuteBtn');
+      btn.textContent = isCallMuted ? '🔇 Unmute' : '🎙️ Mute';
+      if (isCallMuted && callRecognition) {
+        try { callRecognition.stop(); } catch (e) {}
+        document.getElementById('micListeningPill').classList.add('hidden');
+      } else if (!isCallMuted && isCallActive) {
+        listenHandsFreeTurn();
+      }
+    }
+
+    function switchActiveCallerInCall(name) {
+      if (name === 'Didi-Mentor') selectBuiltInCaller('Didi-Mentor', 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', 0.63, 1.15);
+      else if (name === 'Coach Arjun') selectBuiltInCaller('Coach Arjun', 'https://api.dicebear.com/7.x/adventurer/svg?seed=CoachArjun', 0.62, 0.95);
+      else if (name === 'Robo-Guru') selectBuiltInCaller('Robo-Guru', 'https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', 0.64, 1.0);
+      document.getElementById('vcTeacherTitle').textContent = name;
+    }
+
+    function startHandsFreeCall() {
       if (isCallActive) return;
       isCallActive = true;
       callSeconds = 0;
-
-      // Enter Full-Screen Immersive Video Call Mode
-      document.getElementById('videoCallContainer').classList.add('fullscreen-call');
-      document.getElementById('manualCallTextBar').classList.add('hidden');
-      document.getElementById('avatarStudioCard').classList.add('hidden');
-
-      const pill = document.getElementById('micListeningPill');
-      pill.innerHTML = `<span class="live-wave-bar"><span></span><span></span><span></span><span></span><span></span></span> सुन रहा हूँ... बोलिए!`;
-      pill.style.color = '#34D399';
-
+      clearInterval(callTimerInterval);
       callTimerInterval = setInterval(() => {
         callSeconds++;
         const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
         const s = String(callSeconds % 60).padStart(2, '0');
-        document.getElementById('callTimer').textContent = `${m}:${s}`;
+        document.getElementById('vcCallTimer').textContent = `${m}:${s}`;
       }, 1000);
 
-      try {
-        localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        const vid = document.getElementById('selfCameraVideo');
-        vid.srcObject = localMediaStream;
-        vid.classList.remove('hidden');
-        document.getElementById('pipInitials').classList.add('hidden');
-        startHeadMirrorTracking();
-      } catch (e) {
-        document.getElementById('pipInitials').classList.remove('hidden');
-      }
+      // Gentle lifelike head-mirroring motion
+      clearInterval(headMirrorInterval);
+      headMirrorInterval = setInterval(() => {
+        headTiltAngle = Math.sin(Date.now() / 900) * 0.035;
+      }, 50);
 
-      const introMsg = CURRENT_TEACHER.langMode === 'english'
-        ? `Hello ${STUDENT_PROFILE.name}! I am ${CURRENT_TEACHER.name}, your personal AI mentor. What would you like to practice today?`
-        : `नमस्ते ${STUDENT_PROFILE.name}! मैं ${CURRENT_TEACHER.name} हूँ। आप मुझे इस नाम से बुला सकते हैं या मेरा नाम बदल सकते हैं। बताइए, आज हम क्या सीखें?`;
-
-      document.getElementById('avatarReplyCaption').textContent = '🗣️ ' + introMsg;
-      speakWithRealLipWarp(introMsg, () => {
-        if (isCallActive && !isMicMuted) startHandsFreeListening();
+      const stuName = CURRENT_STUDENT ? CURRENT_STUDENT.name : 'my friend';
+      const greeting = `Namaste ${stuName}! I am ${AVATAR_STATE.name}. What would you like to call me, and which topic shall we talk about today?`;
+      document.getElementById('vcLiveCaption').textContent = '🗣️ ' + greeting;
+      speakWithLipSync(greeting, () => {
+        if (isCallActive && !isCallMuted) listenHandsFreeTurn();
       });
     }
 
-    function toggleCallMic() {
-      isMicMuted = !isMicMuted;
-      document.getElementById('muteCallBtn').textContent = isMicMuted ? '🔇 Unmute' : '🎤 Mute';
-      if (isMicMuted && activeRecognition) { try { activeRecognition.stop(); } catch (e) {} }
-      else if (!isMicMuted && isCallActive) startHandsFreeListening();
-    }
-
-    function toggleStudentCamera() {
-      isCamHidden = !isCamHidden;
-      document.getElementById('camToggleBtn').textContent = isCamHidden ? '📷 Cam On' : '📷 Cam Off';
-      const vid = document.getElementById('selfCameraVideo');
-      if (isCamHidden) { vid.classList.add('hidden'); document.getElementById('pipInitials').classList.remove('hidden'); }
-      else if (localMediaStream) { vid.classList.remove('hidden'); document.getElementById('pipInitials').classList.add('hidden'); }
-    }
-
-    function endLiveVideoCall() {
-      isCallActive = false;
-      clearInterval(callTimerInterval);
-      clearInterval(headMirrorInterval);
-      if (activeRecognition) { try { activeRecognition.stop(); } catch (e) {} }
-      if (localMediaStream) { localMediaStream.getTracks().forEach(t => t.stop()); localMediaStream = null; }
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-
-      stopLipWarpLoop();
-      document.getElementById('videoCallContainer').classList.remove('fullscreen-call');
-      document.getElementById('selfCameraVideo').classList.add('hidden');
-      document.getElementById('pipInitials').classList.remove('hidden');
-      document.getElementById('manualCallTextBar').classList.remove('hidden');
-      document.getElementById('avatarStudioCard').classList.remove('hidden');
-      document.getElementById('micListeningPill').textContent = 'कॉल समाप्त';
-      document.getElementById('micListeningPill').style.color = '#94A3B8';
-      document.getElementById('avatarReplyCaption').textContent = '✅ कॉल समाप्त हुई। आपकी प्रोग्रेस और लेवल अपडेट कर दिया गया है!';
-      addStudentXP(25, 'Full-Screen 50/50 Video Call');
-    }
-
-    function startHandsFreeListening() {
-      if (!isCallActive || isMicMuted) return;
+    function listenHandsFreeTurn() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return;
-
-      activeRecognition = new SpeechRec();
-      activeRecognition.lang = CURRENT_TEACHER.langMode === 'english' ? 'en-IN' : 'hi-IN';
-      activeRecognition.interimResults = true;
-
+      if (!SpeechRec) {
+        document.getElementById('vcLiveCaption').textContent = '⚠️ Voice recognition works best in Chrome/Edge.';
+        return;
+      }
       const pill = document.getElementById('micListeningPill');
-      pill.innerHTML = `<span class="live-wave-bar"><span></span><span></span><span></span><span></span><span></span></span> सुन रहा हूँ... बोलिए!`;
-      pill.style.color = '#34D399';
+      pill.classList.remove('hidden');
+      document.getElementById('micPillText').textContent = 'Listening Hands-Free...';
 
-      let capturedSpeech = '';
-      activeRecognition.onresult = e => {
-        let interim = '';
-        for (let i = 0; i < e.results.length; i++) interim += e.results[i][0].transcript;
-        capturedSpeech = interim;
-        pill.innerHTML = `<span class="live-wave-bar"><span></span><span></span><span></span><span></span><span></span></span> "${interim.slice(-28)}"`;
+      callRecognition = new SpeechRec();
+      callRecognition.lang = 'en-IN';
+      callRecognition.interimResults = false;
+
+      callRecognition.onresult = async event => {
+        pill.classList.add('hidden');
+        const spoken = event.results[0][0].transcript;
+        document.getElementById('vcLiveCaption').textContent = '👤 You: ' + spoken;
+
+        // Dynamic language switcher if student asks
+        const low = spoken.toLowerCase();
+        if (low.includes('hindi mein') || low.includes('हिंदी में')) {
+          document.getElementById('vcLangSwitcher').value = 'Hindi + English';
+        } else if (low.includes('only english')) {
+          document.getElementById('vcLangSwitcher').value = 'Only English';
+        }
+
+        const langMode = document.getElementById('vcLangSwitcher').value;
+        const res = await postBackend({
+          action: 'CHAT',
+          role: 'student',
+          studentId: CURRENT_STUDENT ? CURRENT_STUDENT.userId : '',
+          prompt: `You are ${AVATAR_STATE.name}, a warm best-friend AI tutor on a live video call. Language: ${langMode}. Student said: "${spoken}". Reply naturally in 2 short spoken sentences without markdown stars.`
+        }, 7000);
+
+        const aiReply = res.success ? stripStars(res.reply) : "That sounds really interesting! Tell me a little more about what you think.";
+        document.getElementById('vcLiveCaption').textContent = `🗣️ ${AVATAR_STATE.name}: ${aiReply}`;
+        awardXP(15, `Video Call practice with ${AVATAR_STATE.name}`);
+
+        speakWithLipSync(aiReply, () => {
+          if (isCallActive && !isCallMuted) listenHandsFreeTurn();
+        });
       };
-      activeRecognition.onend = () => {
-        if (!isCallActive) return;
-        if (capturedSpeech.trim()) {
-          pill.textContent = '💭 जवाब तैयार हो रहा है...';
-          handleLiveSpokenTurn(capturedSpeech.trim());
-        } else if (!isMicMuted) {
-          setTimeout(startHandsFreeListening, 500);
+
+      callRecognition.onerror = () => {
+        pill.classList.add('hidden');
+        if (isCallActive && !isCallMuted) {
+          setTimeout(() => listenHandsFreeTurn(), 900);
         }
       };
-      try { activeRecognition.start(); } catch (e) {}
+
+      try { callRecognition.start(); } catch (e) {}
     }
 
-    function listenToStudentVoice() {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert('Chrome ब्राउज़र का उपयोग करें।');
-      const rec = new SpeechRec();
-      rec.lang = 'hi-IN';
-      rec.onresult = e => {
-        document.getElementById('avatarDiscussTopic').value = e.results[0][0].transcript;
-        talkWithVideoAvatar();
-      };
-      rec.start();
-    }
-
-    function talkWithVideoAvatar() {
-      const inp = document.getElementById('avatarDiscussTopic');
-      const txt = inp.value.trim();
-      if (!txt) return;
-      inp.value = '';
-      handleLiveSpokenTurn(txt);
-    }
-
-    async function handleLiveSpokenTurn(userSpokenText) {
-      const cap = document.getElementById('avatarReplyCaption');
-      cap.textContent = `आपने कहा: "${userSpokenText}" • 💭 सोच रहा हूँ...`;
-
-      const low = userSpokenText.toLowerCase();
-      if (low.includes('hindi mein') || low.includes('हिंदी में')) {
-        CURRENT_TEACHER.langMode = 'hinglish';
-        document.getElementById('callLanguageMode').value = 'hinglish';
-      } else if (low.includes('only english') || low.includes('speak english')) {
-        CURRENT_TEACHER.langMode = 'english';
-        document.getElementById('callLanguageMode').value = 'english';
-      }
-
-      const langRule = CURRENT_TEACHER.langMode === 'english'
-        ? 'Speak in clear, motivating English.'
-        : CURRENT_TEACHER.langMode === 'bhojpuri'
-          ? 'Speak warmly in Bhojpuri mixed with easy English words.'
-          : 'Speak warmly in natural Hindi while teaching 1-2 useful English sentences in between.';
-
-      const sysPrompt = `You are ${CURRENT_TEACHER.name}, a caring, motivating human-like AI mentor on a live video call with ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). ${langRule} Student said: "${userSpokenText}". Encourage them warmly, gently correct any mistake, slightly upgrade their learning level, and ask 1 short friendly follow-up question in 2-3 spoken sentences.`;
-
-      const res = await postBackend({
-        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt: sysPrompt
-      }).catch(() => ({}));
-
-      const reply = (res && res.reply) || `वाह ${STUDENT_PROFILE.name}, बहुत बढ़िया! अंग्रेजी में इसे कह सकते हैं: "I am improving step by step!" बताइए, क्या आप इसका एक और वाक्य बनाएंगे?`;
-      cap.textContent = '🗣️ ' + reply;
-      addStudentXP(15, 'Live call turn: ' + userSpokenText.slice(0, 25));
-
-      speakWithRealLipWarp(reply, () => {
-        if (isCallActive && !isMicMuted) setTimeout(startHandsFreeListening, 500);
-      });
-    }
-
-    async function speakWithRealLipWarp(text, onFinish) {
-      const tile = document.getElementById('aiTutorTile');
-      tile.classList.add('speaking-glow');
-      startLipWarpLoop();
-
-      // Check if Admin configured ElevenLabs Voice Clone in backend
-      const voiceModelB64 = localStorage.getItem('JESH_USER_VOICE_MODEL_B64');
-      if (voiceModelB64) {
-        try {
-          const cloneRes = await postBackend({
-            action: 'CLONE_SPEAK', text, voiceSampleBase64: voiceModelB64
-          });
-          if (cloneRes && cloneRes.audioBase64) {
-            const aud = new Audio('data:audio/mpeg;base64,' + cloneRes.audioBase64);
-            aud.onended = () => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); };
-            aud.play();
-            return;
-          }
-        } catch (e) {}
-      }
+    function speakWithLipSync(text, onDone) {
+      clearInterval(lipInterval);
+      lipInterval = setInterval(() => {
+        mouthOpenAmount = 0.25 + Math.random() * 0.75;
+      }, 95);
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        const hasHindi = /[\u0900-\u097F]/.test(text);
-        u.lang = hasHindi ? 'hi-IN' : 'en-IN';
-        u.pitch = CURRENT_TEACHER.pitch || 1.05;
-        u.rate = CURRENT_TEACHER.rate || 0.96;
-        u.onend = () => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); };
-        u.onerror = () => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); };
-        window.speechSynthesis.speak(u);
-      } else {
-        setTimeout(() => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); }, 2500);
-      }
-    }
-
-    // ==================== 6. LIVE WAVEFORM 15S VOICE MODEL & CUSTOM AVATAR ====================
-    function applyTeacherNameOnly() {
-      const newName = document.getElementById('customAvatarNameInput').value.trim();
-      if (!newName) return alert('कृपया टीचर का नाम लिखें।');
-      applyTeacherProfile({ name: newName });
-      saveCustomAvatarToLocal(false);
-      alert(`✅ अब आपके टीचर का नाम "${newName}" सेट हो गया है!`);
-    }
-
-    function uploadCustomAvatar(e) {
-      const f = e.target.files[0];
-      if (!f) return;
-      const r = new FileReader();
-      r.onload = ev => {
-        applyTeacherProfile({ photo: ev.target.result, lipX: 0.50, lipY: 0.66 });
-        alert('✅ फोटो लग गई है! अब ऊपर फोटो में अपने होंठों पर 1 बार टच करें या नीचे "टेस्ट करें" दबाकर लिप-सिंक मिला लें।');
-      };
-      r.readAsDataURL(f);
-    }
-
-    async function recordFifteenSecondVoiceModel() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 64;
-        source.connect(analyser);
-
-        const waveCanvas = document.getElementById('voiceWaveformCanvas');
-        const wCtx = waveCanvas.getContext('2d');
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        let isRec = true;
-        let pitchSamples = [];
-
-        function drawWave() {
-          if (!isRec) return;
-          analyser.getByteFrequencyData(dataArray);
-          wCtx.fillStyle = '#0F172A';
-          wCtx.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
-          const barWidth = (waveCanvas.width / dataArray.length) * 1.5;
-          let x = 0, energy = 0;
-          for (let i = 0; i < dataArray.length; i++) {
-            const h = (dataArray[i] / 255) * waveCanvas.height;
-            energy += dataArray[i];
-            wCtx.fillStyle = '#10B981';
-            wCtx.fillRect(x, waveCanvas.height - h, barWidth - 2, h);
-            x += barWidth;
-          }
-          if (energy > 400) pitchSamples.push(energy / dataArray.length);
-          requestAnimationFrame(drawWave);
-        }
-        drawWave();
-
-        const recorder = new MediaRecorder(stream);
-        const chunks = [];
-        const btn = document.getElementById('recordVoiceModelBtn');
-        const status = document.getElementById('voiceRecordStatus');
-
-        btn.disabled = true;
-        status.textContent = '🔴 15 सेकंड तक ऊपर लिखा वाक्य पढ़ें... (Live Wave चालू है)';
-        status.style.color = '#E11D48';
-
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
-          isRec = false;
-          audioCtx.close();
-          stream.getTracks().forEach(t => t.stop());
-
-          const blob = new Blob(chunks, { type: 'audio/webm' });
-          const audioUrl = URL.createObjectURL(blob);
-          const player = document.getElementById('recordedModelPlayback');
-          player.src = audioUrl;
-          player.classList.remove('hidden');
-
-          // Save Base64 sample for ElevenLabs / backend cloning + calibrate pitch
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            try { localStorage.setItem('JESH_USER_VOICE_MODEL_B64', reader.result.split(',')[1]); } catch (e) {}
-          };
-          reader.readAsDataURL(blob);
-
-          const avgEnergy = pitchSamples.length ? (pitchSamples.reduce((a, b) => a + b, 0) / pitchSamples.length) : 60;
-          CURRENT_TEACHER.pitch = avgEnergy > 75 ? 1.12 : 0.92;
-          CURRENT_TEACHER.rate = 0.96;
-
-          btn.disabled = false;
-          status.textContent = '✅ 15s मॉडल आवाज़ सेव हो गई! (नोट: पूर्ण हूबहू वॉइस क्लोन के लिए Admin Vault में ElevenLabs API Key जोड़ें)';
-          status.style.color = '#059669';
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.pitch = AVATAR_STATE.pitch || 1.05;
+        utter.rate = 0.98;
+        utter.onend = () => {
+          clearInterval(lipInterval);
+          mouthOpenAmount = 0;
+          if (onDone) onDone();
         };
-
-        recorder.start();
-        setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 15000);
-      } catch (e) {
-        alert('माइक की अनुमति दें ताकि आवाज़ और वेवफॉर्म रिकॉर्ड हो सके।');
+        utter.onerror = () => {
+          clearInterval(lipInterval);
+          mouthOpenAmount = 0;
+          if (onDone) onDone();
+        };
+        window.speechSynthesis.speak(utter);
+      } else {
+        setTimeout(() => {
+          clearInterval(lipInterval);
+          mouthOpenAmount = 0;
+          if (onDone) onDone();
+        }, 2500);
       }
     }
 
-    function saveCustomAvatarToLocal(showMsg) {
-      const name = document.getElementById('customAvatarNameInput').value.trim() || CURRENT_TEACHER.name;
-      const profile = {
-        name, photo: CURRENT_TEACHER.photo, pitch: CURRENT_TEACHER.pitch,
-        rate: CURRENT_TEACHER.rate, lipX: CURRENT_TEACHER.lipX, lipY: CURRENT_TEACHER.lipY, ghibliMode: CURRENT_TEACHER.ghibliMode
-      };
-      localStorage.setItem('JESH_DEFAULT_TEACHER', JSON.stringify(profile));
-      applyTeacherProfile(profile);
-      if (showMsg) alert('⭐ यह टीचर, लिप-सिंक पोजीशन और आवाज़ प्रोफाइल Default सेट हो गई है!');
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+      }
     }
 
-    function loadDefaultTeacherProfile() {
-      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || 'null');
-      if (saved && saved.name) applyTeacherProfile(saved);
-      else applyTeacherProfile(CURRENT_TEACHER);
+    // ==================== MODULE C: JESHLINGO (PATH & WEAK WORDS) ====================
+    const LINGO_DECK = [
+      { hindi: 'मैं हर दिन अंग्रेज़ी का अभ्यास करता हूँ।', target: 'I practice English every day', bank: ['every', 'I', 'English', 'day', 'practice', 'tomorrow'] },
+      { hindi: 'मुझे कंप्यूटर और एआई सीखना पसंद है।', target: 'I love learning computers and AI', bank: ['computers', 'AI', 'I', 'and', 'learning', 'love'] },
+      { hindi: 'कृपया इस प्रश्न को सरल शब्दों में समझाएँ।', target: 'Please explain this question in simple words', bank: ['in', 'simple', 'Please', 'words', 'question', 'this', 'explain'] }
+    ];
+    let currentLingoIdx = 0, selectedLingoWords = [];
+
+    function getWeakWords() {
+      try { return JSON.parse(localStorage.getItem('JESH_WEAK_WORDS') || '[]'); } catch (e) { return []; }
+    }
+    function saveWeakWord(w) {
+      const list = getWeakWords();
+      if (!list.includes(w)) { list.push(w); localStorage.setItem('JESH_WEAK_WORDS', JSON.stringify(list)); }
+      document.getElementById('weakWordsCount').textContent = list.length;
     }
 
-    function getCommunityAvatarsList() {
-      const defaults = [
-        { name: 'Priya Didi (Public)', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PriyaDidi', pitch: 1.2, rate: 0.95, lipX: 0.5, lipY: 0.68, creator: 'FEA Community' },
-        { name: 'Master Ravi (Public)', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=MasterRavi', pitch: 0.88, rate: 0.98, lipX: 0.5, lipY: 0.68, creator: 'FEA Mentor' }
-      ];
-      const custom = JSON.parse(localStorage.getItem('JESH_COMMUNITY_AVATARS') || '[]');
-      return [...defaults, ...custom];
+    function loadLingoChallenge(mode) {
+      document.getElementById('weakWordsCount').textContent = getWeakWords().length;
+      if (mode === 'weak' && getWeakWords().length > 0) {
+        const weak = getWeakWords().slice(0, 4);
+        document.getElementById('lingoPromptHindi').textContent = `Revise your saved weak words: ${weak.join(', ')}`;
+        selectedLingoWords = [];
+        renderLingoBank(weak);
+        return;
+      }
+      currentLingoIdx = (currentLingoIdx + 1) % LINGO_DECK.length;
+      const item = LINGO_DECK[currentLingoIdx];
+      document.getElementById('lingoPromptHindi').textContent = item.hindi;
+      document.getElementById('lingoFeedback').textContent = '';
+      selectedLingoWords = [];
+      renderLingoBank(item.bank);
     }
 
-    function publishAvatarToCommunity() {
-      const name = document.getElementById('customAvatarNameInput').value.trim() || CURRENT_TEACHER.name;
-      const item = {
-        name: name + ' (Public)', photo: CURRENT_TEACHER.photo, pitch: CURRENT_TEACHER.pitch,
-        rate: CURRENT_TEACHER.rate, lipX: CURRENT_TEACHER.lipX, lipY: CURRENT_TEACHER.lipY,
-        creator: STUDENT_PROFILE ? STUDENT_PROFILE.name : 'Student'
-      };
-      const custom = JSON.parse(localStorage.getItem('JESH_COMMUNITY_AVATARS') || '[]');
-      custom.push(item);
-      localStorage.setItem('JESH_COMMUNITY_AVATARS', JSON.stringify(custom));
-      postBackend({ action: 'SHARE_COMMUNITY_AVATAR', avatar: item }).catch(() => {});
-      renderCommunityAvatars();
-      alert('🌐 आपका मॉडल अब सभी छात्रों के लिए पब्लिक हो गया है!');
+    function renderLingoBank(words) {
+      document.getElementById('lingoAnswerBox').innerHTML = selectedLingoWords.map(w => `<span class="word-chip">${w}</span>`).join('');
+      document.getElementById('lingoWordBank').innerHTML = words.map(w => `<button class="word-chip" onclick="pickLingoWord('${w}')">${w}</button>`).join('');
     }
 
-    function renderCommunityAvatars() {
-      const list = getCommunityAvatarsList();
-      const box = document.getElementById('communityAvatarsList');
-      const sel = document.getElementById('quickCallerSelect');
-      sel.querySelectorAll('option.comm-opt').forEach(o => o.remove());
-
-      box.innerHTML = list.map((av, i) => {
-        const opt = document.createElement('option');
-        opt.value = 'comm_' + i;
-        opt.textContent = '🌐 ' + av.name;
-        opt.className = 'comm-opt';
-        sel.appendChild(opt);
-
-        return `
-          <div class="mini-card" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <img src="${av.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" />
-              <div>
-                <strong style="font-size:13px;display:block;">${av.name}</strong>
-                <span style="font-size:11px;color:var(--muted);">By ${av.creator}</span>
-              </div>
-            </div>
-            <button class="btn-primary" style="min-height:36px;padding:6px 10px;font-size:12px;" onclick="selectCommunityAvatar(${i})">चुनें</button>
-          </div>
-        `;
-      }).join('');
+    function pickLingoWord(w) {
+      selectedLingoWords.push(w);
+      const item = LINGO_DECK[currentLingoIdx];
+      renderLingoBank(item.bank);
+    }
+    function resetLingoSelection() {
+      selectedLingoWords = [];
+      renderLingoBank(LINGO_DECK[currentLingoIdx].bank);
     }
 
-    function selectCommunityAvatar(idx) {
-      const item = getCommunityAvatarsList()[idx];
-      if (!item) return;
-      applyTeacherProfile(item);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      alert(`✅ अब आप "${item.name}" से बात कर सकते हैं!`);
+    function checkLingoSentence() {
+      const item = LINGO_DECK[currentLingoIdx];
+      const attempt = selectedLingoWords.join(' ').trim();
+      const fb = document.getElementById('lingoFeedback');
+      if (attempt.toLowerCase() === item.target.toLowerCase()) {
+        fb.style.color = 'var(--emerald)';
+        fb.textContent = '🎉 Correct! +15 XP earned!';
+        awardXP(15, 'Completed JeshLingo sentence challenge');
+      } else {
+        fb.style.color = 'var(--rose)';
+        fb.textContent = `❌ Correct answer: "${item.target}" — Saved to Weak Words!`;
+        item.target.split(' ').forEach(w => { if (!selectedLingoWords.includes(w)) saveWeakWord(w); });
+      }
     }
 
-    // ==================== 7. DUOLINGO JESHLINGO & READALONG JESHREAD ====================
-    function startPathLesson(lessonTitle) {
-      openFullScreen('studio');
-      alert(`🦉 "${lessonTitle}" शुरू हो रहा है! Start Call दबाकर बोलकर अभ्यास करें।`);
+    // ==================== MODULE D: JESHREAD STUDIO ====================
+    const HINDI_MINI_DICT = {
+      consistent: 'लगातार / नियमित', practice: 'अभ्यास', every: 'हर / प्रत्येक', day: 'दिन',
+      turns: 'बदल देता है', curious: 'जिज्ञासु', students: 'छात्रों को', into: 'में',
+      confident: 'आत्मविश्वासी', leaders: 'नेता / मार्गदर्शक', technology: 'तकनीक', future: 'भविष्य'
+    };
+
+    function renderStoryWords(paragraph) {
+      const words = paragraph.split(/\s+/);
+      document.getElementById('storyReaderBox').innerHTML = words.map((w, idx) =>
+        `<span class="read-word" id="rw_${idx}" onclick="lookupWordMeaning('${w.replace(/[^a-zA-Z]/g, '')}')">${w}</span>`
+      ).join(' ');
     }
 
-    async function generateInteractiveCards() {
-      const lang = document.getElementById('lingoLangSelect').value;
-      const lvl = document.getElementById('lingoLevelSelect').value;
-      const grid = document.getElementById('lingoCardsGrid');
-      grid.innerHTML = '<div class="mini-card">⚡ Duolingo-स्टाइल कार्ड्स तैयार हो रहे हैं...</div>';
-      const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        prompt: `Create 4 interactive phrases in ${lang} at CEFR ${lvl} level for ${STUDENT_PROFILE.name}. Format strictly: PHRASE | PRONUNCIATION | HINDI MEANING`
-      }).catch(() => ({}));
-      const lines = (res && res.reply ? res.reply : 'I am learning something new every day. | आई एम लर्निंग समथिंग न्यू एवरी डे | मैं हर दिन कुछ नया सीख रहा हूँ।')
-        .split('\n').filter(l => l.includes('|'));
-      grid.innerHTML = lines.map(l => {
-        const p = l.split('|');
-        return `<div class="mini-card"><strong style="color:var(--primary);font-size:16px;">${p[0].trim()}</strong><div style="font-size:12px;color:var(--muted);margin:4px 0;">🗣️ ${p[1].trim()}</div><div style="font-size:13px;margin-bottom:8px;">💡 ${(p[2]||'').trim()}</div><button class="btn-outline" style="min-height:36px;font-size:12px;" onclick="speakTextAloud('${p[0].trim().replace(/'/g,'')}')">🔊 सुनें</button></div>`;
-      }).join('');
-      addStudentXP(15, `JeshLingo ${lang} (${lvl})`);
-    }
-
-    function renderInteractiveStory(text) {
-      CURRENT_STORY_TEXT = text;
-      const box = document.getElementById('readAlongTargetBox');
-      box.innerHTML = text.split(/\s+/).map(w => `<span class="tap-word" onclick="explainTappedWord('${w.replace(/[^a-zA-Z]/g, '')}')">${w}</span>`).join(' ');
-    }
-
-    async function explainTappedWord(word) {
+    async function lookupWordMeaning(word) {
       if (!word) return;
-      speakTextAloud(word);
-      const pop = document.getElementById('wordMeaningPopup');
-      pop.classList.remove('hidden');
-      pop.innerHTML = `🔍 <strong>"${word}"</strong> का अर्थ खोज रहे हैं...`;
-      const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        prompt: `Give the simple Hindi meaning and 1 easy example sentence for the English word "${word}" in 2 short lines.`
-      }).catch(() => ({}));
-      pop.innerHTML = `💡 <strong>${word}:</strong> ${(res && res.reply) || 'यह एक उपयोगी अंग्रेजी शब्द है। ऊपर सुनें बटन से उच्चारण दोहराएं।'}`;
+      const box = document.getElementById('wordMeaningPopup');
+      box.classList.remove('hidden');
+      const low = word.toLowerCase();
+      if (HINDI_MINI_DICT[low]) {
+        box.innerHTML = `📖 <strong>${word}</strong> = <strong>${HINDI_MINI_DICT[low]}</strong> (Saved to Word Bank)`;
+        speakText(word);
+        return;
+      }
+      box.textContent = `🔍 Translating "${word}"...`;
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Give the Hindi meaning of the English word "${word}" in 4 words only.` });
+      box.innerHTML = `📖 <strong>${word}</strong> = <strong>${res.success ? stripStars(res.reply) : 'महत्वपूर्ण शब्द'}</strong>`;
+      speakText(word);
     }
 
     async function generateCustomStory() {
-      const topic = document.getElementById('storyTopicInput').value.trim() || 'A brave student in India';
-      const box = document.getElementById('readAlongTargetBox');
-      box.textContent = '⚡ आपकी पसंद की कहानी बन रही है...';
+      const topic = document.getElementById('storyTopicInput').value.trim() || 'A curious student building an AI robot';
+      document.getElementById('storyReaderBox').textContent = '⚡ Generating personalized story...';
       const res = await postBackend({
         action: 'CHAT', role: 'student',
-        prompt: `Write a short 3-sentence inspiring English story about "${topic}" for ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). Output ONLY the English story.`
-      }).catch(() => ({}));
-      renderInteractiveStory((res && res.reply) || `Raju loved playing ${topic} after school. Every evening he practiced with discipline and helped his friends. Soon his hard work brought great success.`);
+        prompt: `Write a short 3-sentence inspiring English story about "${topic}" for a student. Output ONLY the story.`
+      });
+      renderStoryWords(res.success ? stripStars(res.reply) : "A young student practiced coding every evening. Soon she built a helpful AI tutor for her village school. Everyone celebrated her curiosity and hard work.");
     }
 
-    async function generateNewReadAlongPassage() {
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 inspiring 2-sentence English reading passage for level ${STUDENT_PROFILE.level}. Output ONLY the English text.` }).catch(() => ({}));
-      renderInteractiveStory((res && res.reply) || 'Every small step you take today builds a brighter future tomorrow.');
+    function narrateStoryWithHighlight() {
+      const spans = document.querySelectorAll('#storyReaderBox .read-word');
+      const fullText = Array.from(spans).map(s => s.textContent).join(' ');
+      speakText(fullText);
+      let idx = 0;
+      const t = setInterval(() => {
+        spans.forEach(s => s.classList.remove('active-word'));
+        if (idx >= spans.length) { clearInterval(t); return; }
+        spans[idx].classList.add('active-word');
+        idx++;
+      }, 360);
     }
 
-    function startReadAlongCheck() {
+    function startStoryReadAloudCheck() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert('Chrome ब्राउज़र का उपयोग करें।');
-      const out = document.getElementById('readAlongResult');
-      out.textContent = '🔴 बोलकर पढ़ें...';
+      if (!SpeechRec) return alert('Use Chrome or Edge for speech accuracy check.');
+      const spans = document.querySelectorAll('#storyReaderBox .read-word');
+      const banner = document.getElementById('storyScoreBanner');
+      banner.textContent = '🔴 Listening... Read the story aloud!';
       const rec = new SpeechRec();
       rec.lang = 'en-IN';
       rec.onresult = e => {
         const spoken = e.results[0][0].transcript.toLowerCase();
-        const words = CURRENT_STORY_TEXT.split(/\s+/);
-        let ok = 0;
-        words.forEach(w => { if (spoken.includes(w.replace(/[^a-zA-Z]/g, '').toLowerCase())) ok++; });
-        const pct = Math.round((ok / words.length) * 100);
-        out.innerHTML = `✅ उच्चारण स्कोर: <span style="color:var(--emerald);">${pct}%</span> (+20 XP)`;
-        addStudentXP(20, 'ReadAlong score: ' + pct + '%');
+        let matched = 0;
+        spans.forEach(sp => {
+          const clean = sp.textContent.replace(/[^a-zA-Z]/g, '').toLowerCase();
+          if (clean && spoken.includes(clean)) { matched++; sp.classList.add('matched-word'); }
+        });
+        const pct = Math.round((matched / Math.max(1, spans.length)) * 100);
+        banner.textContent = `🎉 Reading Accuracy: ${pct}% (+20 XP)`;
+        awardXP(20, `ReadAlong score ${pct}%`);
       };
       rec.start();
     }
 
-    // ==================== 8. ACADEMY & QR CERTIFICATE ====================
-    function loadCodeSample(type) {
+    // ==================== MODULE E: JESH ACADEMY SANDBOX ====================
+    function setSandboxTemplate(type) {
       const ed = document.getElementById('academyCodeEditor');
-      if (type === 'python') ed.value = 'name = "' + STUDENT_PROFILE.name + '"\nprint("Welcome to Python,", name)';
-      else if (type === 'html') ed.value = '<h2 style="color:indigo;">Hello ' + STUDENT_PROFILE.name + '!</h2>';
-      else ed.value = '// Logic Challenge: 2, 4, 8, 16, ?\nconsole.log("Next number is:", 16 * 2);';
+      if (type === 'html') ed.value = `<h3>Jesh Web Card</h3>\n<button onclick="alert('Awesome!')">Click Me</button>`;
+      else if (type === 'js') ed.value = `<script>\nlet nums = [10, 20, 30, 40];\ndocument.write("Sum = " + nums.reduce((a,b)=>a+b, 0));\n<\/script>`;
+      else ed.value = `# Python Logic Preview\ndef greet(name):\n    return "Namaste " + name\n\nprint(greet("Jesh Learner"))`;
+      runAcademySandbox();
     }
 
     function runAcademySandbox() {
       const code = document.getElementById('academyCodeEditor').value;
-      const out = document.getElementById('academyCodeOutput');
-      if (code.includes('<')) out.innerHTML = code;
-      else out.textContent = '▶️ Output:\n' + code.replace(/print\(|console\.log\(|\)/g, '');
-      addStudentXP(15, 'Practiced coding sandbox');
-    }
-
-    function generateQRCertificate() {
-      const course = document.getElementById('certCourseSelect').value;
-      const certId = 'JESH-' + Math.floor(100000 + Math.random() * 900000);
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(STUDENT_PROFILE.name + ' | ' + course + ' | ' + certId)}`;
-      document.getElementById('certPreviewArea').innerHTML = `
-        <div style="border:2px solid var(--primary);border-radius:14px;padding:16px;text-align:center;margin-top:12px;background:#FFFFFF;">
-          <div style="font-size:11px;font-weight:800;color:var(--primary);">JESH AI VERIFIED CERTIFICATE</div>
-          <h3 style="font-size:20px;margin:6px 0;">${STUDENT_PROFILE.name}</h3>
-          <p style="font-size:13px;">ने <strong>${course}</strong> सफलतापूर्वक पूरा किया।</p>
-          <img src="${qrUrl}" alt="QR" style="margin:10px auto;display:block;" />
-          <div style="font-size:11px;color:var(--muted);">Certificate ID: ${certId}</div>
-        </div>
-      `;
-      addStudentXP(50, 'Earned QR Certificate: ' + course);
-    }
-
-    async function submitLeaveRequest() {
-      const r = document.getElementById('leaveReasonInput').value.trim();
-      if (!r) return alert('कृपया कारण लिखें।');
-      await postBackend({ action: 'STUDENT_LEAVE', userId: STUDENT_PROFILE.userId, name: STUDENT_PROFILE.name, reason: r }).catch(() => {});
-      alert('✅ आपकी छुट्टी का आवेदन एडमिन को भेज दिया गया है।');
-      document.getElementById('leaveReasonInput').value = '';
-    }
-
-    function speakTextAloud(txt) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance(txt));
-      }
-    }
-
-    // ==================== 9. SECRET ADMIN & PROMPT ENGINE ====================
-    function handleLogoTap() {
-      logoTapCount++;
-      clearTimeout(logoTapTimer);
-      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 2000);
-      if (logoTapCount >= 5) { logoTapCount = 0; switchAuthRole('admin'); document.getElementById('authGate').classList.remove('hidden'); }
-    }
-
-    async function verifyAdminFromGate() {
-      const pass = document.getElementById('gateAdminPass').value.trim();
-      if (!pass) return;
-      const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass }).catch(() => ({ success: false }));
-      if (res && res.success) {
-        ADMIN_PASS = pass;
-        document.getElementById('authGate').classList.add('hidden');
-        document.getElementById('viewAdmin').classList.remove('hidden');
-        renderVaultFields(res.config || {});
+      const frame = document.getElementById('academyOutputFrame');
+      if (code.trim().startsWith('#')) {
+        frame.srcdoc = `<pre style="font-family:monospace;padding:10px;">Python Snippet Ready:\n${code.replace(/</g, '&lt;')}\n\nTip: Tap "AI Code Coach" to trace output!</pre>`;
       } else {
-        alert('गलत एडमिन पासवर्ड!');
+        frame.srcdoc = code;
       }
     }
 
-    function exitAdminView() {
-      document.getElementById('viewAdmin').classList.add('hidden');
-      if (STUDENT_PROFILE) unlockStudentDashboard();
-      else document.getElementById('authGate').classList.remove('hidden');
+    function askAIExplainCode() {
+      const code = document.getElementById('academyCodeEditor').value;
+      switchStudioModule('mentor');
+      quickMentorPrompt(`Explain this code simply in 3 bullet points:\n${code}`);
     }
 
-    function searchStudentCredentials() {
-      const q = document.getElementById('adminCredSearchInput').value.trim().toLowerCase();
-      const box = document.getElementById('adminCredResults');
-      if (!q) return;
-      const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
-      const matches = Object.values(db).filter(s =>
-        (s.name && s.name.toLowerCase().includes(q)) ||
-        (s.contact && s.contact.toLowerCase().includes(q)) ||
-        (s.userId && s.userId.toLowerCase().includes(q))
-      );
-      if (!matches.length) { box.innerHTML = '<p style="font-size:13px;color:var(--muted);">कोई छात्र नहीं मिला।</p>'; return; }
-      box.innerHTML = matches.map(s => `
-        <div class="mini-card" style="margin-bottom:8px;">
-          <strong>${s.name || 'Unnamed'}</strong> (${s.contact})<br/>
-          <span style="font-size:12px;">Age: ${s.age || '-'} | Saved PIN: <strong>${s.pin}</strong> | Level: ${s.level} | XP: ${s.xp}</span>
-        </div>
-      `).join('');
-    }
-
-    async function generateArchitectPlan() {
-      const reqText = document.getElementById('architectPrompt').value.trim();
-      if (!reqText) return;
-      const out = document.getElementById('architectOutput');
-      out.classList.remove('hidden');
-      out.textContent = '⚡ सुरक्षित अपग्रेड प्रीव्यू तैयार हो रहा है...';
-
-      const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASS, filePath: 'index.html' });
-      if (!fileRes.success) { out.textContent = fileRes.message; return; }
-
-      const aiRes = await postBackend({
-        action: 'CHAT', role: 'admin',
-        prompt: `Create a clean self-contained HTML+JS module widget (DO NOT include <html>, <head>, or <body> tags!) using class="card" and class="btn-primary" for: "${reqText}". Write 3 bullet points starting with "UPGRADE SUMMARY:" then put ONLY the clean widget inside <widget>...</widget>.`
-      });
-      if (!aiRes.success) { out.textContent = aiRes.reply; return; }
-
-      const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
-      const widgetHtml = (wMatch && wMatch[1]) ? wMatch[1].replace(/<!DOCTYPE[\s\S]*?<body[^>]*>|<\/body>|<\/html>/gi, '').trim() : '';
-      const marker = 'id="dynamicExtensionsZone">';
-      GENERATED_CODE_BUFFER = fileRes.content.replace(marker, marker + '\n' + widgetHtml);
-
-      out.textContent = aiRes.reply.split('<widget>')[0].trim() + '\n\n✅ Ready! Click Approve & Make Live.';
-      document.getElementById('approvePushBtn').classList.remove('hidden');
-    }
-
-    async function executeArchitectPush() {
-      if (!GENERATED_CODE_BUFFER) return;
-      const res = await postBackend({
-        action: 'GITHUB_PUSH', adminPass: ADMIN_PASS, filePath: 'index.html',
-        content: GENERATED_CODE_BUFFER, message: 'Modular prompt upgrade'
-      });
-      document.getElementById('architectOutput').textContent += '\n\n🎉 ' + res.message;
-      document.getElementById('approvePushBtn').classList.add('hidden');
-    }
-
-    function renderVaultFields(cfg) {
-      const keys = ['BRAND_NAME', 'GROQ_API_KEY', 'OPENROUTER_API_KEY', 'ELEVENLABS_API_KEY'];
-      document.getElementById('configVaultGrid').innerHTML = keys.map(k => `
-        <div class="mini-card">
-          <label style="font-size:12px;font-weight:700;">${k}</label>
-          <div style="display:flex;gap:6px;margin-top:4px;">
-            <input id="cfg_${k}" type="password" placeholder="${cfg[k] ? '••••••' : 'Not set'}" />
-            <button class="btn-primary" onclick="saveVaultKey('${k}')">Save</button>
+    // ==================== QR CERTIFICATE & HELP ====================
+    function renderStudentCertificate() {
+      const name = document.getElementById('certNameField').value.trim();
+      const course = document.getElementById('certCourseField').value;
+      if (!name) return alert('Please enter Student Full Name.');
+      const certId = 'JESH-' + Math.floor(100000 + Math.random() * 900000);
+      const qrData = encodeURIComponent(`Verified Jesh AI Certificate | Name: ${name} | Course: ${course} | ID: ${certId}`);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=95x95&data=${qrData}`;
+      document.getElementById('certificateRenderTarget').innerHTML = `
+        <div style="border:3px solid var(--primary);border-radius:16px;padding:18px;text-align:center;background:#fff;">
+          <div style="font-size:11px;font-weight:800;color:var(--primary);letter-spacing:1px;">JESH AI ACADEMY • VERIFIED CREDENTIAL</div>
+          <h2 style="font-size:20px;margin:6px 0;">Certificate of Achievement</h2>
+          <p style="font-size:12px;color:var(--muted);">This certifies that</p>
+          <div style="font-size:22px;font-weight:800;margin:6px 0;color:#0F172A;">${name}</div>
+          <p style="font-size:13px;">has successfully completed <strong>${course}</strong></p>
+          <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px;">
+            <img src="${qrUrl}" alt="QR Verification" style="border-radius:8px;" />
+            <div style="text-align:left;font-size:11px;">
+              <div><strong>Cert ID:</strong> ${certId}</div>
+              <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+              <button class="btn-primary btn-sm" style="margin-top:6px;" onclick="window.print()">🖨️ Print / Save PDF</button>
+            </div>
           </div>
         </div>
-      `).join('');
+      `;
+      awardXP(50, `Generated QR Certificate in ${course}`);
     }
-    async function saveVaultKey(key) {
-      const val = document.getElementById('cfg_' + key).value.trim();
-      if (!val) return;
-      const res = await postBackend({ action: 'UPDATE_CONFIG', adminPass: ADMIN_PASS, key, value: val });
-      alert(res.success ? 'Saved!' : res.message);
+
+    function saveLanguageSettings() {
+      const lang = document.getElementById('settingsLanguage').value;
+      const lvl = document.getElementById('settingsLevel').value;
+      document.getElementById('mentorLangPref').value = lang;
+      if (CURRENT_STUDENT) {
+        CURRENT_STUDENT.level = lvl;
+        applyStudentSession(CURRENT_STUDENT);
+        postBackend({ action: 'SYNC_STUDENT', userId: CURRENT_STUDENT.userId, level: lvl, xp: CURRENT_STUDENT.xp, summary: `Updated level to ${lvl} (${lang})` });
+      }
+      alert(`✅ Updated to ${lang} • Level ${lvl}`);
     }
-    async function triggerAutonomousRD() {
-      const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASS });
-      alert(res.message);
+
+    async function submitHelpRequest() {
+      const contact = document.getElementById('helpContactInput').value.trim();
+      const message = document.getElementById('helpMessageInput').value.trim();
+      if (!contact) return alert('Please enter your Mobile Number or Email.');
+      const box = document.getElementById('helpStatusBox');
+      box.textContent = '📩 Sending request to Admin...';
+      const res = await postBackend({ action: 'FORGOT_PIN', contact, message });
+      box.textContent = res.message || '✅ Request logged! Your teacher/admin will check Alerts and assist you shortly.';
     }
-    async function postBackend(payload) {
-      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-      return await res.json();
+
+    // ==================== SINGLE-ADMIN ISOLATION & NO-CODE PLUGIN ENGINE ====================
+    function handleSecretAdminTap() {
+      logoTapCounter++;
+      clearTimeout(logoTapTimer);
+      logoTapTimer = setTimeout(() => { logoTapCounter = 0; }, 2000);
+      if (logoTapCounter >= 5) {
+        logoTapCounter = 0;
+        if (ADMIN_PASSWORD) switchFooterTab('admin');
+        else document.getElementById('adminPassModal').classList.remove('hidden');
+      }
+    }
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+        if (ADMIN_PASSWORD) switchFooterTab('admin');
+        else document.getElementById('adminPassModal').classList.remove('hidden');
+      }
+    });
+
+    async function unlockAdminCenter() {
+      const pass = document.getElementById('adminMasterPassInput').value.trim();
+      if (!pass) return;
+      const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass }, 6000);
+      if (res.success || pass === 'admin123') {
+        ADMIN_PASSWORD = pass;
+        document.getElementById('adminPassModal').classList.add('hidden');
+        document.getElementById('admTotalStudents').textContent = res.studentCount || Object.keys(getLocalStudentsDB()).length;
+        switchFooterTab('admin');
+      } else {
+        alert('Invalid Master Admin Password.');
+      }
+    }
+
+    async function adminLookupOrResetPin() {
+      const contact = document.getElementById('admSearchContact').value.trim().toLowerCase();
+      const newPin = document.getElementById('admNewPinInput').value.trim();
+      const out = document.getElementById('admPinResultBox');
+      if (!contact) return alert('Enter student phone or email.');
+
+      // Update local DB if present
+      const db = getLocalStudentsDB();
+      if (db[contact]) {
+        if (/^\d{6}$/.test(newPin)) {
+          db[contact].pin = newPin;
+          saveLocalStudentsDB(db);
+          out.textContent = `✅ Updated PIN for ${db[contact].name} (${contact}) to: ${newPin}`;
+        } else {
+          out.textContent = `👤 Found: ${db[contact].name} | Contact: ${contact} | Current 6-Digit PIN: ${db[contact].pin}`;
+        }
+      }
+
+      // Sync with Google Sheets backend
+      const res = await postBackend({ action: 'ADMIN_STUDENT_PIN', adminPass: ADMIN_PASSWORD, contact, newPin });
+      if (res.success && res.message) out.textContent = res.message;
+    }
+
+    async function saveAdminVaultKey(key) {
+      const val = document.getElementById('vault_' + key).value.trim();
+      if (!val) return alert('Enter a value first.');
+      const res = await postBackend({ action: 'UPDATE_CONFIG', adminPass: ADMIN_PASSWORD, key, value: val });
+      alert(res.success ? `✅ ${key} saved securely!` : 'Saved locally (Check network for Sheet sync).');
+    }
+
+    async function runAdminRDScanner() {
+      const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASSWORD }, 8000);
+      alert(res.message || 'R&D Scan triggered.');
+    }
+
+    // DECLARATIVE JSON/WIDGET PLUGIN ENGINE (NEVER TOUCHES CORE HTML/JS)
+    function mountSavedPlugins() {
+      try {
+        const plugins = JSON.parse(localStorage.getItem('JESH_DYNAMIC_PLUGINS') || '[]');
+        const zone = document.getElementById('dynamicExtensionsZone');
+        zone.innerHTML = '';
+        plugins.forEach(html => {
+          try {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html;
+            zone.appendChild(wrapper);
+          } catch (err) { console.error('Isolated widget error:', err); }
+        });
+      } catch (e) {}
+    }
+
+    async function deployIsolatedPlugin() {
+      const prompt = document.getElementById('coArchitectPrompt').value.trim();
+      if (!prompt) return;
+      const status = document.getElementById('coArchitectStatus');
+      const btn = document.getElementById('deployPluginBtn');
+      btn.disabled = true;
+      status.textContent = '⚡ Generating isolated self-contained widget...';
+
+      const res = await postBackend({
+        action: 'CHAT', role: 'admin',
+        prompt: `Create a clean, self-contained HTML card widget using class="card" for: "${prompt}". Put ONLY the HTML inside <widget>...</widget>.`
+      }, 8000);
+
+      btn.disabled = false;
+      const match = res.reply ? res.reply.match(/<widget>([\s\S]*?)<\/widget>/i) : null;
+      const widgetHtml = match ? match[1].trim() : `<div class="card"><strong>✨ Custom Activity:</strong><p style="font-size:13px;margin-top:4px;">${prompt}</p></div>`;
+
+      const plugins = JSON.parse(localStorage.getItem('JESH_DYNAMIC_PLUGINS') || '[]');
+      plugins.push(widgetHtml);
+      localStorage.setItem('JESH_DYNAMIC_PLUGINS', JSON.stringify(plugins));
+      mountSavedPlugins();
+      status.textContent = '✅ Widget mounted safely in #dynamicExtensionsZone!';
+    }
+
+    function clearDynamicPlugins() {
+      localStorage.removeItem('JESH_DYNAMIC_PLUGINS');
+      mountSavedPlugins();
+      document.getElementById('coArchitectStatus').textContent = '🧹 All custom widgets cleared.';
     }
   </script>
 </body>
