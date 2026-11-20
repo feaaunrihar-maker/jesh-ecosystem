@@ -328,6 +328,139 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+<div class="card" style="padding:20px; max-width:800px; margin:auto;">
+  <h2>Interactive Quest‑Based Learning Hub</h2>
+  
+  <!-- Course List -->
+  <div id="course-list" style="display:flex; flex-wrap:wrap; gap:15px;">
+    <div class="mini-card" data-course="HTML Basics" data-points="50">
+      <h4>HTML Basics</h4>
+      <p>Start your web adventure.</p>
+      <button class="btn-primary start-btn">Start Quest</button>
+    </div>
+    <div class="mini-card" data-course="JavaScript Intro" data-points="70">
+      <h4>JavaScript Intro</h4>
+      <p>Unlock dynamic powers.</p>
+      <button class="btn-primary start-btn">Start Quest</button>
+    </div>
+    <div class="mini-card" data-course="Python Fundamentals" data-points="80">
+      <h4>Python Fundamentals</h4>
+      <p>Code your first script.</p>
+      <button class="btn-primary start-btn">Start Quest</button>
+    </div>
+  </div>
+
+  <!-- Progress & Rewards -->
+  <div id="progress-panel" style="margin-top:30px; display:none;">
+    <h3 id="current-course"></h3>
+    <p id="hint"></p>
+    <button class="btn-primary" id="complete-btn">Complete Challenge</button>
+  </div>
+
+  <!-- Leaderboard -->
+  <div style="margin-top:30px;">
+    <h3>Class Leaderboard</h3>
+    <table id="leaderboard" style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr><th style="text-align:left;">Student</th><th style="text-align:right;">Points</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- QR Certificate -->
+  <div id="certificate" style="margin-top:30px; display:none;">
+    <h3>Congratulations!</h3>
+    <p>You earned a QR certificate for completing <span id="cert-course"></span>.</p>
+    <canvas id="qr-canvas" width="150" height="150" style="border:1px solid #ccc;"></canvas>
+  </div>
+</div>
+
+<script>
+// Simple in‑memory data (replace with real backend later)
+const studentName = "You"; // In a real app, fetch logged‑in user
+let points = 0;
+let completedCourses = [];
+
+// Initialize leaderboard with dummy data
+const leaderboardData = [
+  { name: "Alice", points: 120 },
+  { name: "Bob", points: 95 },
+  { name: studentName, points: points }
+];
+
+function renderLeaderboard() {
+  const tbody = document.querySelector("#leaderboard tbody");
+  tbody.innerHTML = "";
+  // Sort descending
+  const sorted = [...leaderboardData].sort((a,b)=>b.points-a.points);
+  sorted.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${row.name}</td><td style="text-align:right;">${row.points}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// Simple hint generator
+function getHint(course) {
+  const hints = {
+    "HTML Basics": "Remember tags are written inside < >.",
+    "JavaScript Intro": "Use console.log() to see output.",
+    "Python Fundamentals": "Indentation matters!"
+  };
+  return hints[course] || "Good luck!";
+}
+
+// QR generation (basic data URL)
+function generateQR(text) {
+  const canvas = document.getElementById("qr-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Very simple placeholder QR (black squares)
+  ctx.fillStyle = "#000";
+  for(let i=0;i<25;i++){
+    for(let j=0;j<25;j++){
+      if(Math.random()>0.7){
+        ctx.fillRect(i*6, j*6, 5,5);
+      }
+    }
+  }
+  // In production replace with a QR library.
+}
+
+// Event listeners
+document.querySelectorAll(".start-btn").forEach(btn=>{
+  btn.addEventListener("click", e=>{
+    const card = e.target.closest(".mini-card");
+    const course = card.dataset.course;
+    const reward = parseInt(card.dataset.points);
+    document.getElementById("current-course").textContent = `Quest: ${course}`;
+    document.getElementById("hint").textContent = getHint(course);
+    document.getElementById("progress-panel").style.display = "block";
+    document.getElementById("complete-btn").dataset.course = course;
+    document.getElementById("complete-btn").dataset.reward = reward;
+  });
+});
+
+document.getElementById("complete-btn").addEventListener("click", e=>{
+  const course = e.target.dataset.course;
+  const reward = parseInt(e.target.dataset.reward);
+  points += reward;
+  completedCourses.push(course);
+  // Update leaderboard entry for this student
+  const entry = leaderboardData.find(o=>o.name===studentName);
+  if(entry) entry.points = points; else leaderboardData.push({name:studentName, points});
+  renderLeaderboard();
+  // Show certificate
+  document.getElementById("cert-course").textContent = course;
+  document.getElementById("certificate").style.display = "block";
+  generateQR(`${studentName}-${course}-${Date.now()}`);
+  // Reset UI
+  document.getElementById("progress-panel").style.display = "none";
+});
+
+renderLeaderboard();
+</script>
 <div class="card" style="max-width: 500px; margin: 20px auto; padding: 20px;">
     <h2>Master Vision Blueprint</h2>
     <ol>
