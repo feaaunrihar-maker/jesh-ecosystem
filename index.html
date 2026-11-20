@@ -33,7 +33,7 @@
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
       text-decoration: none;
     }
-    button:active, .btn-label:active { transform: scale(0.98); }
+    button:active, .btn-label:active { transform: scale(0.97); }
     .btn-primary { background: var(--primary); color: #FFFFFF; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-dark { background: var(--dark); color: #FFFFFF; }
@@ -116,60 +116,46 @@
 
     /* CHAT MESSAGES */
     .chat-messages {
-      height: 250px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+      height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
       background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px;
     }
     .msg-ai { background: #FFFFFF; border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-start; font-size: 14px; line-height: 1.5; white-space: pre-line; }
     .msg-user { background: var(--primary); color: #FFFFFF; padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-end; font-size: 14px; }
 
-    /* TRUE 50/50 SPLIT-SCREEN FACE-TO-FACE VIDEO CALL */
+    /* FULL-SCREEN IMMERSIVE 50/50 VIDEO CALL */
     .dark-studio { background: #0F172A; color: #F8FAFC; border-radius: 18px; padding: 14px; }
-    .split-call-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+    .dark-studio.fullscreen-call {
+      position: fixed; inset: 0; z-index: 95; border-radius: 0; padding: 12px;
+      display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;
     }
-    @media (max-width: 600px) {
+    .split-call-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; margin-bottom: 10px;
+    }
+    @media (max-width: 640px) {
       .split-call-grid { grid-template-columns: 1fr; }
     }
     .call-tile {
-      position: relative; background: #1E293B; border-radius: 16px; border: 2px solid #334155;
-      min-height: 230px; overflow: hidden; display: flex; flex-direction: column;
+      position: relative; background: #1E293B; border-radius: 18px; border: 2px solid #334155;
+      min-height: 240px; overflow: hidden; display: flex; flex-direction: column;
       align-items: center; justify-content: center; padding: 12px;
     }
-    .call-tile.speaking-glow { border-color: #10B981; box-shadow: 0 0 24px rgba(16,185,129,0.45); }
+    .call-tile.speaking-glow { border-color: #10B981; box-shadow: 0 0 28px rgba(16,185,129,0.5); }
     .tile-badge {
       position: absolute; top: 10px; left: 10px; background: rgba(15,23,42,0.85);
       color: #F8FAFC; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; z-index: 5;
     }
     .timer-badge {
-      position: absolute; top: 10px; right: 10px; background: rgba(5,150,105,0.9);
+      position: absolute; top: 10px; right: 10px; background: rgba(5,150,105,0.92);
       color: #FFFFFF; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 800; z-index: 5;
     }
 
-    /* AVATAR WITH REAL-TIME LIP-SYNC MOUTH OVERLAY */
-    .avatar-face-wrap {
-      position: relative; width: 132px; height: 132px; border-radius: 50%;
+    /* REAL PHOTO CANVAS LIP-WARP & HEAD MIRRORING */
+    .avatar-canvas-frame {
+      position: relative; width: 170px; height: 170px; border-radius: 50%;
       overflow: hidden; border: 3px solid #4F46E5; background: #0F172A; margin-bottom: 8px;
-      transition: transform 0.2s ease;
+      transition: transform 0.12s ease-out; cursor: crosshair;
     }
-    .avatar-face-wrap.head-nod { animation: headMotion 0.55s infinite alternate ease-in-out; }
-    @keyframes headMotion { from { transform: rotate(-2deg) scale(1.01); } to { transform: rotate(2deg) scale(1.04); } }
-    .avatar-face-wrap img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* Animated Talking Mouth Overlay on Photo/Avatar */
-    .lip-sync-mouth {
-      position: absolute; bottom: 24%; left: 50%; transform: translateX(-50%);
-      width: 26px; height: 6px; background: #7F1D1D; border: 2px solid #FCA5A5;
-      border-radius: 50%; opacity: 0; transition: height 0.08s ease;
-    }
-    .lip-sync-mouth.talking {
-      opacity: 0.92;
-      animation: mouthFlap 0.22s infinite alternate;
-    }
-    @keyframes mouthFlap {
-      0% { height: 5px; width: 22px; }
-      50% { height: 16px; width: 26px; }
-      100% { height: 9px; width: 24px; }
-    }
+    #avatarWarpCanvas { width: 100%; height: 100%; display: block; }
 
     .student-cam-video {
       position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
@@ -179,22 +165,51 @@
       color: #FFFFFF; font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center;
     }
     .subtitle-overlay {
-      background: rgba(2,6,23,0.88); color: #F8FAFC; padding: 8px 12px; border-radius: 10px;
-      font-size: 13px; text-align: center; width: 100%; line-height: 1.4; z-index: 4;
+      background: rgba(2,6,23,0.9); color: #F8FAFC; padding: 8px 12px; border-radius: 12px;
+      font-size: 13px; text-align: center; width: 100%; line-height: 1.45; z-index: 4;
     }
+
+    /* LIVE SOUND WAVE INDICATOR (LISTENING & RECORDING) */
+    .live-wave-bar {
+      display: inline-flex; align-items: center; gap: 3px; height: 18px; vertical-align: middle; margin-right: 6px;
+    }
+    .live-wave-bar span {
+      display: block; width: 3px; height: 6px; background: #10B981; border-radius: 2px;
+      animation: waveBounce 0.5s infinite ease-in-out;
+    }
+    .live-wave-bar span:nth-child(2) { animation-delay: 0.1s; }
+    .live-wave-bar span:nth-child(3) { animation-delay: 0.2s; }
+    .live-wave-bar span:nth-child(4) { animation-delay: 0.3s; }
+    .live-wave-bar span:nth-child(5) { animation-delay: 0.15s; }
+    @keyframes waveBounce {
+      0%, 100% { height: 5px; }
+      50% { height: 18px; }
+    }
+
+    /* DUOLINGO-STYLE PATH NODES & INTERACTIVE READALONG WORDS */
+    .path-node {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px; border-radius: 14px; border: 2px solid var(--border); background: #FFFFFF; margin-bottom: 10px;
+    }
+    .path-node.completed { border-color: #10B981; background: #ECFDF5; }
+    .path-node.active-node { border-color: var(--primary); background: #EEF2FF; }
+    .tap-word {
+      display: inline-block; padding: 2px 5px; border-radius: 6px; cursor: pointer;
+      border-bottom: 1.5px dashed #94A3B8; margin: 2px 1px; transition: 0.12s;
+    }
+    .tap-word:hover { background: #EEF2FF; color: var(--primary); }
 
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15,23,42,0.75); backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+      display: flex; align-items: center; justify-content: center; z-index: 120; padding: 16px;
     }
     .modal-box { background: #FFFFFF; border-radius: 18px; padding: 22px; max-width: 430px; width: 100%; }
   </style>
-  <!-- Future Prompt-Driven CSS Slot -->
   <style id="dynamicCustomCSS"></style>
 </head>
 <body>
 
-  <!-- ==================== 1. FULL-SCREEN LOGIN & CREATE ACCOUNT GATE ==================== -->
+  <!-- ==================== 1. LOGIN & CREATE ACCOUNT GATE ==================== -->
   <section id="authGate" class="auth-gate">
     <div class="auth-card">
       <div style="text-align:center;margin-bottom:16px;">
@@ -285,25 +300,25 @@
               <h2 style="font-size:18px;margin-top:2px;">नमस्ते, <span id="dashGreetingName">Learner</span>!</h2>
               <p id="adaptiveSkillBadge" style="font-size:12px;color:var(--muted);margin-top:4px;">Level: A1 Beginner • Grammar: A1 | Math: L1 | Logic: L1</p>
             </div>
-            <button class="btn-primary" onclick="openFullScreen('studio')">📹 लाइव वीडियो कॉल शुरू करें</button>
+            <button class="btn-primary" onclick="openFullScreen('studio')">📹 Full-Screen वीडियो कॉल शुरू करें</button>
           </div>
         </div>
 
         <div class="grid-2" style="margin-bottom:14px;">
           <div class="module-card" style="border-color:#10B981;background:#ECFDF5;" onclick="openFullScreen('studio')">
             <span style="font-size:26px;">📹</span>
-            <strong style="font-size:16px;">JeshLive 50/50 Video Tutor</strong>
-            <span style="font-size:12px;color:#065F46;">आमने-सामने लाइव बात करें, टीचर का नाम व आवाज़ बदलें</span>
+            <strong style="font-size:16px;">JeshLive Video Tutor</strong>
+            <span style="font-size:12px;color:#065F46;">Full-Screen 50/50 कॉल, असली फोटो लिप-सिंक व हेड मिररिंग</span>
           </div>
           <div class="module-card" onclick="openFullScreen('lingo')">
-            <span style="font-size:26px;">🌍</span>
-            <strong style="font-size:16px;">JeshLingo</strong>
-            <span style="font-size:12px;color:var(--muted);">20+ भाषाएँ और बोलचाल के आसान कार्ड्स</span>
+            <span style="font-size:26px;">🦉</span>
+            <strong style="font-size:16px;">JeshLingo (Duolingo Path)</strong>
+            <span style="font-size:12px;color:var(--muted);">स्टेप-बाय-स्टेप लर्निंग रोडमैप, क्विज़, हार्ट्स और फ्लैशकार्ड्स</span>
           </div>
           <div class="module-card" onclick="openFullScreen('read')">
             <span style="font-size:26px;">📖</span>
             <strong style="font-size:16px;">JeshRead Studio</strong>
-            <span style="font-size:12px;color:var(--muted);">बोलकर पढ़ें और रियल-टाइम उच्चारण सुधारें</span>
+            <span style="font-size:12px;color:var(--muted);">कस्टम कहानियाँ, 1-टैप शब्दार्थ और बोलकर पढ़ने का अभ्यास</span>
           </div>
           <div class="module-card" onclick="openFullScreen('academy')">
             <span style="font-size:26px;">🎓</span>
@@ -313,7 +328,7 @@
         </div>
 
         <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">💬 Personal AI Mentor (आपके स्तर के अनुसार सिखाता और बढ़ाता है)</strong>
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">💬 Personal AI Mentor (आपके स्तर के अनुसार सिखाता और आगे बढ़ाता है)</strong>
           <div id="tutorChatFeed" class="chat-messages">
             <div class="msg-ai">👋 नमस्ते! आप मुझसे English, Hindi, Math या Computer का कोई भी सवाल पूछ सकते हैं।</div>
           </div>
@@ -323,218 +338,22 @@
           </div>
         </div>
 
-        <!-- FUTURE PROMPT-DRIVEN WIDGETS & SCRIPTS ZONE -->
-        <div id="dynamicExtensionsZone">
-
-
-<div class="card" id="avatarStudioCard" style="padding:1rem; max-width:320px;">
-    <h3 style="margin-top:0;">Lip‑Sync Fine‑Tuner</h3>
-
-    <label for="lipVertSlider">Vertical Position (होंठ ऊपर/नीचे)</label>
-    <input type="range" id="lipVertSlider" min="-30" max="30" value="0" style="width:100%;">
-
-    <label for="lipWidthSlider" style="margin-top:0.5rem;">Mouth Width (आकार)</label>
-    <input type="range" id="lipWidthSlider" min="50" max="150" value="100" style="width:100%;">
-
-    <button id="testLipBtn" class="btn-primary" style="margin-top:0.75rem; width:100%;">👄 Test Lip Position</button>
-  </div>
-
-  <script>
-    // ---------- Utility: Face detection (native + fallback) ----------
-    async function detectFace(img) {
-      // Try native FaceDetector
-      if ('FaceDetector' in window) {
-        try {
-          const detector = new FaceDetector({ fastMode: true });
-          const faces = await detector.detect(img);
-          if (faces.length) return faces[0].boundingBox;
-        } catch (e) { console.warn('FaceDetector error:', e); }
-      }
-
-      // ----- Simple skin‑tone fallback (very rough) -----
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      ctx.drawImage(img, 0, 0);
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-      // Scan for a cluster of skin‑like pixels (HSV approx 0‑50° hue, 0.2‑0.6 sat, 0.4‑0.9 val)
-      let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0, count = 0;
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          const i = (y * canvas.width + x) * 4;
-          const r = data[i], g = data[i + 1], b = data[i + 2];
-          // Convert to HSV quickly
-          const max = Math.max(r, g, b), min = Math.min(r, g, b);
-          const v = max / 255;
-          const delta = max - min;
-          const s = max ? delta / max : 0;
-          const hue = delta ? (() => {
-            switch (max) {
-              case r: return ((g - b) / delta) % 6;
-              case g: return ((b - r) / delta) + 2;
-              case b: return ((r - g) / delta) + 4;
-            }
-          })() * 60 : 0;
-          const h = hue < 0 ? hue + 360 : hue;
-
-          // Rough skin range
-          if (h >= 0 && h <= 50 && s >= 0.2 && s <= 0.6 && v >= 0.4 && v <= 0.9) {
-            count++;
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-          }
-        }
-      }
-      if (count > 500) { // arbitrary threshold
-        return {
-          x: minX,
-          y: minY,
-          width: maxX - minX,
-          height: maxY - minY
-        };
-      }
-      // Fallback to centre of image
-      return {
-        x: canvas.width * 0.25,
-        y: canvas.height * 0.25,
-        width: canvas.width * 0.5,
-        height: canvas.height * 0.5
-      };
-    }
-
-    // ---------- Apply lip‑sync geometry ----------
-    async function positionMouthFromFace() {
-      const img = document.getElementById('avatarPhotoPreview');
-      if (!img) return;
-      const box = await detectFace(img);
-      const stage = document.getElementById('avatarStage');
-      const mouth = document.getElementById('lipSyncMouth');
-      if (!stage || !mouth) return;
-
-      // Convert image coordinates to stage coordinates (assume same size)
-      const stageRect = stage.getBoundingClientRect();
-
-      const faceTop = box.y;
-      const faceHeight = box.height;
-      const faceWidth = box.width;
-      const faceCenterX = box.x + faceWidth / 2;
-
-      // Base lip geometry
-      const lipTop = faceTop + faceHeight * 0.74;
-      const lipWidth = faceWidth * 0.24;
-
-      // Apply saved manual offsets (if any)
-      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || '{}');
-      const avatarKey = img.dataset.avatarId || 'default';
-      const avatarAdjust = saved[avatarKey] || {};
-
-      const finalTop = lipTop + (avatarAdjust.lipTop || 0);
-      const finalLeft = faceCenterX - (lipWidth / 2) + (avatarAdjust.lipLeft || 0);
-      const finalWidth = lipWidth * (avatarAdjust.lipScale || 1);
-
-      // Position the mouth element (assumes absolute positioning inside #avatarStage)
-      mouth.style.position = 'absolute';
-      mouth.style.top = `${finalTop}px`;
-      mouth.style.left = `${finalLeft}px`;
-      mouth.style.width = `${finalWidth}px`;
-      mouth.style.height = 'auto'; // keep aspect ratio
-    }
-
-    // ---------- Hook image load ----------
-    const avatarImg = document.getElementById('avatarPhotoPreview');
-    if (avatarImg) {
-      avatarImg.addEventListener('load', () => {
-        positionMouthFromFace();
-      });
-    }
-
-    // ---------- Slider handling ----------
-    const vertSlider = document.getElementById('lipVertSlider');
-    const widthSlider = document.getElementById('lipWidthSlider');
-    const testBtn = document.getElementById('testLipBtn');
-
-    // Load saved adjustments for current avatar
-    function loadAdjustments() {
-      const img = document.getElementById('avatarPhotoPreview');
-      if (!img) return;
-      const avatarKey = img.dataset.avatarId || 'default';
-      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || '{}');
-      const adj = saved[avatarKey] || { lipTop: 0, lipLeft: 0, lipScale: 1 };
-      vertSlider.value = adj.lipTop;
-      widthSlider.value = adj.lipScale * 100; // store as percent
-    }
-
-    // Save adjustments
-    function saveAdjustments() {
-      const img = document.getElementById('avatarPhotoPreview');
-      if (!img) return;
-      const avatarKey = img.dataset.avatarId || 'default';
-      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || '{}');
-      saved[avatarKey] = {
-        lipTop: parseInt(vertSlider.value, 10),
-        lipLeft: 0, // left offset not exposed in UI (could be added later)
-        lipScale: parseInt(widthSlider.value, 10) / 100
-      };
-      localStorage.setItem('JESH_DEFAULT_TEACHER', JSON.stringify(saved));
-    }
-
-    testBtn.addEventListener('click', () => {
-      // Apply temporary offsets for preview
-      const mouth = document.getElementById('lipSyncMouth');
-      if (!mouth) return;
-      const currentTop = parseFloat(mouth.style.top) || 0;
-      const currentWidth = parseFloat(mouth.style.width) || 0;
-
-      const newTop = currentTop + parseInt(vertSlider.value, 10);
-      const newWidth = currentWidth * (parseInt(widthSlider.value, 10) / 100);
-
-      mouth.style.top = `${newTop}px`;
-      mouth.style.width = `${newWidth}px`;
-
-      // Persist after 2 seconds
-      setTimeout(() => {
-        saveAdjustments();
-        // Re‑run auto‑position to combine base + saved offsets
-        positionMouthFromFace();
-      }, 2000);
-    });
-
-    // Initialise sliders when avatar is ready
-    if (avatarImg) {
-      avatarImg.addEventListener('load', loadAdjustments);
-    }
-
-    // ---------- Mic‑status pill patch ----------
-    (function () {
-      const original = window.startLiveVideoCall;
-      if (typeof original === 'function') {
-        window.startLiveVideoCall = function (...args) {
-          const pill = document.getElementById('micListeningPill');
-          if (pill) pill.textContent = '🔴 सुन रहा हूँ... बोलिए!';
-          return original.apply(this, args);
-        };
-      }
-    })();
-  </script></div>
+        <div id="dynamicExtensionsZone"></div>
       </section>
 
-      <!-- JESHLIVE 50/50 SPLIT-SCREEN VIDEO CALL & AVATAR STUDIO -->
+      <!-- JESHLIVE FULL-SCREEN 50/50 VIDEO CALL & AVATAR STUDIO -->
       <section id="scr-studio" class="app-screen hidden">
-        <div class="dark-studio" style="margin-bottom:14px;">
+        <div id="videoCallContainer" class="dark-studio" style="margin-bottom:14px;">
 
-          <!-- QUICK CALLER & LANGUAGE SWITCHER BAR -->
+          <!-- TOP CALLER & LANGUAGE SWITCHER -->
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <select id="quickCallerSelect" onchange="switchCallerFromDropdown()" style="width:auto;min-height:40px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
+            <select id="quickCallerSelect" onchange="switchCallerFromDropdown()" style="width:auto;min-height:42px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
               <option value="didi">👩‍🏫 Didi-Mentor (Warm Hindi+Eng)</option>
               <option value="arjun">🧑‍🏫 Coach Arjun (Motivational)</option>
               <option value="robo">🤖 Robo-Guru (Tech & Logic)</option>
             </select>
 
-            <select id="callLanguageMode" onchange="updateCallLanguageMode()" style="width:auto;min-height:40px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
+            <select id="callLanguageMode" onchange="updateCallLanguageMode()" style="width:auto;min-height:42px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
               <option value="hinglish">🇮🇳 हिंदी + बीच में English</option>
               <option value="english">🌍 Only English Practice</option>
               <option value="bhojpuri">🏡 भोजपुरी + English</option>
@@ -543,41 +362,41 @@
 
           <!-- 50/50 FACE-TO-FACE SPLIT SCREEN -->
           <div class="split-call-grid">
-            <!-- PANEL 1: AI TUTOR AVATAR WITH LIP-SYNC -->
+            <!-- PANEL 1: AI TUTOR CANVAS (REAL PHOTO LIP-WARP + HEAD MIRRORING) -->
             <div id="aiTutorTile" class="call-tile">
               <span class="tile-badge" id="activeAvatarTitle">👩‍🏫 Didi-Mentor</span>
               <span class="timer-badge" id="callTimer">00:00</span>
 
-              <div id="avatarStage" class="avatar-face-wrap">
-                <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor" alt="AI Teacher" />
-                <div id="lipSyncMouth" class="lip-sync-mouth"></div>
+              <div id="avatarCanvasFrame" class="avatar-canvas-frame" onclick="calibrateLipOnCanvasTap(event)" title="होंठ की सही जगह सेट करने के लिए फोटो के होंठ पर टच करें">
+                <canvas id="avatarWarpCanvas" width="240" height="240"></canvas>
               </div>
+              <div style="font-size:10px;color:#94A3B8;margin-bottom:6px;">💡 Tip: फोटो के होंठ पर 1 बार टच करके लिप-सिंक लॉक करें</div>
 
               <div class="subtitle-overlay" id="avatarReplyCaption">
-                👋 "Start Call" दबाएं—मैं अपना परिचय दूँगी और आपसे बात करूँगी!
+                👋 "Start Call" दबाएं—मैं Full-Screen में आपसे आमने-सामने बात करूँगी!
               </div>
             </div>
 
-            <!-- PANEL 2: STUDENT LIVE MIRROR CAMERA -->
+            <!-- PANEL 2: STUDENT LIVE MIRROR CAMERA + HEAD MOTION TRACKER -->
             <div class="call-tile">
               <span class="tile-badge" id="studentCamBadge">🎥 आप (Live)</span>
               <video id="selfCameraVideo" autoplay muted playsinline class="student-cam-video hidden"></video>
               <div id="pipInitials" class="cam-initials-circle">YOU</div>
-              <div id="micListeningPill" style="position:absolute;bottom:10px;background:rgba(15,23,42,0.85);padding:4px 12px;border-radius:99px;font-size:11px;color:#94A3B8;z-index:4;">
-                माइक तैयार है
+              <div id="micListeningPill" style="position:absolute;bottom:10px;background:rgba(15,23,42,0.9);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;color:#94A3B8;z-index:4;">
+                कॉल शुरू करने के लिए तैयार
               </div>
             </div>
           </div>
 
-          <!-- CLEAN CALL CONTROL BUTTONS -->
-          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <!-- CALL CONTROLS -->
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding-top:4px;">
             <button class="btn-emerald" id="startVideoCallBtn" onclick="startLiveVideoCall()">📞 Start Call</button>
             <button class="btn-outline" id="muteCallBtn" onclick="toggleCallMic()">🎤 Mute</button>
             <button class="btn-outline" id="camToggleBtn" onclick="toggleStudentCamera()">📷 Cam Off</button>
             <button class="btn-rose" onclick="endLiveVideoCall()">📵 End Call</button>
           </div>
 
-          <!-- MANUAL TEXT BAR (AUTO-HIDDEN DURING ACTIVE CALL FOR DISTRACTION-FREE EXPERIENCE) -->
+          <!-- MANUAL TEXT BAR -->
           <div id="manualCallTextBar" class="input-row" style="margin-top:12px;">
             <button class="btn-amber" onclick="listenToStudentVoice()">🎙️ बोलें</button>
             <input id="avatarDiscussTopic" type="text" style="background:#1E293B;color:#FFFFFF;border-color:#475569;" placeholder="या यहाँ लिखकर भेजें..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
@@ -585,88 +404,135 @@
           </div>
         </div>
 
-        <!-- CUSTOM TEACHER NAME, PHOTO (CAMERA/GALLERY) & 10-SEC VOICE MODEL STUDIO -->
+        <!-- CUSTOM TEACHER STUDIO (GHIBLI STYLE + LIP TAP + 15S WAVEFORM VOICE MODEL) -->
         <div id="avatarStudioCard" class="card">
-          <h3 style="font-size:16px;margin-bottom:4px;">🎭 अपना टीचर और आवाज़ मॉडल बनाएं (Custom Teacher Studio)</h3>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">टीचर का नाम बदलें, लाइव सेल्फ़ी या गैलरी से फोटो लगाएं, और 10-सेकंड पढ़कर अपनी आवाज़ का मॉडल सेव करें।</p>
+          <h3 style="font-size:16px;margin-bottom:4px;">🎭 अपना टीचर और आवाज़ मॉडल बनाएं</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">अपनी फोटो को Ghibli/Cartoon अवतार बनाएं, फोटो के होंठ पर टच करके लिप-सिंक सेट करें, और लाइव वेव के साथ 15-सेकंड आवाज़ रिकॉर्ड करें।</p>
 
-          <!-- 1. Teacher Name Customizer -->
+          <!-- 1. Teacher Name -->
           <div style="margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">✏️ टीचर का नाम बदलें (आप इन्हें क्या कहकर बुलाना चाहते हैं?)</label>
+            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">✏️ टीचर का नाम बदलें</label>
             <div class="input-row">
-              <input id="customAvatarNameInput" type="text" placeholder="उदा. Priya Didi, Ravi Sir, या मेरा नाम..." />
+              <input id="customAvatarNameInput" type="text" placeholder="उदा. Priya Didi, Ravi Sir, या आपका नाम..." />
               <button class="btn-primary" onclick="applyTeacherNameOnly()">नाम सेव करें</button>
             </div>
           </div>
 
-          <!-- 2. Camera Selfie OR Gallery Photo Upload -->
+          <!-- 2. Photo Upload + Ghibli Style + Lip-Position Fine Tuner -->
           <div style="margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">📸 टीचर का चेहरा चुनें (Camera या Gallery से)</label>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">📸 फोटो और स्टाइल चुनें</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
               <label class="btn-label btn-amber">
                 📷 लाइव कैमरा सेल्फ़ी <input type="file" accept="image/*" capture="user" class="hidden" onchange="uploadCustomAvatar(event)" />
               </label>
               <label class="btn-label btn-outline">
                 🖼️ गैलरी से फोटो चुनें <input type="file" accept="image/*" class="hidden" onchange="uploadCustomAvatar(event)" />
               </label>
+              <button class="btn-primary" onclick="applyGhibliCartoonFilter()">✨ Ghibli / Cartoon स्टाइल</button>
+            </div>
+
+            <!-- Precision Lip Vertical Position Slider -->
+            <div class="mini-card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:12px;font-weight:700;">👄 होंठ की ऊँचाई (Lip Y):</span>
+              <input id="lipYSlider" type="range" min="35" max="88" value="68" oninput="updateLipPositionFromSlider()" style="flex:1;min-width:130px;min-height:32px;" />
+              <button class="btn-outline" style="min-height:36px;padding:4px 10px;font-size:12px;" onclick="testLipMovementPreview()">▶️ टेस्ट करें</button>
             </div>
           </div>
 
-          <!-- 3. 10-Second Guided Voice Model Recorder -->
+          <!-- 3. 15-Second Live Waveform Voice Model Recorder -->
           <div class="mini-card" style="margin-bottom:12px;">
-            <strong style="font-size:13px;display:block;margin-bottom:4px;">🎙️ 10-सेकंड मॉडल आवाज़ रिकॉर्ड करें (Voice Model Training)</strong>
+            <strong style="font-size:13px;display:block;margin-bottom:4px;">🎙️ 15-सेकंड मॉडल आवाज़ रिकॉर्ड करें (Live Audio Wave के साथ)</strong>
             <p style="font-size:12px;color:var(--primary);background:#EEF2FF;padding:8px;border-radius:8px;margin-bottom:8px;">
-              पढ़ें: <em>"नमस्ते! मैं हर दिन कुछ नया सीखता हूँ और पूरे आत्मविश्वास के साथ आगे बढ़ता हूँ। Learning is fun!"</em>
+              पढ़ें: <em>"नमस्ते! मैं हर दिन पूरे आत्मविश्वास के साथ नई चीज़ें सीखता हूँ। अंग्रेजी और कंप्यूटर सीखना मेरे लिए बहुत आसान है। Learning is my superpower!"</em>
             </p>
+            <canvas id="voiceWaveformCanvas" width="320" height="44" style="width:100%;height:44px;background:#0F172A;border-radius:8px;margin-bottom:8px;display:block;"></canvas>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <button id="recordVoiceModelBtn" class="btn-rose" onclick="recordTenSecondVoiceModel()">🔴 10s आवाज़ रिकॉर्ड करें</button>
-              <span id="voiceRecordStatus" style="font-size:12px;font-weight:700;color:var(--muted);">कोई मॉडल आवाज़ रिकॉर्ड नहीं है</span>
+              <button id="recordVoiceModelBtn" class="btn-rose" onclick="recordFifteenSecondVoiceModel()">🔴 15s आवाज़ रिकॉर्ड करें</button>
+              <span id="voiceRecordStatus" style="font-size:12px;font-weight:700;color:var(--muted);">रिकॉर्डिंग के लिए तैयार</span>
             </div>
             <audio id="recordedModelPlayback" controls class="hidden" style="width:100%;margin-top:8px;height:36px;"></audio>
           </div>
 
-          <!-- 4. Save as Default OR Make Public for All Students -->
+          <!-- 4. Save as Default OR Make Public -->
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-emerald" style="flex:1;" onclick="saveCustomAvatarToLocal(true)">⭐ Save & Set as My Default</button>
-            <button class="btn-dark" style="flex:1;" onclick="publishAvatarToCommunity()">🌐 Make Public (सबके लिए पब्लिक करें)</button>
+            <button class="btn-emerald" style="flex:1;" onclick="saveCustomAvatarToLocal(true)">⭐ Save & Set as Default</button>
+            <button class="btn-dark" style="flex:1;" onclick="publishAvatarToCommunity()">🌐 Make Public (सबके लिए पब्लिक)</button>
           </div>
 
-          <!-- Community Public Avatars List -->
-          <div id="communityAvatarsBox" style="margin-top:14px;">
-            <strong style="font-size:13px;display:block;margin-bottom:6px;">🌐 Community Public Teachers (अन्य यूज़र्स द्वारा शेयर किए गए):</strong>
+          <div style="margin-top:14px;">
+            <strong style="font-size:13px;display:block;margin-bottom:6px;">🌐 Community Public Teachers:</strong>
             <div id="communityAvatarsList" class="grid-2"></div>
           </div>
         </div>
       </section>
 
-      <!-- JESHLINGO SCREEN -->
+      <!-- DUOLINGO-STYLE JESHLINGO SCREEN -->
       <section id="scr-lingo" class="app-screen hidden">
         <div class="card">
-          <strong style="font-size:16px;display:block;margin-bottom:8px;">🌍 JeshLingo (भाषा सीखें)</strong>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <div>
+              <strong style="font-size:17px;">🦉 JeshLingo Adaptive Learning Path</strong>
+              <p style="font-size:12px;color:var(--muted);">Duolingo की तरह चरण-दर-चरण अभ्यास करें और अगला लेवल अनलॉक करें</p>
+            </div>
+            <div style="font-weight:800;font-size:13px;color:var(--rose);">❤️❤️❤️❤️❤️ 5 Hearts</div>
+          </div>
+
           <div class="input-row" style="margin-bottom:12px;">
-            <select id="lingoLangSelect" style="max-width:240px;">
+            <select id="lingoLangSelect" style="max-width:220px;">
               <option>English (Global)</option><option>Hindi (हिन्दी)</option><option>Bhojpuri (भोजपुरी)</option>
               <option>Sanskrit (संस्कृत)</option><option>Japanese (日本語)</option><option>French (Français)</option>
             </select>
-            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 नए कार्ड्स लोड करें</button>
+            <select id="lingoLevelSelect" style="max-width:180px;">
+              <option value="A1">🌱 Level A1 (Basic)</option>
+              <option value="A2">🚀 Level A2 (Daily Talk)</option>
+              <option value="B1">🏆 Level B1 (Fluent)</option>
+            </select>
+            <button class="btn-primary" onclick="generateInteractiveCards()">🃏 नए कार्ड्स व क्विज़</button>
           </div>
+
+          <!-- Interactive Duolingo Path Nodes -->
+          <div id="duolingoPathContainer" style="margin-bottom:14px;">
+            <div class="path-node completed">
+              <div><strong>Step 1: Self-Introduction & Greetings</strong><div style="font-size:12px;color:var(--muted);">अपना परिचय देना और अभिवादन करना</div></div>
+              <button class="btn-emerald" style="min-height:38px;" onclick="startPathLesson('Self-Introduction & Greetings')">✅ Practice</button>
+            </div>
+            <div class="path-node active-node">
+              <div><strong>Step 2: Daily Routine & Action Verbs</strong><div style="font-size:12px;color:var(--muted);">रोज़मर्रा के काम और सही क्रियाओं का उपयोग</div></div>
+              <button class="btn-primary" style="min-height:38px;" onclick="startPathLesson('Daily Routine & Action Verbs')">▶️ Start (+25 XP)</button>
+            </div>
+            <div class="path-node">
+              <div><strong>Step 3: Real-Life Confidence & Interviews</strong><div style="font-size:12px;color:var(--muted);">बाज़ार, ऑफिस और इंटरव्यू में आत्मविश्वास से बोलना</div></div>
+              <button class="btn-outline" style="min-height:38px;" onclick="startPathLesson('Real-Life Confidence & Interviews')">🔓 Unlock</button>
+            </div>
+          </div>
+
           <div id="lingoCardsGrid" class="grid-2"></div>
         </div>
       </section>
 
-      <!-- JESHREAD STUDIO SCREEN -->
+      <!-- READALONG-STYLE JESHREAD STUDIO SCREEN -->
       <section id="scr-read" class="app-screen hidden">
         <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <strong style="font-size:16px;">📖 JeshRead Pronunciation Studio</strong>
-            <button class="btn-outline" onclick="generateNewReadAlongPassage()">🔄 नया वाक्य</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <div>
+              <strong style="font-size:17px;">📖 JeshRead Adaptive Story & ReadAlong Studio</strong>
+              <p style="font-size:12px;color:var(--muted);">किसी भी शब्द पर टच करके उसका हिंदी अर्थ व उच्चारण सुनें</p>
+            </div>
+            <button class="btn-outline" onclick="generateNewReadAlongPassage()">🔄 नई कहानी बनाएं</button>
           </div>
-          <p id="readAlongTargetText" style="font-size:16px;font-weight:700;padding:14px;background:#F8FAFC;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;">
-            Consistent practice every day turns beginners into confident leaders.
-          </p>
+
+          <!-- Interest-Based Story Generator -->
+          <div class="input-row" style="margin-bottom:10px;">
+            <input id="storyTopicInput" type="text" placeholder="कहानी का विषय लिखें (जैसे: Cricket, Village, Space, Honesty)..." />
+            <button class="btn-primary" onclick="generateCustomStory()">✨ Story बनाएं</button>
+          </div>
+
+          <div id="readAlongTargetBox" style="font-size:17px;font-weight:600;line-height:1.7;padding:14px;background:#F8FAFC;border-radius:12px;border:1px solid var(--border);margin-bottom:10px;"></div>
+          <div id="wordMeaningPopup" class="mini-card hidden" style="margin-bottom:10px;border-left:4px solid var(--primary);font-size:13px;"></div>
+
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-rose" onclick="startReadAlongCheck()">🎤 बोलकर पढ़ें</button>
-            <button class="btn-outline" onclick="speakTextAloud(document.getElementById('readAlongTargetText').textContent)">🔊 पहले सुनें</button>
+            <button class="btn-rose" onclick="startReadAlongCheck()">🎤 बोलकर पढ़ें (Check Accuracy)</button>
+            <button class="btn-outline" onclick="speakTextAloud(CURRENT_STORY_TEXT)">🔊 पूरी कहानी सुनें</button>
           </div>
           <div id="readAlongResult" style="margin-top:12px;font-size:14px;font-weight:700;"></div>
         </div>
@@ -735,7 +601,6 @@
         </div>
       </div>
 
-      <!-- ADMIN CREDENTIAL RECOVERY TOOL -->
       <div class="card">
         <h3 style="font-size:16px;margin-bottom:8px;">🔍 Search Help for Credentials (छात्र का पासवर्ड/डिटेल्स खोजें)</h3>
         <div class="input-row" style="margin-bottom:10px;">
@@ -745,11 +610,9 @@
         <div id="adminCredResults"></div>
       </div>
 
-      <!-- FUTURE-PROOF PROMPT-ONLY UPGRADE ENGINE -->
       <div class="card">
-        <h3 style="font-size:16px;margin-bottom:4px;">🤖 AI Co-Architect (केवल प्रॉम्प्ट से कोई भी नया फीचर या बदलाव करें)</h3>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">यहाँ हिंदी या अंग्रेजी में लिखें कि आप क्या जोड़ना/बदलना चाहते हैं—सिस्टम बिना पेज बिगाड़े सुरक्षित रूप से अपडेट कर देगा।</p>
-        <textarea id="architectPrompt" rows="3" placeholder="उदा. होम स्क्रीन पर गणित का क्विज़ जोड़ें, या थीम का रंग हरा करें..."></textarea>
+        <h3 style="font-size:16px;margin-bottom:4px;">🤖 AI Co-Architect (केवल प्रॉम्प्ट से नया फीचर जोड़ें)</h3>
+        <textarea id="architectPrompt" rows="3" placeholder="यहाँ लिखें कि आप क्या जोड़ना या बदलना चाहते हैं..."></textarea>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
           <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Safe Preview</button>
           <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Make Live 🚀</button>
@@ -757,9 +620,8 @@
         <div id="architectOutput" class="mini-card hidden" style="margin-top:10px;white-space:pre-line;font-size:13px;"></div>
       </div>
 
-      <!-- CONFIG VAULT -->
       <div class="card">
-        <h3 style="font-size:16px;margin-bottom:8px;">🔐 API & Voice/Video Vault</h3>
+        <h3 style="font-size:16px;margin-bottom:8px;">🔐 API & Voice Cloning Vault (ElevenLabs / Groq / OpenRouter)</h3>
         <div id="configVaultGrid" class="grid-2"></div>
       </div>
     </div>
@@ -787,22 +649,33 @@
     let GENERATED_CODE_BUFFER = "";
     let logoTapCount = 0, logoTapTimer = null;
 
-    // Video Call, Teacher & Voice State
+    // Video Call, Real Canvas Lip-Warp, Head-Mirroring & Voice State
     let callTimerInterval = null, callSeconds = 0, localMediaStream = null;
     let isMicMuted = false, isCamHidden = false, isCallActive = false;
-    let activeRecognition = null;
+    let activeRecognition = null, headMirrorInterval = null;
+    let avatarImgObj = new Image();
+    avatarImgObj.crossOrigin = "anonymous";
+    let lipWarpAnimId = null, isAvatarSpeaking = false, mouthOpenAmount = 0;
+
     let CURRENT_TEACHER = {
       name: "Didi-Mentor",
       photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor",
       pitch: 1.15,
       rate: 0.96,
-      langMode: "hinglish"
+      langMode: "hinglish",
+      lipX: 0.50,
+      lipY: 0.68,
+      ghibliMode: false
     };
 
-    // ==================== 1. INITIALIZATION & 48H SESSION ====================
+    let CURRENT_STORY_TEXT = "Consistent practice every single day turns beginners into confident leaders.";
+
+    // ==================== 1. INITIALIZATION ====================
     window.addEventListener('DOMContentLoaded', () => {
       loadDefaultTeacherProfile();
       renderCommunityAvatars();
+      renderInteractiveStory(CURRENT_STORY_TEXT);
+
       const rawSession = localStorage.getItem('JESH_PERSISTENT_SESSION');
       if (rawSession) {
         try {
@@ -820,10 +693,7 @@
 
     function savePersistentSession(studentObj) {
       STUDENT_PROFILE = studentObj;
-      localStorage.setItem('JESH_PERSISTENT_SESSION', JSON.stringify({
-        student: studentObj,
-        loginTime: Date.now()
-      }));
+      localStorage.setItem('JESH_PERSISTENT_SESSION', JSON.stringify({ student: studentObj, loginTime: Date.now() }));
       const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
       db[studentObj.contact.toLowerCase()] = studentObj;
       localStorage.setItem('JESH_LOCAL_STUDENTS_DB', JSON.stringify(db));
@@ -856,11 +726,8 @@
 
       const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
       const key = contact.toLowerCase();
-
       let backendRes = null;
-      try {
-        backendRes = await postBackend({ action: 'STUDENT_AUTH', mode: AUTH_MODE, contact, pin });
-      } catch (e) {}
+      try { backendRes = await postBackend({ action: 'STUDENT_AUTH', mode: AUTH_MODE, contact, pin }); } catch (e) {}
 
       btn.disabled = false;
       switchStudentMode(AUTH_MODE);
@@ -869,11 +736,8 @@
         if (db[key] && db[key].pin) return alert('यह Phone/Email पहले से रजिस्टर्ड है! कृपया Login करें।');
         const newStudent = {
           userId: (backendRes && backendRes.student && backendRes.student.userId) || ('STU-' + Date.now().toString().slice(-6)),
-          contact, pin, name: '', age: '', xp: 10, streak: 1,
-          level: 'A1',
-          mindsetTag: 'Motivated Beginner',
-          skillMatrix: 'Grammar: A1 | Math: L1 | Logic: L1',
-          oneLineSummary: 'Started learning journey'
+          contact, pin, name: '', age: '', xp: 10, streak: 1, level: 'A1',
+          mindsetTag: 'Motivated Beginner', skillMatrix: 'Grammar: A1 | Math: L1 | Logic: L1', oneLineSummary: 'Started journey'
         };
         savePersistentSession(newStudent);
         routeAfterAuth();
@@ -954,7 +818,7 @@
       document.getElementById('forgotModal').classList.add('hidden');
     }
 
-    // ==================== 3. ADAPTIVE GROWTH & LEVEL PROGRESSION ====================
+    // ==================== 3. ADAPTIVE GROWTH ====================
     function updateAdaptiveBadgeUI() {
       if (!STUDENT_PROFILE) return;
       document.getElementById('adaptiveSkillBadge').textContent =
@@ -964,7 +828,6 @@
     function addStudentXP(pts, note) {
       if (!STUDENT_PROFILE) return;
       STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + pts;
-      // Auto-level up progression based on XP
       if (STUDENT_PROFILE.xp >= 300) {
         STUDENT_PROFILE.level = 'B1 Intermediate';
         STUDENT_PROFILE.skillMatrix = 'Grammar: B1 | Math: L2 | Logic: L2';
@@ -975,7 +838,6 @@
       document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
       updateAdaptiveBadgeUI();
       savePersistentSession(STUDENT_PROFILE);
-
       postBackend({
         action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, xp: STUDENT_PROFILE.xp,
         summary: `${STUDENT_PROFILE.level} | ${STUDENT_PROFILE.skillMatrix} | ${note || ''}`
@@ -986,9 +848,7 @@
       document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden'));
       const target = document.getElementById('scr-' + scr);
       if (target) target.classList.remove('hidden');
-      document.querySelectorAll('.footer-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.scr === scr);
-      });
+      document.querySelectorAll('.footer-btn').forEach(b => b.classList.toggle('active', b.dataset.scr === scr));
       document.getElementById('viewLearner').scrollTop = 0;
     }
 
@@ -1001,38 +861,165 @@
       inp.value = '';
       feed.scrollTop = feed.scrollHeight;
 
-      const prompt = `You are ${CURRENT_TEACHER.name}, a warm, motivating mentor for ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). Answer in simple Hindi with helpful English terms, praise their effort, and gently raise their understanding level. Question: ${q}`;
+      const prompt = `You are ${CURRENT_TEACHER.name}, a warm, motivating mentor for ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). Answer simply in Hindi with English examples, praise their effort, and raise their understanding level. Question: ${q}`;
       const res = await postBackend({ action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt }).catch(() => ({}));
-      const reply = (res && res.reply) || `शाबाश ${STUDENT_PROFILE.name}! यह बहुत अच्छा सवाल है। आइए इसे आसान तरीके से समझते हैं और एक कदम आगे बढ़ते हैं!`;
+      const reply = (res && res.reply) || `शाबाश ${STUDENT_PROFILE.name}! यह बहुत अच्छा सवाल है। आइए इसे आसान उदाहरण से समझते हैं!`;
       feed.innerHTML += `<div class="msg-ai">${reply}</div>`;
       feed.scrollTop = feed.scrollHeight;
       addStudentXP(10, 'Chat doubt: ' + q.slice(0, 25));
     }
 
-    // ==================== 4. 50/50 HANDS-FREE VIDEO CALL & LIP-SYNC ====================
+    // ==================== 4. REAL PHOTO JAW/LIP-WARP ENGINE & HEAD-MIRRORING ====================
+    function renderAvatarCanvasFrame() {
+      const canvas = document.getElementById('avatarWarpCanvas');
+      if (!canvas || !avatarImgObj.complete || !avatarImgObj.naturalWidth) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      if (CURRENT_TEACHER.ghibliMode) {
+        ctx.filter = 'saturate(1.45) contrast(1.08) brightness(1.05)';
+      } else {
+        ctx.filter = 'none';
+      }
+
+      // Draw base photo cleanly centered (object-fit: cover)
+      const iw = avatarImgObj.naturalWidth, ih = avatarImgObj.naturalHeight;
+      const scale = Math.max(W / iw, H / ih);
+      const dw = iw * scale, dh = ih * scale;
+      const dx = (W - dw) / 2, dy = (H - dh) / 2;
+      ctx.drawImage(avatarImgObj, dx, dy, dw, dh);
+
+      // Animate REAL photo's own lower lip & chin pixels (no fake floating sticker!)
+      if (mouthOpenAmount > 0.5) {
+        const lx = W * (CURRENT_TEACHER.lipX || 0.50);
+        const ly = H * (CURRENT_TEACHER.lipY || 0.68);
+        const mw = W * 0.22;
+        const mh = H * 0.14;
+        const drop = mouthOpenAmount * 8; // real jaw downward displacement in px
+
+        // 1. Subtle natural inner-mouth shadow at exact lip line
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(lx, ly + drop * 0.35, mw * 0.42, Math.max(1.5, drop * 0.55), 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(45, 12, 16, 0.78)';
+        ctx.fill();
+        ctx.restore();
+
+        // 2. Shift the photo's own lower-lip & chin skin slice downward smoothly
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(lx, ly + mh * 0.45 + drop, mw * 0.65, mh * 0.65, 0, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(canvas, lx - mw, ly, mw * 2, mh * 1.4, lx - mw, ly + drop, mw * 2, mh * 1.4);
+        ctx.restore();
+      }
+      ctx.filter = 'none';
+    }
+
+    function startLipWarpLoop() {
+      isAvatarSpeaking = true;
+      let phase = 0;
+      function step() {
+        if (!isAvatarSpeaking) {
+          mouthOpenAmount = 0;
+          renderAvatarCanvasFrame();
+          return;
+        }
+        phase += 0.32;
+        mouthOpenAmount = Math.abs(Math.sin(phase)) * (0.6 + Math.random() * 0.4);
+        renderAvatarCanvasFrame();
+        lipWarpAnimId = requestAnimationFrame(step);
+      }
+      cancelAnimationFrame(lipWarpAnimId);
+      lipWarpAnimId = requestAnimationFrame(step);
+    }
+
+    function stopLipWarpLoop() {
+      isAvatarSpeaking = false;
+      mouthOpenAmount = 0;
+      renderAvatarCanvasFrame();
+    }
+
+    function calibrateLipOnCanvasTap(event) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const relX = (event.clientX - rect.left) / rect.width;
+      const relY = (event.clientY - rect.top) / rect.height;
+      CURRENT_TEACHER.lipX = Math.max(0.25, Math.min(0.75, relX));
+      CURRENT_TEACHER.lipY = Math.max(0.35, Math.min(0.88, relY));
+      document.getElementById('lipYSlider').value = Math.round(CURRENT_TEACHER.lipY * 100);
+      testLipMovementPreview();
+    }
+
+    function updateLipPositionFromSlider() {
+      CURRENT_TEACHER.lipY = parseInt(document.getElementById('lipYSlider').value, 10) / 100;
+      renderAvatarCanvasFrame();
+    }
+
+    function testLipMovementPreview() {
+      startLipWarpLoop();
+      setTimeout(stopLipWarpLoop, 1600);
+    }
+
+    function applyGhibliCartoonFilter() {
+      CURRENT_TEACHER.ghibliMode = !CURRENT_TEACHER.ghibliMode;
+      renderAvatarCanvasFrame();
+      alert(CURRENT_TEACHER.ghibliMode ? '✨ Ghibli / Animated स्टाइल चालू हो गया!' : '📷 ओरिजिनल फोटो स्टाइल वापस सेट हो गया!');
+    }
+
+    // Live Student Head-Motion Mirroring (AI Teacher mirrors student's subtle head tilt!)
+    function startHeadMirrorTracking() {
+      const vid = document.getElementById('selfCameraVideo');
+      const frame = document.getElementById('avatarCanvasFrame');
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = 48; offCanvas.height = 48;
+      const oCtx = offCanvas.getContext('2d');
+
+      clearInterval(headMirrorInterval);
+      headMirrorInterval = setInterval(() => {
+        if (!isCallActive || isCamHidden || !vid || vid.readyState < 2) {
+          frame.style.transform = isAvatarSpeaking ? 'scale(1.02)' : 'scale(1)';
+          return;
+        }
+        oCtx.drawImage(vid, 0, 0, 48, 48);
+        const data = oCtx.getImageData(0, 0, 48, 48).data;
+        let sumX = 0, weight = 0;
+        for (let y = 8; y < 40; y++) {
+          for (let x = 8; x < 40; x++) {
+            const idx = (y * 48 + x) * 4;
+            const lum = data[idx] + data[idx + 1] + data[idx + 2];
+            sumX += x * lum;
+            weight += lum;
+          }
+        }
+        const centerX = weight ? (sumX / weight) : 24;
+        const tiltDeg = Math.max(-7, Math.min(7, (24 - centerX) * 1.4));
+        const speakScale = isAvatarSpeaking ? 1.03 : 1.0;
+        frame.style.transform = `rotate(${tiltDeg.toFixed(1)}deg) scale(${speakScale})`;
+      }, 150);
+    }
+
+    // ==================== 5. FULL-SCREEN 50/50 CALL & VOICE ENGINE ====================
     function switchCallerFromDropdown() {
       const v = document.getElementById('quickCallerSelect').value;
-      if (v === 'didi') applyTeacherProfile({ name: 'Didi-Mentor', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', pitch: 1.15, rate: 0.96 });
-      else if (v === 'arjun') applyTeacherProfile({ name: 'Coach Arjun', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=CoachArjun', pitch: 0.9, rate: 1.0 });
-      else if (v === 'robo') applyTeacherProfile({ name: 'Robo-Guru', photo: 'https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', pitch: 1.0, rate: 1.02 });
+      if (v === 'didi') applyTeacherProfile({ name: 'Didi-Mentor', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', pitch: 1.15, rate: 0.96, lipX: 0.5, lipY: 0.68 });
+      else if (v === 'arjun') applyTeacherProfile({ name: 'Coach Arjun', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=CoachArjun', pitch: 0.9, rate: 1.0, lipX: 0.5, lipY: 0.68 });
+      else if (v === 'robo') applyTeacherProfile({ name: 'Robo-Guru', photo: 'https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', pitch: 1.0, rate: 1.02, lipX: 0.5, lipY: 0.68 });
       else if (v.startsWith('comm_')) {
-        const list = getCommunityAvatarsList();
-        const item = list[parseInt(v.replace('comm_', ''), 10)];
+        const item = getCommunityAvatarsList()[parseInt(v.replace('comm_', ''), 10)];
         if (item) applyTeacherProfile(item);
       }
     }
 
     function applyTeacherProfile(t) {
       CURRENT_TEACHER = { ...CURRENT_TEACHER, ...t };
-      document.getElementById('avatarPhotoPreview').src = CURRENT_TEACHER.photo;
       document.getElementById('activeAvatarTitle').textContent = '👩‍🏫 ' + CURRENT_TEACHER.name;
       document.getElementById('customAvatarNameInput').value = CURRENT_TEACHER.name;
+      avatarImgObj.onload = () => renderAvatarCanvasFrame();
+      avatarImgObj.src = CURRENT_TEACHER.photo;
     }
 
-    function updateCallLanguageMode() {
-      CURRENT_TEACHER.langMode = document.getElementById('callLanguageMode').value;
-    }
-
+    function updateCallLanguageMode() { CURRENT_TEACHER.langMode = document.getElementById('callLanguageMode').value; }
     function cycleUILanguage() {
       const sel = document.getElementById('callLanguageMode');
       sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length;
@@ -1045,9 +1032,14 @@
       isCallActive = true;
       callSeconds = 0;
 
-      // Distraction-Free Real Call Mode: Hide text bar & studio during active call
+      // Enter Full-Screen Immersive Video Call Mode
+      document.getElementById('videoCallContainer').classList.add('fullscreen-call');
       document.getElementById('manualCallTextBar').classList.add('hidden');
       document.getElementById('avatarStudioCard').classList.add('hidden');
+
+      const pill = document.getElementById('micListeningPill');
+      pill.innerHTML = `<span class="live-wave-bar"><span></span><span></span><span></span><span></span><span></span></span> सुन रहा हूँ... बोलिए!`;
+      pill.style.color = '#34D399';
 
       callTimerInterval = setInterval(() => {
         callSeconds++;
@@ -1056,24 +1048,23 @@
         document.getElementById('callTimer').textContent = `${m}:${s}`;
       }, 1000);
 
-      // Start Student 50% Camera Tile
       try {
         localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         const vid = document.getElementById('selfCameraVideo');
         vid.srcObject = localMediaStream;
         vid.classList.remove('hidden');
         document.getElementById('pipInitials').classList.add('hidden');
+        startHeadMirrorTracking();
       } catch (e) {
         document.getElementById('pipInitials').classList.remove('hidden');
       }
 
-      // First-Time Call Introduction + Asking What Student Wants to Call Them
       const introMsg = CURRENT_TEACHER.langMode === 'english'
-        ? `Hello ${STUDENT_PROFILE.name}! I am ${CURRENT_TEACHER.name}, your personal AI mentor and friend. You can call me ${CURRENT_TEACHER.name}, or change my name anytime. How are you feeling today?`
-        : `नमस्ते ${STUDENT_PROFILE.name}! मैं ${CURRENT_TEACHER.name} हूँ, आपकी पर्सनल AI मेंटर और दोस्त। आप मुझे ${CURRENT_TEACHER.name} कहकर बुला सकते हैं, या नीचे से मेरा नाम बदल भी सकते हैं। बताइए, आज आप क्या सीखना चाहते हैं?`;
+        ? `Hello ${STUDENT_PROFILE.name}! I am ${CURRENT_TEACHER.name}, your personal AI mentor. What would you like to practice today?`
+        : `नमस्ते ${STUDENT_PROFILE.name}! मैं ${CURRENT_TEACHER.name} हूँ। आप मुझे इस नाम से बुला सकते हैं या मेरा नाम बदल सकते हैं। बताइए, आज हम क्या सीखें?`;
 
       document.getElementById('avatarReplyCaption').textContent = '🗣️ ' + introMsg;
-      speakWithLipSync(introMsg, () => {
+      speakWithRealLipWarp(introMsg, () => {
         if (isCallActive && !isMicMuted) startHandsFreeListening();
       });
     }
@@ -1096,18 +1087,21 @@
     function endLiveVideoCall() {
       isCallActive = false;
       clearInterval(callTimerInterval);
+      clearInterval(headMirrorInterval);
       if (activeRecognition) { try { activeRecognition.stop(); } catch (e) {} }
       if (localMediaStream) { localMediaStream.getTracks().forEach(t => t.stop()); localMediaStream = null; }
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
-      stopLipSyncVisuals();
+      stopLipWarpLoop();
+      document.getElementById('videoCallContainer').classList.remove('fullscreen-call');
       document.getElementById('selfCameraVideo').classList.add('hidden');
       document.getElementById('pipInitials').classList.remove('hidden');
       document.getElementById('manualCallTextBar').classList.remove('hidden');
       document.getElementById('avatarStudioCard').classList.remove('hidden');
       document.getElementById('micListeningPill').textContent = 'कॉल समाप्त';
-      document.getElementById('avatarReplyCaption').textContent = '✅ बहुत बढ़िया बातचीत रही! आपकी प्रोग्रेस और लेवल अपडेट कर दिया गया है।';
-      addStudentXP(25, '50/50 Live Video Call session');
+      document.getElementById('micListeningPill').style.color = '#94A3B8';
+      document.getElementById('avatarReplyCaption').textContent = '✅ कॉल समाप्त हुई। आपकी प्रोग्रेस और लेवल अपडेट कर दिया गया है!';
+      addStudentXP(25, 'Full-Screen 50/50 Video Call');
     }
 
     function startHandsFreeListening() {
@@ -1117,23 +1111,26 @@
 
       activeRecognition = new SpeechRec();
       activeRecognition.lang = CURRENT_TEACHER.langMode === 'english' ? 'en-IN' : 'hi-IN';
-      activeRecognition.interimResults = false;
+      activeRecognition.interimResults = true;
 
       const pill = document.getElementById('micListeningPill');
-      pill.textContent = '🔴 सुन रहा हूँ... बोलिए!';
+      pill.innerHTML = `<span class="live-wave-bar"><span></span><span></span><span></span><span></span><span></span></span> सुन रहा हूँ... बोलिए!`;
       pill.style.color = '#34D399';
 
       let capturedSpeech = '';
       activeRecognition.onresult = e => {
-        capturedSpeech = e.results[0][0].transcript;
+        let interim = '';
+        for (let i = 0; i < e.results.length; i++) interim += e.results[i][0].transcript;
+        capturedSpeech = interim;
+        pill.innerHTML = `<span class="live-wave-bar"><span></span><span></span><span></span><span></span><span></span></span> "${interim.slice(-28)}"`;
       };
       activeRecognition.onend = () => {
-        pill.textContent = 'माइक तैयार';
-        pill.style.color = '#94A3B8';
+        if (!isCallActive) return;
         if (capturedSpeech.trim()) {
+          pill.textContent = '💭 जवाब तैयार हो रहा है...';
           handleLiveSpokenTurn(capturedSpeech.trim());
-        } else if (isCallActive && !isMicMuted) {
-          setTimeout(startHandsFreeListening, 600);
+        } else if (!isMicMuted) {
+          setTimeout(startHandsFreeListening, 500);
         }
       };
       try { activeRecognition.start(); } catch (e) {}
@@ -1161,9 +1158,8 @@
 
     async function handleLiveSpokenTurn(userSpokenText) {
       const cap = document.getElementById('avatarReplyCaption');
-      cap.textContent = `आपने कहा: "${userSpokenText}" • 💭 जवाब सोच रहा हूँ...`;
+      cap.textContent = `आपने कहा: "${userSpokenText}" • 💭 सोच रहा हूँ...`;
 
-      // Dynamic Language Switch by Voice Command!
       const low = userSpokenText.toLowerCase();
       if (low.includes('hindi mein') || low.includes('हिंदी में')) {
         CURRENT_TEACHER.langMode = 'hinglish';
@@ -1174,67 +1170,66 @@
       }
 
       const langRule = CURRENT_TEACHER.langMode === 'english'
-        ? 'Speak in simple, encouraging English.'
+        ? 'Speak in clear, motivating English.'
         : CURRENT_TEACHER.langMode === 'bhojpuri'
           ? 'Speak warmly in Bhojpuri mixed with easy English words.'
-          : 'Speak warmly in natural Hindi while teaching 1-2 useful English words/sentences in between.';
+          : 'Speak warmly in natural Hindi while teaching 1-2 useful English sentences in between.';
 
-      const sysPrompt = `You are ${CURRENT_TEACHER.name}, a caring, motivating best-friend AI teacher on a live video call with ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). ${langRule} Student said: "${userSpokenText}". Praise their effort, gently fix any mistake, upgrade their knowledge slightly, and ask 1 short friendly follow-up question in 2-3 spoken sentences.`;
+      const sysPrompt = `You are ${CURRENT_TEACHER.name}, a caring, motivating human-like AI mentor on a live video call with ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). ${langRule} Student said: "${userSpokenText}". Encourage them warmly, gently correct any mistake, slightly upgrade their learning level, and ask 1 short friendly follow-up question in 2-3 spoken sentences.`;
 
       const res = await postBackend({
         action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt: sysPrompt
       }).catch(() => ({}));
 
-      const reply = (res && res.reply) || `वाह ${STUDENT_PROFILE.name}, बहुत अच्छा! अंग्रेजी में इसे हम कह सकते हैं: "I am improving every day!" बताइए, क्या आप इसका एक और उदाहरण बनाना चाहेंगे?`;
+      const reply = (res && res.reply) || `वाह ${STUDENT_PROFILE.name}, बहुत बढ़िया! अंग्रेजी में इसे कह सकते हैं: "I am improving step by step!" बताइए, क्या आप इसका एक और वाक्य बनाएंगे?`;
       cap.textContent = '🗣️ ' + reply;
-      addStudentXP(15, 'Live conversation: ' + userSpokenText.slice(0, 25));
+      addStudentXP(15, 'Live call turn: ' + userSpokenText.slice(0, 25));
 
-      speakWithLipSync(reply, () => {
-        if (isCallActive && !isMicMuted) setTimeout(startHandsFreeListening, 600);
+      speakWithRealLipWarp(reply, () => {
+        if (isCallActive && !isMicMuted) setTimeout(startHandsFreeListening, 500);
       });
     }
 
-    function speakWithLipSync(text, onFinish) {
+    async function speakWithRealLipWarp(text, onFinish) {
       const tile = document.getElementById('aiTutorTile');
-      const face = document.getElementById('avatarStage');
-      const mouth = document.getElementById('lipSyncMouth');
-
       tile.classList.add('speaking-glow');
-      face.classList.add('head-nod');
-      mouth.classList.add('talking');
+      startLipWarpLoop();
+
+      // Check if Admin configured ElevenLabs Voice Clone in backend
+      const voiceModelB64 = localStorage.getItem('JESH_USER_VOICE_MODEL_B64');
+      if (voiceModelB64) {
+        try {
+          const cloneRes = await postBackend({
+            action: 'CLONE_SPEAK', text, voiceSampleBase64: voiceModelB64
+          });
+          if (cloneRes && cloneRes.audioBase64) {
+            const aud = new Audio('data:audio/mpeg;base64,' + cloneRes.audioBase64);
+            aud.onended = () => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); };
+            aud.play();
+            return;
+          }
+        } catch (e) {}
+      }
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        // Choose Hindi/Indian voice automatically when Devanagari characters exist
         const hasHindi = /[\u0900-\u097F]/.test(text);
         u.lang = hasHindi ? 'hi-IN' : 'en-IN';
         u.pitch = CURRENT_TEACHER.pitch || 1.05;
         u.rate = CURRENT_TEACHER.rate || 0.96;
-        u.onend = () => {
-          stopLipSyncVisuals();
-          if (onFinish) onFinish();
-        };
-        u.onerror = () => {
-          stopLipSyncVisuals();
-          if (onFinish) onFinish();
-        };
+        u.onend = () => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); };
+        u.onerror = () => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); };
         window.speechSynthesis.speak(u);
       } else {
-        setTimeout(() => { stopLipSyncVisuals(); if (onFinish) onFinish(); }, 2500);
+        setTimeout(() => { tile.classList.remove('speaking-glow'); stopLipWarpLoop(); if (onFinish) onFinish(); }, 2500);
       }
     }
 
-    function stopLipSyncVisuals() {
-      document.getElementById('aiTutorTile').classList.remove('speaking-glow');
-      document.getElementById('avatarStage').classList.remove('head-nod');
-      document.getElementById('lipSyncMouth').classList.remove('talking');
-    }
-
-    // ==================== 5. CUSTOM TEACHER, VOICE MODEL & COMMUNITY ====================
+    // ==================== 6. LIVE WAVEFORM 15S VOICE MODEL & CUSTOM AVATAR ====================
     function applyTeacherNameOnly() {
       const newName = document.getElementById('customAvatarNameInput').value.trim();
-      if (!newName) return alert('कृपया टीचर का नया नाम लिखें।');
+      if (!newName) return alert('कृपया टीचर का नाम लिखें।');
       applyTeacherProfile({ name: newName });
       saveCustomAvatarToLocal(false);
       alert(`✅ अब आपके टीचर का नाम "${newName}" सेट हो गया है!`);
@@ -1245,65 +1240,111 @@
       if (!f) return;
       const r = new FileReader();
       r.onload = ev => {
-        applyTeacherProfile({ photo: ev.target.result });
-        alert('✅ फोटो लग गई है! अब नीचे "Save & Set as My Default" दबाएं।');
+        applyTeacherProfile({ photo: ev.target.result, lipX: 0.50, lipY: 0.66 });
+        alert('✅ फोटो लग गई है! अब ऊपर फोटो में अपने होंठों पर 1 बार टच करें या नीचे "टेस्ट करें" दबाकर लिप-सिंक मिला लें।');
       };
       r.readAsDataURL(f);
     }
 
-    async function recordTenSecondVoiceModel() {
+    async function recordFifteenSecondVoiceModel() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+
+        const waveCanvas = document.getElementById('voiceWaveformCanvas');
+        const wCtx = waveCanvas.getContext('2d');
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        let isRec = true;
+        let pitchSamples = [];
+
+        function drawWave() {
+          if (!isRec) return;
+          analyser.getByteFrequencyData(dataArray);
+          wCtx.fillStyle = '#0F172A';
+          wCtx.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+          const barWidth = (waveCanvas.width / dataArray.length) * 1.5;
+          let x = 0, energy = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const h = (dataArray[i] / 255) * waveCanvas.height;
+            energy += dataArray[i];
+            wCtx.fillStyle = '#10B981';
+            wCtx.fillRect(x, waveCanvas.height - h, barWidth - 2, h);
+            x += barWidth;
+          }
+          if (energy > 400) pitchSamples.push(energy / dataArray.length);
+          requestAnimationFrame(drawWave);
+        }
+        drawWave();
+
         const recorder = new MediaRecorder(stream);
         const chunks = [];
         const btn = document.getElementById('recordVoiceModelBtn');
         const status = document.getElementById('voiceRecordStatus');
 
         btn.disabled = true;
-        status.textContent = '🔴 10 सेकंड तक वाक्य पढ़ें...';
+        status.textContent = '🔴 15 सेकंड तक ऊपर लिखा वाक्य पढ़ें... (Live Wave चालू है)';
+        status.style.color = '#E11D48';
+
         recorder.ondataavailable = e => chunks.push(e.data);
         recorder.onstop = () => {
+          isRec = false;
+          audioCtx.close();
           stream.getTracks().forEach(t => t.stop());
+
           const blob = new Blob(chunks, { type: 'audio/webm' });
           const audioUrl = URL.createObjectURL(blob);
           const player = document.getElementById('recordedModelPlayback');
           player.src = audioUrl;
           player.classList.remove('hidden');
-          // Calibrate natural vocal pitch profile
-          CURRENT_TEACHER.pitch = 1.02;
-          CURRENT_TEACHER.rate = 0.95;
+
+          // Save Base64 sample for ElevenLabs / backend cloning + calibrate pitch
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            try { localStorage.setItem('JESH_USER_VOICE_MODEL_B64', reader.result.split(',')[1]); } catch (e) {}
+          };
+          reader.readAsDataURL(blob);
+
+          const avgEnergy = pitchSamples.length ? (pitchSamples.reduce((a, b) => a + b, 0) / pitchSamples.length) : 60;
+          CURRENT_TEACHER.pitch = avgEnergy > 75 ? 1.12 : 0.92;
+          CURRENT_TEACHER.rate = 0.96;
+
           btn.disabled = false;
-          status.textContent = '✅ मॉडल आवाज़ कैप्चर हो गई!';
+          status.textContent = '✅ 15s मॉडल आवाज़ सेव हो गई! (नोट: पूर्ण हूबहू वॉइस क्लोन के लिए Admin Vault में ElevenLabs API Key जोड़ें)';
+          status.style.color = '#059669';
         };
+
         recorder.start();
-        setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 10000);
+        setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 15000);
       } catch (e) {
-        alert('माइक की अनुमति दें ताकि आवाज़ रिकॉर्ड हो सके।');
+        alert('माइक की अनुमति दें ताकि आवाज़ और वेवफॉर्म रिकॉर्ड हो सके।');
       }
     }
 
     function saveCustomAvatarToLocal(showMsg) {
       const name = document.getElementById('customAvatarNameInput').value.trim() || CURRENT_TEACHER.name;
       const profile = {
-        name,
-        photo: document.getElementById('avatarPhotoPreview').src,
-        pitch: CURRENT_TEACHER.pitch,
-        rate: CURRENT_TEACHER.rate
+        name, photo: CURRENT_TEACHER.photo, pitch: CURRENT_TEACHER.pitch,
+        rate: CURRENT_TEACHER.rate, lipX: CURRENT_TEACHER.lipX, lipY: CURRENT_TEACHER.lipY, ghibliMode: CURRENT_TEACHER.ghibliMode
       };
       localStorage.setItem('JESH_DEFAULT_TEACHER', JSON.stringify(profile));
       applyTeacherProfile(profile);
-      if (showMsg) alert('⭐ यह टीचर और आवाज़ आपके लिए Default सेट हो गई है!');
+      if (showMsg) alert('⭐ यह टीचर, लिप-सिंक पोजीशन और आवाज़ प्रोफाइल Default सेट हो गई है!');
     }
 
     function loadDefaultTeacherProfile() {
       const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || 'null');
       if (saved && saved.name) applyTeacherProfile(saved);
+      else applyTeacherProfile(CURRENT_TEACHER);
     }
 
     function getCommunityAvatarsList() {
       const defaults = [
-        { name: 'Priya Didi (Public)', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PriyaDidi', pitch: 1.2, rate: 0.95, creator: 'FEA Community' },
-        { name: 'Master Ravi (Public)', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=MasterRavi', pitch: 0.88, rate: 0.98, creator: 'FEA Mentor' }
+        { name: 'Priya Didi (Public)', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PriyaDidi', pitch: 1.2, rate: 0.95, lipX: 0.5, lipY: 0.68, creator: 'FEA Community' },
+        { name: 'Master Ravi (Public)', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=MasterRavi', pitch: 0.88, rate: 0.98, lipX: 0.5, lipY: 0.68, creator: 'FEA Mentor' }
       ];
       const custom = JSON.parse(localStorage.getItem('JESH_COMMUNITY_AVATARS') || '[]');
       return [...defaults, ...custom];
@@ -1312,10 +1353,8 @@
     function publishAvatarToCommunity() {
       const name = document.getElementById('customAvatarNameInput').value.trim() || CURRENT_TEACHER.name;
       const item = {
-        name: name + ' (Community)',
-        photo: document.getElementById('avatarPhotoPreview').src,
-        pitch: CURRENT_TEACHER.pitch,
-        rate: CURRENT_TEACHER.rate,
+        name: name + ' (Public)', photo: CURRENT_TEACHER.photo, pitch: CURRENT_TEACHER.pitch,
+        rate: CURRENT_TEACHER.rate, lipX: CURRENT_TEACHER.lipX, lipY: CURRENT_TEACHER.lipY,
         creator: STUDENT_PROFILE ? STUDENT_PROFILE.name : 'Student'
       };
       const custom = JSON.parse(localStorage.getItem('JESH_COMMUNITY_AVATARS') || '[]');
@@ -1323,14 +1362,13 @@
       localStorage.setItem('JESH_COMMUNITY_AVATARS', JSON.stringify(custom));
       postBackend({ action: 'SHARE_COMMUNITY_AVATAR', avatar: item }).catch(() => {});
       renderCommunityAvatars();
-      alert('🌐 बधाई हो! आपका अवतार अब सभी छात्रों के लिए पब्लिक हो गया है।');
+      alert('🌐 आपका मॉडल अब सभी छात्रों के लिए पब्लिक हो गया है!');
     }
 
     function renderCommunityAvatars() {
       const list = getCommunityAvatarsList();
       const box = document.getElementById('communityAvatarsList');
       const sel = document.getElementById('quickCallerSelect');
-      // Remove old community options from dropdown
       sel.querySelectorAll('option.comm-opt').forEach(o => o.remove());
 
       box.innerHTML = list.map((av, i) => {
@@ -1363,42 +1401,75 @@
       alert(`✅ अब आप "${item.name}" से बात कर सकते हैं!`);
     }
 
-    // ==================== 6. JESHLINGO, READ & ACADEMY ====================
+    // ==================== 7. DUOLINGO JESHLINGO & READALONG JESHREAD ====================
+    function startPathLesson(lessonTitle) {
+      openFullScreen('studio');
+      alert(`🦉 "${lessonTitle}" शुरू हो रहा है! Start Call दबाकर बोलकर अभ्यास करें।`);
+    }
+
     async function generateInteractiveCards() {
       const lang = document.getElementById('lingoLangSelect').value;
+      const lvl = document.getElementById('lingoLevelSelect').value;
       const grid = document.getElementById('lingoCardsGrid');
-      grid.innerHTML = '<div class="mini-card">⚡ कार्ड्स तैयार हो रहे हैं...</div>';
+      grid.innerHTML = '<div class="mini-card">⚡ Duolingo-स्टाइल कार्ड्स तैयार हो रहे हैं...</div>';
       const res = await postBackend({
         action: 'CHAT', role: 'student',
-        prompt: `Give 4 daily phrases in ${lang} for ${STUDENT_PROFILE.name} (${STUDENT_PROFILE.level}). Format strictly: PHRASE | PRONUNCIATION | HINDI MEANING`
+        prompt: `Create 4 interactive phrases in ${lang} at CEFR ${lvl} level for ${STUDENT_PROFILE.name}. Format strictly: PHRASE | PRONUNCIATION | HINDI MEANING`
       }).catch(() => ({}));
-      const lines = (res && res.reply ? res.reply : 'I am confident today. | आई एम कॉन्फिडेंट टुडे | मैं आज आत्मविश्वास से भरा हूँ।')
+      const lines = (res && res.reply ? res.reply : 'I am learning something new every day. | आई एम लर्निंग समथिंग न्यू एवरी डे | मैं हर दिन कुछ नया सीख रहा हूँ।')
         .split('\n').filter(l => l.includes('|'));
       grid.innerHTML = lines.map(l => {
         const p = l.split('|');
         return `<div class="mini-card"><strong style="color:var(--primary);font-size:16px;">${p[0].trim()}</strong><div style="font-size:12px;color:var(--muted);margin:4px 0;">🗣️ ${p[1].trim()}</div><div style="font-size:13px;margin-bottom:8px;">💡 ${(p[2]||'').trim()}</div><button class="btn-outline" style="min-height:36px;font-size:12px;" onclick="speakTextAloud('${p[0].trim().replace(/'/g,'')}')">🔊 सुनें</button></div>`;
       }).join('');
-      addStudentXP(15, 'Practiced ' + lang);
+      addStudentXP(15, `JeshLingo ${lang} (${lvl})`);
+    }
+
+    function renderInteractiveStory(text) {
+      CURRENT_STORY_TEXT = text;
+      const box = document.getElementById('readAlongTargetBox');
+      box.innerHTML = text.split(/\s+/).map(w => `<span class="tap-word" onclick="explainTappedWord('${w.replace(/[^a-zA-Z]/g, '')}')">${w}</span>`).join(' ');
+    }
+
+    async function explainTappedWord(word) {
+      if (!word) return;
+      speakTextAloud(word);
+      const pop = document.getElementById('wordMeaningPopup');
+      pop.classList.remove('hidden');
+      pop.innerHTML = `🔍 <strong>"${word}"</strong> का अर्थ खोज रहे हैं...`;
+      const res = await postBackend({
+        action: 'CHAT', role: 'student',
+        prompt: `Give the simple Hindi meaning and 1 easy example sentence for the English word "${word}" in 2 short lines.`
+      }).catch(() => ({}));
+      pop.innerHTML = `💡 <strong>${word}:</strong> ${(res && res.reply) || 'यह एक उपयोगी अंग्रेजी शब्द है। ऊपर सुनें बटन से उच्चारण दोहराएं।'}`;
+    }
+
+    async function generateCustomStory() {
+      const topic = document.getElementById('storyTopicInput').value.trim() || 'A brave student in India';
+      const box = document.getElementById('readAlongTargetBox');
+      box.textContent = '⚡ आपकी पसंद की कहानी बन रही है...';
+      const res = await postBackend({
+        action: 'CHAT', role: 'student',
+        prompt: `Write a short 3-sentence inspiring English story about "${topic}" for ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). Output ONLY the English story.`
+      }).catch(() => ({}));
+      renderInteractiveStory((res && res.reply) || `Raju loved playing ${topic} after school. Every evening he practiced with discipline and helped his friends. Soon his hard work brought great success.`);
     }
 
     async function generateNewReadAlongPassage() {
-      const el = document.getElementById('readAlongTargetText');
-      el.textContent = '⚡ नया वाक्य लोड हो रहा है...';
       const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 inspiring 2-sentence English reading passage for level ${STUDENT_PROFILE.level}. Output ONLY the English text.` }).catch(() => ({}));
-      el.textContent = (res && res.reply) || 'Every small step you take today builds a brighter future tomorrow.';
+      renderInteractiveStory((res && res.reply) || 'Every small step you take today builds a brighter future tomorrow.');
     }
 
     function startReadAlongCheck() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRec) return alert('Chrome ब्राउज़र का उपयोग करें।');
-      const target = document.getElementById('readAlongTargetText').textContent.trim();
       const out = document.getElementById('readAlongResult');
       out.textContent = '🔴 बोलकर पढ़ें...';
       const rec = new SpeechRec();
       rec.lang = 'en-IN';
       rec.onresult = e => {
         const spoken = e.results[0][0].transcript.toLowerCase();
-        const words = target.split(/\s+/);
+        const words = CURRENT_STORY_TEXT.split(/\s+/);
         let ok = 0;
         words.forEach(w => { if (spoken.includes(w.replace(/[^a-zA-Z]/g, '').toLowerCase())) ok++; });
         const pct = Math.round((ok / words.length) * 100);
@@ -1408,6 +1479,7 @@
       rec.start();
     }
 
+    // ==================== 8. ACADEMY & QR CERTIFICATE ====================
     function loadCodeSample(type) {
       const ed = document.getElementById('academyCodeEditor');
       if (type === 'python') ed.value = 'name = "' + STUDENT_PROFILE.name + '"\nprint("Welcome to Python,", name)';
@@ -1454,7 +1526,7 @@
       }
     }
 
-    // ==================== 7. SECRET ADMIN & FUTURE PROMPT ENGINE ====================
+    // ==================== 9. SECRET ADMIN & PROMPT ENGINE ====================
     function handleLogoTap() {
       logoTapCount++;
       clearTimeout(logoTapTimer);
