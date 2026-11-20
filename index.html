@@ -328,6 +328,136 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+<div id="student-auth-widget">
+  <!-- Login / Register Button (injected into #hook-navbar) -->
+  <script>
+    (function() {
+      const navbar = document.getElementById('hook-navbar');
+      if (!navbar) return;
+
+      // Create button
+      const loginBtn = document.createElement('button');
+      loginBtn.className = 'btn-primary';
+      loginBtn.textContent = '👤 Student Login / Register';
+      loginBtn.id = 'student-login-btn';
+      navbar.appendChild(loginBtn);
+
+      // Profile badge (mini-card)
+      const profileBadge = document.createElement('div');
+      profileBadge.className = 'mini-card';
+      profileBadge.id = 'student-profile-badge';
+      profileBadge.style.display = 'none';
+      navbar.appendChild(profileBadge);
+
+      // Modal container
+      const modalOverlay = document.createElement('div');
+      modalOverlay.id = 'student-auth-modal';
+      modalOverlay.style.cssText = `
+        position:fixed;top:0;left:0;width:100%;height:100%;
+        background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;
+        z-index:1000;
+      `;
+      modalOverlay.innerHTML = `
+        <div class="card" style="width:320px;padding:20px;position:relative;">
+          <h3 id="auth-modal-title">Student Register</h3>
+          <form id="auth-form">
+            <div style="margin-bottom:10px;">
+              <label>Name</label><br>
+              <input type="text" id="auth-name" required style="width:100%;">
+            </div>
+            <div style="margin-bottom:10px;">
+              <label>Email or Phone</label><br>
+              <input type="text" id="auth-contact" required style="width:100%;">
+            </div>
+            <div style="margin-bottom:10px;">
+              <label>PIN (4‑6 digits)</label><br>
+              <input type="password" id="auth-pin" pattern="\\d{4,6}" required style="width:100%;">
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;">Submit</button>
+            <button type="button" id="auth-cancel" class="btn-primary" style="width:100%;margin-top:5px;background:#ccc;color:#000;">Cancel</button>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modalOverlay);
+
+      // Helper: hide admin UI
+      function hideAdminTools() {
+        document.querySelectorAll('.admin-tool').forEach(el => el.style.display = 'none');
+      }
+
+      // Load profile if exists
+      function loadProfile() {
+        const data = localStorage.getItem('studentProfile');
+        if (data) {
+          const profile = JSON.parse(data);
+          profileBadge.innerHTML = `
+            <strong>${profile.name}</strong><br>
+            Level ${profile.level} • XP ${profile.xp}
+          `;
+          profileBadge.style.display = 'inline-block';
+          loginBtn.style.display = 'none';
+          hideAdminTools();
+        } else {
+          profileBadge.style.display = 'none';
+          loginBtn.style.display = 'inline-block';
+        }
+      }
+
+      // Sync with backend (placeholder URL)
+      function syncProfile(profile) {
+        fetch('https://example.com/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profile)
+        })
+        .then(res => res.json())
+        .then(updated => {
+          // Assume backend returns updated xp, streak, level
+          profile.xp = updated.xp ?? profile.xp;
+          profile.streak = updated.streak ?? profile.streak;
+          profile.level = updated.level ?? profile.level;
+          localStorage.setItem('studentProfile', JSON.stringify(profile));
+          loadProfile();
+        })
+        .catch(() => {
+          // If sync fails, keep local copy
+          console.warn('Unable to sync with backend.');
+        });
+      }
+
+      // Open modal
+      loginBtn.addEventListener('click', () => {
+        document.getElementById('auth-modal-title').textContent = 'Student Register';
+        document.getElementById('auth-form').reset();
+        modalOverlay.style.display = 'flex';
+      });
+
+      // Cancel button
+      document.getElementById('auth-cancel').addEventListener('click', () => {
+        modalOverlay.style.display = 'none';
+      });
+
+      // Form submit
+      document.getElementById('auth-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const profile = {
+          name: document.getElementById('auth-name').value.trim(),
+          contact: document.getElementById('auth-contact').value.trim(),
+          pin: document.getElementById('auth-pin').value,
+          xp: 0,
+          streak: 0,
+          level: 1
+        };
+        localStorage.setItem('studentProfile', JSON.stringify(profile));
+        syncProfile(profile);
+        modalOverlay.style.display = 'none';
+      });
+
+      // Initialize
+      loadProfile();
+    })();
+  </script>
+</div>
 <div class="card" style="padding:20px; max-width:800px; margin:auto;">
   <h2>Interactive Quest‑Based Learning Hub</h2>
   
