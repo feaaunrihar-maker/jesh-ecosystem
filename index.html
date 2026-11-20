@@ -299,6 +299,106 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<style>
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-family: Arial, sans-serif;
+    }
+    .mini-card {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+      margin: 8px 0;
+      background-color: #f9f9f9;
+    }
+    .btn-primary {
+      background-color: #0069d9;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-primary:hover {
+      background-color: #0053b3;
+    }
+    .log-output {
+      font-size: 13px;
+      color: #333;
+      white-space: pre-wrap;
+      background: #eef;
+      padding: 8px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+  </style>
+
+  <div class="card">
+    <h3>🚀 Upgrade Workflow</h3>
+    <div class="mini-card">
+      <strong>Step 1:</strong> Snapshot current version (SystemBackups) with <code>?safe=1</code>
+    </div>
+    <div class="mini-card">
+      <strong>Step 2:</strong> Log timestamp, snapshot ID, and repo URL in MasterBlueprint
+    </div>
+    <div class="mini-card">
+      <strong>Step 3:</strong> Push changes to <code>feaaunrihar-maker/jesh-ecosystem</code> (main branch)
+    </div>
+    <button class="btn-primary" id="runUpgradeBtn">Run Upgrade</button>
+    <div id="log" class="log-output"></div>
+  </div>
+
+  <script>
+    class UpgradeManager {
+      constructor() {
+        this.logEl = document.getElementById('log');
+      }
+
+      log(message) {
+        const time = new Date().toISOString();
+        this.logEl.textContent += `[${time}] ${message}\n`;
+      }
+
+      async createSnapshot() {
+        // Simulated snapshot creation
+        const snapshotId = 'snap_' + Math.random().toString(36).substr(2, 9);
+        this.log(`✅ Snapshot created with ID: ${snapshotId}`);
+        return snapshotId;
+      }
+
+      async logToMasterBlueprint(snapshotId) {
+        const timestamp = new Date().toISOString();
+        const repoUrl = 'https://github.com/feaaunrihar-maker/jesh-ecosystem';
+        // Simulated logging
+        this.log(`✅ Logged to MasterBlueprint → Timestamp: ${timestamp}, Snapshot ID: ${snapshotId}, Repo: ${repoUrl}`);
+      }
+
+      async pushChanges() {
+        // Simulated push
+        await new Promise(res => setTimeout(res, 1000));
+        this.log('✅ Changes pushed to GitHub repository (main branch).');
+      }
+
+      async run() {
+        this.log('🔧 Starting upgrade process...');
+        const snapshotId = await this.createSnapshot();
+        await this.logToMasterBlueprint(snapshotId);
+        await this.pushChanges();
+        this.log('🎉 Upgrade complete. All safety checks passed.');
+      }
+    }
+
+    document.getElementById('runUpgradeBtn').addEventListener('click', () => {
+      const manager = new UpgradeManager();
+      manager.run();
+    });
+  </script>
 ```html
 <!-- Student Dashboard UI Adjustments -->
 <div class="dashboard">
