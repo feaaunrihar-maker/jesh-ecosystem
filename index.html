@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Jesh AI Ecosystem</title>
   <meta name="theme-color" content="#4F46E5" />
-  <style>
+  <style id="masterThemeStyles">
     :root {
       --primary: #4F46E5;
       --primary-dark: #3730A3;
@@ -26,13 +26,14 @@
     }
     .hidden { display: none !important; }
 
-    /* TOUCH-FRIENDLY 48PX BUTTONS & INPUTS */
-    button, .btn {
+    /* 48PX TOUCH-FRIENDLY BUTTONS & INPUTS */
+    button, .btn-label {
       cursor: pointer; border: none; border-radius: 12px; font-weight: 700; font-size: 14px;
       min-height: 48px; padding: 10px 16px; transition: 0.15s ease;
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      text-decoration: none;
     }
-    button:active { transform: scale(0.98); }
+    button:active, .btn-label:active { transform: scale(0.98); }
     .btn-primary { background: var(--primary); color: #FFFFFF; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-dark { background: var(--dark); color: #FFFFFF; }
@@ -41,14 +42,14 @@
     .btn-amber { background: var(--amber); color: #FFFFFF; }
     .btn-outline { background: #FFFFFF; color: var(--text); border: 1.5px solid #CBD5E1; }
 
-    input[type="text"], input[type="password"], input[type="number"], input[type="tel"], select, textarea {
+    input[type="text"], input[type="password"], input[type="number"], select, textarea {
       width: 100%; min-height: 48px; padding: 11px 14px; border-radius: 12px;
       border: 1.5px solid #CBD5E1; font-size: 15px; font-family: inherit;
       outline: none; background: #FFFFFF; color: var(--text);
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
 
-    /* FULL-SCREEN AUTH & ONBOARDING GATE */
+    /* AUTH & ONBOARDING GATES */
     .auth-gate {
       position: fixed; inset: 0; background: var(--bg); z-index: 90;
       display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;
@@ -66,7 +67,7 @@
     }
     .tab-switch button.active { background: #FFFFFF; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
-    /* TOP HEADER (HIDDEN UNTIL LOGGED IN) */
+    /* HEADER & LOCKED 48PX FOOTER */
     header {
       height: 60px; background: #FFFFFF; border-bottom: 1px solid var(--border); padding: 0 14px;
       display: flex; justify-content: space-between; align-items: center;
@@ -81,12 +82,11 @@
     .brand h1 { font-size: 15px; font-weight: 800; color: var(--text); }
     .brand p { font-size: 11px; color: var(--muted); font-weight: 600; }
 
-    /* WORKSPACE & LOCKED 48PX FOOTER */
     .app-workspace {
       position: fixed; top: 60px; bottom: 54px; left: 0; right: 0;
       overflow-y: auto; padding: 14px; background: var(--bg);
     }
-    .screen-inner { max-width: 900px; margin: 0 auto; }
+    .screen-inner { max-width: 960px; margin: 0 auto; }
     .bottom-footer {
       position: fixed; bottom: 0; left: 0; right: 0; height: 54px;
       background: #FFFFFF; border-top: 1px solid var(--border);
@@ -104,9 +104,7 @@
       background: #FFFFFF; border-radius: 16px; border: 1px solid var(--border);
       padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.03);
     }
-    .mini-card {
-      background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 14px;
-    }
+    .mini-card { background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
     .module-card {
       background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 16px; padding: 16px;
@@ -114,52 +112,85 @@
     }
     .module-card:hover { border-color: var(--primary); background: #EEF2FF; }
     .input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .input-row input { flex: 1; min-width: 170px; }
+    .input-row input { flex: 1; min-width: 160px; }
 
-    /* CHAT & SPEAKING */
+    /* CHAT MESSAGES */
     .chat-messages {
-      height: 270px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+      height: 250px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
       background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px;
     }
     .msg-ai { background: #FFFFFF; border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-start; font-size: 14px; line-height: 1.5; white-space: pre-line; }
     .msg-user { background: var(--primary); color: #FFFFFF; padding: 10px 14px; border-radius: 14px; max-width: 86%; align-self: flex-end; font-size: 14px; }
 
-    /* 2-WAY VIDEO CALL STAGE */
-    .dark-studio { background: #0F172A; color: #F8FAFC; border-radius: 18px; padding: 16px; position: relative; }
-    .video-stage {
-      position: relative; background: #1E293B; border-radius: 16px; padding: 20px 14px;
-      text-align: center; border: 1px solid #334155; margin-bottom: 12px; min-height: 250px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    /* TRUE 50/50 SPLIT-SCREEN FACE-TO-FACE VIDEO CALL */
+    .dark-studio { background: #0F172A; color: #F8FAFC; border-radius: 18px; padding: 14px; }
+    .split-call-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
     }
-    .call-timer-pill {
-      position: absolute; top: 12px; left: 12px; background: rgba(15,23,42,0.85);
-      color: #34D399; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700;
+    @media (max-width: 600px) {
+      .split-call-grid { grid-template-columns: 1fr; }
     }
-    .pip-box {
-      position: absolute; top: 12px; right: 12px; width: 84px; height: 108px; border-radius: 12px;
-      overflow: hidden; border: 2px solid #4F46E5; background: #0F172A;
-      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: #FFFFFF;
+    .call-tile {
+      position: relative; background: #1E293B; border-radius: 16px; border: 2px solid #334155;
+      min-height: 230px; overflow: hidden; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 12px;
     }
-    .pip-box video { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-stage {
-      width: 124px; height: 124px; border-radius: 50%; overflow: hidden;
-      border: 4px solid #10B981; background: #0F172A; margin-bottom: 10px;
+    .call-tile.speaking-glow { border-color: #10B981; box-shadow: 0 0 24px rgba(16,185,129,0.45); }
+    .tile-badge {
+      position: absolute; top: 10px; left: 10px; background: rgba(15,23,42,0.85);
+      color: #F8FAFC; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; z-index: 5;
     }
-    .avatar-stage img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-speaking { animation: speakPulse 0.4s infinite alternate; box-shadow: 0 0 28px rgba(16,185,129,0.8); }
-    @keyframes speakPulse { from { transform: scale(1); } to { transform: scale(1.06); } }
-    .subtitle-bar {
-      background: rgba(2,6,23,0.85); color: #F8FAFC; padding: 8px 12px; border-radius: 10px;
-      font-size: 13px; max-width: 92%; line-height: 1.4;
+    .timer-badge {
+      position: absolute; top: 10px; right: 10px; background: rgba(5,150,105,0.9);
+      color: #FFFFFF; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 800; z-index: 5;
+    }
+
+    /* AVATAR WITH REAL-TIME LIP-SYNC MOUTH OVERLAY */
+    .avatar-face-wrap {
+      position: relative; width: 132px; height: 132px; border-radius: 50%;
+      overflow: hidden; border: 3px solid #4F46E5; background: #0F172A; margin-bottom: 8px;
+      transition: transform 0.2s ease;
+    }
+    .avatar-face-wrap.head-nod { animation: headMotion 0.55s infinite alternate ease-in-out; }
+    @keyframes headMotion { from { transform: rotate(-2deg) scale(1.01); } to { transform: rotate(2deg) scale(1.04); } }
+    .avatar-face-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Animated Talking Mouth Overlay on Photo/Avatar */
+    .lip-sync-mouth {
+      position: absolute; bottom: 24%; left: 50%; transform: translateX(-50%);
+      width: 26px; height: 6px; background: #7F1D1D; border: 2px solid #FCA5A5;
+      border-radius: 50%; opacity: 0; transition: height 0.08s ease;
+    }
+    .lip-sync-mouth.talking {
+      opacity: 0.92;
+      animation: mouthFlap 0.22s infinite alternate;
+    }
+    @keyframes mouthFlap {
+      0% { height: 5px; width: 22px; }
+      50% { height: 16px; width: 26px; }
+      100% { height: 9px; width: 24px; }
+    }
+
+    .student-cam-video {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
+    }
+    .cam-initials-circle {
+      width: 88px; height: 88px; border-radius: 50%; background: var(--primary);
+      color: #FFFFFF; font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+    }
+    .subtitle-overlay {
+      background: rgba(2,6,23,0.88); color: #F8FAFC; padding: 8px 12px; border-radius: 10px;
+      font-size: 13px; text-align: center; width: 100%; line-height: 1.4; z-index: 4;
     }
 
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15,23,42,0.75); backdrop-filter: blur(4px);
       display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
     }
-    .modal-box { background: #FFFFFF; border-radius: 18px; padding: 22px; max-width: 420px; width: 100%; }
-    .terminal { background: #020617; color: #34D399; font-family: monospace; font-size: 12px; padding: 12px; border-radius: 10px; margin-top: 10px; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+    .modal-box { background: #FFFFFF; border-radius: 18px; padding: 22px; max-width: 430px; width: 100%; }
   </style>
+  <!-- Future Prompt-Driven CSS Slot -->
+  <style id="dynamicCustomCSS"></style>
 </head>
 <body>
 
@@ -169,16 +200,14 @@
       <div style="text-align:center;margin-bottom:16px;">
         <div class="logo" style="margin:0 auto 8px;width:46px;height:46px;font-size:22px;" onclick="handleLogoTap()">J</div>
         <h2 style="font-size:20px;font-weight:800;color:var(--text);">Jesh AI Ecosystem</h2>
-        <p style="font-size:13px;color:var(--muted);">आसान और पर्सनल AI लर्निंग प्लेटफ़ॉर्म</p>
+        <p style="font-size:13px;color:var(--muted);">आपका पर्सनल 2-Way AI मेंटर प्लेटफ़ॉर्म</p>
       </div>
 
-      <!-- Role Switch: Student vs Admin -->
       <div class="tab-switch">
         <button id="roleBtnStudent" class="active" onclick="switchAuthRole('student')">🎓 Student</button>
         <button id="roleBtnAdmin" onclick="switchAuthRole('admin')">🔐 Admin</button>
       </div>
 
-      <!-- Student Login / Create Account Form -->
       <div id="studentAuthForm">
         <div class="tab-switch" style="background:#EEF2FF;">
           <button id="modeBtnLogin" class="active" onclick="switchStudentMode('login')">Login करें</button>
@@ -199,7 +228,6 @@
         </div>
       </div>
 
-      <!-- Admin Login Form (Hidden until Admin tab clicked) -->
       <div id="adminAuthForm" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
         <div>
           <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Admin Master Password</label>
@@ -214,16 +242,13 @@
   <section id="profileSetupGate" class="auth-gate hidden">
     <div class="auth-card">
       <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px;">✨ स्वागत है! बस 2 आसान सवाल</div>
-
-      <!-- Step A: Name -->
       <div id="setupStepName" style="display:flex;flex-direction:column;gap:12px;">
         <h3 style="font-size:20px;">आपका पूरा नाम क्या है?</h3>
-        <p style="font-size:13px;color:var(--muted);">Enter your full name (यह आपके सर्टिफिकेट और AI ट्यूटर के लिए है)</p>
+        <p style="font-size:13px;color:var(--muted);">ताकि आपका AI टीचर आपको आपके नाम से बुला सके</p>
         <input id="setupNameInput" type="text" placeholder="अपना नाम लिखें..." onkeydown="if(event.key==='Enter') goToAgeStep()" />
         <button class="btn-primary" style="width:100%;" onclick="goToAgeStep()">Next (आगे बढ़ें) →</button>
       </div>
 
-      <!-- Step B: Age -->
       <div id="setupStepAge" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
         <h3 style="font-size:20px;">आपकी उम्र (Age) क्या है?</h3>
         <p style="font-size:13px;color:var(--muted);">ताकि AI आपकी उम्र और समझ के हिसाब से सिखा सके</p>
@@ -233,7 +258,7 @@
     </div>
   </section>
 
-  <!-- ==================== 3. TOP HEADER (ONLY SHOWN AFTER LOGIN) ==================== -->
+  <!-- ==================== 3. TOP HEADER ==================== -->
   <header id="mainAppHeader" class="hidden">
     <div class="brand">
       <div class="logo" onclick="handleLogoTap()">J</div>
@@ -254,18 +279,22 @@
       <!-- HOME DASHBOARD -->
       <section id="scr-home" class="app-screen">
         <div class="card" style="background:linear-gradient(135deg,#EEF2FF,#FFFFFF);border-left:5px solid var(--primary);">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
             <div>
-              <span style="font-size:11px;font-weight:800;color:var(--primary);">🧠 360° ADAPTIVE AI MEMORY</span>
+              <span style="font-size:11px;font-weight:800;color:var(--primary);">🧠 360° ADAPTIVE GROWTH ENGINE</span>
               <h2 style="font-size:18px;margin-top:2px;">नमस्ते, <span id="dashGreetingName">Learner</span>!</h2>
-              <p id="adaptiveSkillBadge" style="font-size:12px;color:var(--muted);margin-top:4px;">Mindset: Curious Learner • Grammar: A1 | Math: L1 | Logic: L1</p>
+              <p id="adaptiveSkillBadge" style="font-size:12px;color:var(--muted);margin-top:4px;">Level: A1 Beginner • Grammar: A1 | Math: L1 | Logic: L1</p>
             </div>
-            <button class="btn-primary" onclick="openFullScreen('studio')">📹 शुरू करें / Start Lesson</button>
+            <button class="btn-primary" onclick="openFullScreen('studio')">📹 लाइव वीडियो कॉल शुरू करें</button>
           </div>
         </div>
 
-        <!-- 4 CORE LEARNING MODULES -->
         <div class="grid-2" style="margin-bottom:14px;">
+          <div class="module-card" style="border-color:#10B981;background:#ECFDF5;" onclick="openFullScreen('studio')">
+            <span style="font-size:26px;">📹</span>
+            <strong style="font-size:16px;">JeshLive 50/50 Video Tutor</strong>
+            <span style="font-size:12px;color:#065F46;">आमने-सामने लाइव बात करें, टीचर का नाम व आवाज़ बदलें</span>
+          </div>
           <div class="module-card" onclick="openFullScreen('lingo')">
             <span style="font-size:26px;">🌍</span>
             <strong style="font-size:16px;">JeshLingo</strong>
@@ -281,18 +310,12 @@
             <strong style="font-size:16px;">Jesh Academy</strong>
             <span style="font-size:12px;color:var(--muted);">Python, HTML, CCC कोर्स और QR सर्टिफिकेट</span>
           </div>
-          <div class="module-card" style="border-color:#10B981;background:#ECFDF5;" onclick="openFullScreen('studio')">
-            <span style="font-size:26px;">📹</span>
-            <strong style="font-size:16px;">JeshLive Video Tutor</strong>
-            <span style="font-size:12px;color:#065F46;">2-Way AI वीडियो कॉल और बेस्ट-फ्रेंड ट्रेनर</span>
-          </div>
         </div>
 
-        <!-- PERSONAL AI DOUBT SOLVER -->
         <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">💬 Personal AI Tutor (आपके स्तर के अनुसार सिखाता है)</strong>
+          <strong style="font-size:15px;display:block;margin-bottom:8px;">💬 Personal AI Mentor (आपके स्तर के अनुसार सिखाता और बढ़ाता है)</strong>
           <div id="tutorChatFeed" class="chat-messages">
-            <div class="msg-ai">👋 नमस्ते! आप मुझसे English Grammar, Math, Logic या Computer का कोई भी सवाल पूछ सकते हैं।</div>
+            <div class="msg-ai">👋 नमस्ते! आप मुझसे English, Hindi, Math या Computer का कोई भी सवाल पूछ सकते हैं।</div>
           </div>
           <div class="input-row">
             <input id="learnerPrompt" type="text" placeholder="अपना सवाल लिखें..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
@@ -300,663 +323,125 @@
           </div>
         </div>
 
-        <!-- DYNAMIC EXTENSIONS SLOT (RESERVED FOR FUTURE ADMIN PROMPTS) -->
-        <div id="dynamicExtensionsZone">
-<div class="card" style="max-width:400px; margin:auto; font-family:Arial,Helvetica,sans-serif; border:1px solid #ddd; border-radius:8px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-  <div style="background:#f5f5f5; padding:12px 16px;">
-    <h3 style="margin:0; font-size:1.2em;">GitHub SHA Sync & Video Call Upgrade</h3>
-  </div>
-  <div style="padding:16px;">
-    <p style="margin:0 0 12px; line-height:1.4;">
-      Click the button to fetch the latest <code>index.html</code> SHA, then push your updated content without encountering a 409 error. The UI also restores the 50/50 split‑screen video call layout.
-    </p>
-    <textarea id="newContent" placeholder="Enter new index.html content here..." style="width:100%; height:80px; box-sizing:border-box; margin-bottom:12px; font-family:monospace;"></textarea>
-    <button id="updateBtn" class="btn-primary" style="background:#007bff; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">
-      Update index.html
-    </button>
-    <p id="statusMsg" style="margin-top:12px; font-size:0.9em; color:#555;"></p>
-  </div>
-</div>
+        <!-- FUTURE PROMPT-DRIVEN WIDGETS & SCRIPTS ZONE -->
+        <div id="dynamicExtensionsZone"></div>
+      </section>
 
-<script>
-(() => {
-  const token = ''; // ← Insert a personal access token with repo scope
-  const owner = 'feaaunrihar-maker';
-  const repo = 'jesh-ecosystem';
-  const path = 'index.html';
-  const apiBase = 'https://api.github.com';
+      <!-- JESHLIVE 50/50 SPLIT-SCREEN VIDEO CALL & AVATAR STUDIO -->
+      <section id="scr-studio" class="app-screen hidden">
+        <div class="dark-studio" style="margin-bottom:14px;">
 
-  const updateBtn = document.getElementById('updateBtn');
-  const statusMsg = document.getElementById('statusMsg');
-  const newContent = document.getElementById('newContent');
+          <!-- QUICK CALLER & LANGUAGE SWITCHER BAR -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <select id="quickCallerSelect" onchange="switchCallerFromDropdown()" style="width:auto;min-height:40px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
+              <option value="didi">👩‍🏫 Didi-Mentor (Warm Hindi+Eng)</option>
+              <option value="arjun">🧑‍🏫 Coach Arjun (Motivational)</option>
+              <option value="robo">🤖 Robo-Guru (Tech & Logic)</option>
+            </select>
 
-  const encodeContent = (str) => btoa(unescape(encodeURIComponent(str)));
+            <select id="callLanguageMode" onchange="updateCallLanguageMode()" style="width:auto;min-height:40px;background:#1E293B;color:#FFFFFF;border-color:#475569;font-size:12px;font-weight:700;">
+              <option value="hinglish">🇮🇳 हिंदी + बीच में English</option>
+              <option value="english">🌍 Only English Practice</option>
+              <option value="bhojpuri">🏡 भोजपुरी + English</option>
+            </select>
+          </div>
 
-  const fetchSHA = async () => {
-    const resp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${path}`, {
-      headers: { Authorization: `token ${token}` }
-    });
-    if (!resp.ok) throw new Error('Failed to get file metadata');
-    const data = await resp.json();
-    return data.sha;
-  };
+          <!-- 50/50 FACE-TO-FACE SPLIT SCREEN -->
+          <div class="split-call-grid">
+            <!-- PANEL 1: AI TUTOR AVATAR WITH LIP-SYNC -->
+            <div id="aiTutorTile" class="call-tile">
+              <span class="tile-badge" id="activeAvatarTitle">👩‍🏫 Didi-Mentor</span>
+              <span class="timer-badge" id="callTimer">00:00</span>
 
-  const pushUpdate = async (sha, content) => {
-    const payload = {
-      message: 'Auto‑update index.html via widget',
-      content: encodeContent(content),
-      sha: sha
-    };
-    const resp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${path}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    if (!resp.ok) throw new Error('PUT failed: ' + resp.status);
-    return resp.json();
-  };
+              <div id="avatarStage" class="avatar-face-wrap">
+                <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor" alt="AI Teacher" />
+                <div id="lipSyncMouth" class="lip-sync-mouth"></div>
+              </div>
 
-  const runUpdate = async () => {
-    statusMsg.textContent = 'Fetching latest SHA...';
-    try {
-      const sha = await fetchSHA();
-      statusMsg.textContent = 'SHA retrieved. Pushing update...';
-      await pushUpdate(sha, newContent.value);
-      statusMsg.textContent = '✅ Update successful! Video call UI restored.';
-    } catch (e) {
-      statusMsg.textContent = '❌ Error: ' + e.message;
-    }
-  };
+              <div class="subtitle-overlay" id="avatarReplyCaption">
+                👋 "Start Call" दबाएं—मैं अपना परिचय दूँगी और आपसे बात करूँगी!
+              </div>
+            </div>
 
-  updateBtn.addEventListener('click', runUpdate);
-})();
-</script>
-<style>
-/* Core card styling */
-.card {
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  overflow: hidden;
-  background:#fff;
-}
+            <!-- PANEL 2: STUDENT LIVE MIRROR CAMERA -->
+            <div class="call-tile">
+              <span class="tile-badge" id="studentCamBadge">🎥 आप (Live)</span>
+              <video id="selfCameraVideo" autoplay muted playsinline class="student-cam-video hidden"></video>
+              <div id="pipInitials" class="cam-initials-circle">YOU</div>
+              <div id="micListeningPill" style="position:absolute;bottom:10px;background:rgba(15,23,42,0.85);padding:4px 12px;border-radius:99px;font-size:11px;color:#94A3B8;z-index:4;">
+                माइक तैयार है
+              </div>
+            </div>
+          </div>
 
-/* Avatar studio */
-.avatar-studio {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  background:#f9f9f9;
-}
-.avatar-studio .btn-primary {
-  min-height:48px;
-  border-radius:12px;
-  padding:0 16px;
-  background:#ff9800;
-  color:#fff;
-  border:none;
-  cursor:pointer;
-}
-.avatar-studio .photo-label {
-  min-height:48px;
-  border-radius:12px;
-  display:inline-flex;
-  align-items:center;
-  padding:0 12px;
-  background:#e0e0e0;
-  font-size:14px;
-}
+          <!-- CLEAN CALL CONTROL BUTTONS -->
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn-emerald" id="startVideoCallBtn" onclick="startLiveVideoCall()">📞 Start Call</button>
+            <button class="btn-outline" id="muteCallBtn" onclick="toggleCallMic()">🎤 Mute</button>
+            <button class="btn-outline" id="camToggleBtn" onclick="toggleStudentCamera()">📷 Cam Off</button>
+            <button class="btn-rose" onclick="endLiveVideoCall()">📵 End Call</button>
+          </div>
 
-/* Input bar */
-.input-bar {
-  display:flex;
-  gap:8px;
-  padding:12px;
-  border-top:1px solid #eee;
-}
-.input-bar input {
-  flex:1;
-  padding:8px;
-  border:1px solid #ccc;
-  border-radius:8px;
-}
-.input-bar .send-btn {
-  min-height:48px;
-}
+          <!-- MANUAL TEXT BAR (AUTO-HIDDEN DURING ACTIVE CALL FOR DISTRACTION-FREE EXPERIENCE) -->
+          <div id="manualCallTextBar" class="input-row" style="margin-top:12px;">
+            <button class="btn-amber" onclick="listenToStudentVoice()">🎙️ बोलें</button>
+            <input id="avatarDiscussTopic" type="text" style="background:#1E293B;color:#FFFFFF;border-color:#475569;" placeholder="या यहाँ लिखकर भेजें..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
+            <button class="btn-primary" onclick="talkWithVideoAvatar()">Send</button>
+          </div>
+        </div>
 
-/* Call screen */
-.call-screen {
-  display:none;
-  height:100vh;
-  background:#000;
-}
-.call-screen.active {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-}
-@media (max-width:600px) {
-  .call-screen.active {
-    grid-template-columns:1fr;
-    grid-template-rows:1fr 1fr;
-  }
-}
+        <!-- CUSTOM TEACHER NAME, PHOTO (CAMERA/GALLERY) & 10-SEC VOICE MODEL STUDIO -->
+        <div id="avatarStudioCard" class="card">
+          <h3 style="font-size:16px;margin-bottom:4px;">🎭 अपना टीचर और आवाज़ मॉडल बनाएं (Custom Teacher Studio)</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">टीचर का नाम बदलें, लाइव सेल्फ़ी या गैलरी से फोटो लगाएं, और 10-सेकंड पढ़कर अपनी आवाज़ का मॉडल सेव करें।</p>
 
-/* Panels */
-.panel {
-  position:relative;
-  background:#111;
-  overflow:hidden;
-}
-.panel video, .panel .avatar-placeholder {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.panel .avatar-placeholder {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:24px;
-  background:#222;
-}
-.avatar-glow {
-  animation:glow 2s infinite;
-}
-@keyframes glow {
-  0%,100% { box-shadow:0 0 10px 2px rgba(0,255,0,0.5); }
-  50% { box-shadow:0 0 20px 4px rgba(0,255,0,1); }
-}
+          <!-- 1. Teacher Name Customizer -->
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">✏️ टीचर का नाम बदलें (आप इन्हें क्या कहकर बुलाना चाहते हैं?)</label>
+            <div class="input-row">
+              <input id="customAvatarNameInput" type="text" placeholder="उदा. Priya Didi, Ravi Sir, या मेरा नाम..." />
+              <button class="btn-primary" onclick="applyTeacherNameOnly()">नाम सेव करें</button>
+            </div>
+          </div>
 
-/* Subtitle & timer */
-.sub-bar, .timer {
-  position:absolute;
-  left:0;
-  width:100%;
-  text-align:center;
-  color:#fff;
-  background:rgba(0,0,0,0.5);
-  padding:4px 0;
-  font-size:14px;
-}
-.sub-bar { bottom:0; }
-.timer { top:0; }
+          <!-- 2. Camera Selfie OR Gallery Photo Upload -->
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">📸 टीचर का चेहरा चुनें (Camera या Gallery से)</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <label class="btn-label btn-amber">
+                📷 लाइव कैमरा सेल्फ़ी <input type="file" accept="image/*" capture="user" class="hidden" onchange="uploadCustomAvatar(event)" />
+              </label>
+              <label class="btn-label btn-outline">
+                🖼️ गैलरी से फोटो चुनें <input type="file" accept="image/*" class="hidden" onchange="uploadCustomAvatar(event)" />
+              </label>
+            </div>
+          </div>
 
-/* Call controls */
-.controls {
-  display:none;
-  justify-content:center;
-  gap:12px;
-  padding:12px;
-  background:#222;
-}
-.controls.active {
-  display:flex;
-}
-.controls button {
-  min-height:48px;
-  border-radius:12px;
-  background:#ff5722;
-  color:#fff;
-  border:none;
-  cursor:pointer;
-}
-.controls button.toggled {
-  background:#4caf50;
-}
-</style>
+          <!-- 3. 10-Second Guided Voice Model Recorder -->
+          <div class="mini-card" style="margin-bottom:12px;">
+            <strong style="font-size:13px;display:block;margin-bottom:4px;">🎙️ 10-सेकंड मॉडल आवाज़ रिकॉर्ड करें (Voice Model Training)</strong>
+            <p style="font-size:12px;color:var(--primary);background:#EEF2FF;padding:8px;border-radius:8px;margin-bottom:8px;">
+              पढ़ें: <em>"नमस्ते! मैं हर दिन कुछ नया सीखता हूँ और पूरे आत्मविश्वास के साथ आगे बढ़ता हूँ। Learning is fun!"</em>
+            </p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button id="recordVoiceModelBtn" class="btn-rose" onclick="recordTenSecondVoiceModel()">🔴 10s आवाज़ रिकॉर्ड करें</button>
+              <span id="voiceRecordStatus" style="font-size:12px;font-weight:700;color:var(--muted);">कोई मॉडल आवाज़ रिकॉर्ड नहीं है</span>
+            </div>
+            <audio id="recordedModelPlayback" controls class="hidden" style="width:100%;margin-top:8px;height:36px;"></audio>
+          </div>
 
-<div class="card">
-  <!-- Studio view -->
-  <div class="studio">
-    <div class="avatar-studio">
-      <button class="btn-primary">Didi-Mentor</button>
-      <button class="btn-primary">Robo-Guru</button>
-      <span class="photo-label">अपनी फोटो लगाएं</span>
-    </div>
-    <div class="input-bar">
-      <input type="text" placeholder="बोलें / Send">
-      <button class="btn-primary send-btn">Send</button>
-    </div>
-    <button id="startCallBtn" class="btn-primary" style="margin:12px;">📞 Start Call</button>
-  </div>
+          <!-- 4. Save as Default OR Make Public for All Students -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-emerald" style="flex:1;" onclick="saveCustomAvatarToLocal(true)">⭐ Save & Set as My Default</button>
+            <button class="btn-dark" style="flex:1;" onclick="publishAvatarToCommunity()">🌐 Make Public (सबके लिए पब्लिक करें)</button>
+          </div>
 
-  <!-- Call screen -->
-  <div class="call-screen" id="callScreen">
-    <div class="panel" id="aiPanel">
-      <div class="avatar-placeholder avatar-glow">AI Avatar</div>
-      <div class="timer" id="callTimer">00:00</div>
-      <div class="sub-bar" id="subtitleBar">Listening...</div>
-    </div>
-    <div class="panel" id="studentPanel">
-      <video id="webcamVideo" autoplay muted playsinline></video>
-      <div class="subtitle" id="studentName" style="position:absolute;bottom:8px;left:8px;color:#fff;background:rgba(0,0,0,0.5);padding:4px 8px;border-radius:8px;">Brijesh</div>
-    </div>
-    <div class="controls" id="callControls">
-      <button id="muteBtn">🎤 Mute</button>
-      <button id="cameraBtn">📷 Camera Off</button>
-      <button id="loopBtn" class="toggled">🔁 Auto-Loop: ON</button>
-      <button id="endCallBtn">📵 End Call</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(() => {
-  const startBtn = document.getElementById('startCallBtn');
-  const callScreen = document.getElementById('callScreen');
-  const studio = document.querySelector('.studio');
-  const controls = document.getElementById('callControls');
-  const timerEl = document.getElementById('callTimer');
-  const webcamVideo = document.getElementById('webcamVideo');
-  const muteBtn = document.getElementById('muteBtn');
-  const cameraBtn = document.getElementById('cameraBtn');
-  const loopBtn = document.getElementById('loopBtn');
-  const endCallBtn = document.getElementById('endCallBtn');
-
-  let timerInterval = null;
-  let seconds = 0;
-  let stream = null;
-  let audioEnabled = true;
-  let videoEnabled = true;
-
-  const formatTime = s => {
-    const m = String(Math.floor(s/60)).padStart(2,'0');
-    const sec = String(s%60).padStart(2,'0');
-    return `${m}:${sec}`;
-  };
-
-  const startTimer = () => {
-    timerEl.textContent = formatTime(seconds);
-    timerInterval = setInterval(() => {
-      seconds++;
-      timerEl.textContent = formatTime(seconds);
-    },1000);
-  };
-  const stopTimer = () => {
-    clearInterval(timerInterval);
-    seconds = 0;
-    timerEl.textContent = '00:00';
-  };
-
-  const startWebcam = async () => {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      webcamVideo.srcObject = stream;
-      webcamVideo.style.transform = 'scaleX(-1)'; // mirror
-    } catch (e) {
-      console.warn('Webcam not available, showing placeholder');
-      webcamVideo.style.display='none';
-    }
-  };
-  const stopWebcam = () => {
-    if (stream) {
-      stream.getTracks().forEach(t=>t.stop());
-      stream = null;
-    }
-    webcamVideo.srcObject = null;
-  };
-
-  startBtn.addEventListener('click', async () => {
-    studio.style.display='none';
-    callScreen.classList.add('active');
-    controls.classList.add('active');
-    await startWebcam();
-    startTimer();
-  });
-
-  endCallBtn.addEventListener('click', () => {
-    stopWebcam();
-    stopTimer();
-    callScreen.classList.remove('active');
-    controls.classList.remove('active');
-    studio.style.display='block';
-  });
-
-  muteBtn.addEventListener('click', () => {
-    if (!stream) return;
-    audioEnabled = !audioEnabled;
-    stream.getAudioTracks().forEach(t=>t.enabled = audioEnabled);
-    muteBtn.textContent = audioEnabled ? '🎤 Mute' : '🔊 Unmute';
-  });
-
-  cameraBtn.addEventListener('click', () => {
-    if (!stream) return;
-    videoEnabled = !videoEnabled;
-    stream.getVideoTracks().forEach(t=>t.enabled = videoEnabled);
-    cameraBtn.textContent = videoEnabled ? '📷 Camera Off' : '📷 Camera On';
-  });
-
-  loopBtn.addEventListener('click', () => {
-    loopBtn.classList.toggle('toggled');
-    const on = loopBtn.classList.contains('toggled');
-    loopBtn.textContent = on ? '🔁 Auto-Loop: ON' : '🔁 Auto-Loop: OFF';
-    // placeholder: no actual looping logic
-  });
-})();
-</script>
-<style>
-    .card {
-      max-width: 420px;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 12px;
-      background: #ffffff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      font-family: Arial, sans-serif;
-      color: #333;
-    }
-    .card h3 {
-      margin-top: 0;
-      font-size: 1.2rem;
-      color: #2c3e50;
-    }
-    .btn-primary {
-      display: inline-block;
-      padding: 10px 16px;
-      margin: 6px 0;
-      font-size: 0.95rem;
-      color: #fff;
-      background: #3f51b5;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: center;
-    }
-    .btn-primary:disabled {
-      background: #9fa8da;
-      cursor: not-allowed;
-    }
-    .toggle-btn {
-      background: #e0e0e0;
-      color: #333;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-right: 8px;
-      font-size: 0.9rem;
-    }
-    .toggle-btn.active {
-      background: #ffeb3b;
-    }
-    #avatar-stage {
-      position: relative;
-      width: 100%;
-      height: 240px;
-      background: #f5f5f5;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    #avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    #mouth-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    #upload-btn {
-      display: block;
-      width: 100%;
-      height: 48px;
-      line-height: 48px;
-      background: #fff;
-      border: 2px solid #3f51b5;
-      color: #3f51b5;
-      text-align: center;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 8px;
-      font-weight: 500;
-    }
-    #calibration-text {
-      font-size: 0.9rem;
-      margin: 8px 0;
-      color: #555;
-    }
-  </style>
-
-  <div class="card">
-    <h3>🛠️ Upgrade JeshLive 2‑Way Call & Avatar Studio</h3>
-
-    <!-- Avatar Stage -->
-    <div id="avatar-stage">
-      <img id="avatar-img" src="https://via.placeholder.com/400x240?text=Your+Avatar" alt="Avatar">
-      <canvas id="mouth-canvas"></canvas>
-    </div>
-
-    <!-- Controls -->
-    <button id="start-call" class="btn-primary">▶️ Start Call</button>
-    <button id="end-call" class="btn-primary" disabled>⏹️ End Call</button>
-
-    <!-- Upload Button -->
-    <div id="upload-btn">📤 अपनी फोटो लगाएं</div>
-
-    <!-- Calibration -->
-    <div id="calibration-text">
-      कृपया नीचे दिया गया वाक्य दो बार पढ़ें ताकि आपका आवाज़ प्रोफ़ाइल तैयार हो सके:
-      <em>"मैं आज नई तकनीक सीख रहा हूँ। यह बहुत रोमांचक है!"</em>
-    </div>
-    <button id="calibrate" class="btn-primary">🔧 Calibrate Voice (10 s)</button>
-
-    <!-- Toggles -->
-    <div style="margin-top:10px;">
-      <span id="default-toggle" class="toggle-btn">⭐ Set as My Default</span>
-      <span id="public-toggle" class="toggle-btn">🌐 Share Publicly</span>
-    </div>
-  </div>
-
-  <script>
-    // ==== Speech Recognition (Hands‑Free) ====
-    const startBtn = document.getElementById('start-call');
-    const endBtn   = document.getElementById('end-call');
-    const avatarImg = document.getElementById('avatar-img');
-    const canvas   = document.getElementById('mouth-canvas');
-    const ctx      = canvas.getContext('2d');
-
-    let recognizing = false;
-    let recognition;
-    let micStream;
-    let isCalling = false;
-    let speechQueue = [];
-
-    // Setup SpeechRecognition (browser‑native)
-    function initRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('Your browser does not support Speech Recognition.');
-        return;
-      }
-      recognition = new SpeechRecognition();
-      recognition.lang = 'hi-IN';
-      recognition.interimResults = false;
-      recognition.continuous = false;
-
-      recognition.onresult = e => {
-        const transcript = e.results[0][0].transcript.trim();
-        console.log('You said:', transcript);
-        // Simulate sending to AI and getting a response
-        mockAIResponse(transcript);
-      };
-
-      recognition.onend = () => {
-        if (isCalling) {
-          // restart listening after short pause
-          setTimeout(() => recognition.start(), 700);
-        }
-      };
-    }
-
-    // ==== Mock AI (replace with real API) ====
-    function mockAIResponse(userText) {
-      // Simple echo + delay
-      const reply = `मैं समझ गया: "${userText}"`;
-      speechQueue.push(reply);
-      if (speechQueue.length === 1) playNextReply();
-    }
-
-    function playNextReply() {
-      if (speechQueue.length === 0) return;
-      const utter = new SpeechSynthesisUtterance(speechQueue[0]);
-      utter.lang = 'hi-IN';
-      // Bind animation to speech events
-      utter.onstart = startMouthAnim;
-      utter.onend   = () => {
-        stopMouthAnim();
-        speechQueue.shift(); // remove spoken reply
-        setTimeout(() => {
-          if (speechQueue.length) playNextReply();
-          else if (isCalling) recognition.start(); // back to listening
-        }, 700);
-      };
-      speechSynthesis.speak(utter);
-    }
-
-    // ==== Mouth Animation ====
-    let mouthAnimId;
-    function startMouthAnim() {
-      const w = canvas.width = avatarImg.clientWidth;
-      const h = canvas.height = avatarImg.clientHeight;
-      let open = false;
-      function draw() {
-        ctx.clearRect(0,0,w,h);
-        // Simple oval mouth in the lower‑center area
-        const mouthW = w * 0.4;
-        const mouthH = open ? h * 0.12 : h * 0.04;
-        ctx.fillStyle = '#e53935';
-        ctx.beginPath();
-        ctx.ellipse(w/2, h*0.75, mouthW/2, mouthH, 0, 0, Math.PI*2);
-        ctx.fill();
-        // Simple blink every 2‑3 sec
-        if (Math.random() < 0.02) drawBlink();
-        open = !open;
-        mouthAnimId = requestAnimationFrame(draw);
-      }
-      draw();
-    }
-    function stopMouthAnim() {
-      cancelAnimationFrame(mouthAnimId);
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
-    function drawBlink() {
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.fillStyle = '#000';
-      ctx.fillRect(w*0.4, h*0.3, w*0.2, h*0.02);
-    }
-
-    // ==== Call Controls ====
-    startBtn.onclick = () => {
-      if (isCalling) return;
-      isCalling = true;
-      startBtn.disabled = true;
-      endBtn.disabled = false;
-      initRecognition();
-      recognition.start();
-    };
-    endBtn.onclick = () => {
-      isCalling = false;
-      startBtn.disabled = false;
-      endBtn.disabled = true;
-      if (recognition) recognition.stop();
-      speechSynthesis.cancel();
-      stopMouthAnim();
-    };
-
-    // ==== Avatar Upload (styled button) ====
-    const uploadBtn = document.getElementById('upload-btn');
-    uploadBtn.onclick = () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const url = URL.createObjectURL(file);
-        avatarImg.src = url;
-      };
-      input.click();
-    };
-
-    // ==== Voice Calibration ====
-    const calibrateBtn = document.getElementById('calibrate');
-    calibrateBtn.onclick = async () => {
-      calibrateBtn.disabled = true;
-      calibrateBtn.textContent = '🔧 Calibrating...';
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-        // Record 10 seconds (simple placeholder, no processing)
-        const recorder = new MediaRecorder(stream);
-        recorder.start();
-        setTimeout(() => {
-          recorder.stop();
-          stream.getTracks().forEach(t=>t.stop());
-          alert('Calibration complete! (Profile stored locally)');
-          calibrateBtn.disabled = false;
-          calibrateBtn.textContent = '🔧 Calibrate Voice (10 s)';
-        }, 10000);
-      } catch (err) {
-        alert('Microphone access denied.');
-        calibrateBtn.disabled = false;
-        calibrateBtn.textContent = '🔧 Calibrate Voice (10 s)';
-      }
-    };
-
-    // ==== Toggles ====
-    const defaultToggle = document.getElementById('default-toggle');
-    const publicToggle  = document.getElementById('public-toggle');
-
-    defaultToggle.onclick = () => {
-      defaultToggle.classList.toggle('active');
-      if (defaultToggle.classList.contains('active')) {
-        localStorage.setItem('defaultAvatar', avatarImg.src);
-        alert('Saved as your default avatar.');
-      } else {
-        localStorage.removeItem('defaultAvatar');
-      }
-    };
-
-    publicToggle.onclick = async () => {
-      publicToggle.classList.toggle('active');
-      if (publicToggle.classList.contains('active')) {
-        // Simulated push to Google Sheet (replace with real API)
-        const payload = {
-          name: 'User_' + Math.floor(Math.random()*1000),
-          avatarUrl: avatarImg.src,
-          timestamp: new Date().toISOString()
-        };
-        // Fake fetch – in production replace with actual endpoint
-        try {
-          await fetch('https://example.com/push-avatar', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-          });
-          alert('Avatar shared publicly!');
-        } catch (e) {
-          alert('Failed to share avatar.');
-          publicToggle.classList.remove('active');
-        }
-      } else {
-        // Optionally remove from public list – omitted for brevity
-      }
-    };
-
-    // Load saved default on page load
-    window.addEventListener('load', () => {
-      const saved = localStorage.getItem('defaultAvatar');
-      if (saved) avatarImg.src = saved;
-    });
-  </script></div>
+          <!-- Community Public Avatars List -->
+          <div id="communityAvatarsBox" style="margin-top:14px;">
+            <strong style="font-size:13px;display:block;margin-bottom:6px;">🌐 Community Public Teachers (अन्य यूज़र्स द्वारा शेयर किए गए):</strong>
+            <div id="communityAvatarsList" class="grid-2"></div>
+          </div>
+        </div>
       </section>
 
       <!-- JESHLINGO SCREEN -->
@@ -1020,56 +505,6 @@
         </div>
       </section>
 
-      <!-- JESHLIVE 2-WAY AI VIDEO-CALL TUTOR -->
-      <section id="scr-studio" class="app-screen hidden">
-        <div class="dark-studio" style="margin-bottom:14px;">
-          <div class="video-stage">
-            <span class="call-timer-pill" id="callTimer">00:00</span>
-            <div class="pip-box" id="pipContainer">
-              <video id="selfCameraVideo" autoplay muted playsinline class="hidden"></video>
-              <span id="pipInitials">YOU</span>
-            </div>
-
-            <div id="avatarStage" class="avatar-stage">
-              <img id="avatarPhotoPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor" alt="AI Best Friend" />
-            </div>
-            <div style="font-weight:700;font-size:14px;margin-bottom:6px;" id="activeAvatarTitle">Didi-Mentor (Your Best-Friend AI)</div>
-            <div class="subtitle-bar" id="avatarReplyCaption">👋 Namaste! "Start Call" दबाएं या नीचे बोलें—मैं आपका बेस्ट-फ्रेंड ट्यूटर हूँ!</div>
-          </div>
-
-          <!-- 48PX VIDEO CALL CONTROLS -->
-          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">
-            <button class="btn-emerald" id="startVideoCallBtn" onclick="startLiveVideoCall()">📞 Start Call</button>
-            <button class="btn-outline" id="muteCallBtn" onclick="toggleCallMic()">🎤 Mute</button>
-            <button class="btn-primary" id="autoLoopBtn" onclick="toggleAutoLoop()">🔁 Auto-Loop: ON</button>
-            <button class="btn-rose" onclick="endLiveVideoCall()">📵 End Call</button>
-          </div>
-
-          <!-- SPEAK OR TYPE INPUT -->
-          <div class="input-row">
-            <button class="btn-amber" onclick="listenToStudentVoice()">🎙️ बोलें</button>
-            <input id="avatarDiscussTopic" type="text" style="background:#1E293B;color:#FFFFFF;border-color:#475569;" placeholder="अंग्रेजी या हिंदी में बात करें..." onkeydown="if(event.key==='Enter') talkWithVideoAvatar()" />
-            <button class="btn-primary" onclick="talkWithVideoAvatar()">Send</button>
-          </div>
-        </div>
-
-        <!-- PERSISTENT PHOTO & VOICE CLONE STUDIO -->
-        <div class="card">
-          <strong style="font-size:15px;display:block;margin-bottom:8px;">📸 Photo & Voice Clone Studio (Saved Locally)</strong>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-            <button class="btn-outline" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', 'Didi-Mentor', 1.15)">👩‍🏫 Didi-Mentor</button>
-            <button class="btn-outline" onclick="selectPresetAvatar('https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', 'Robo-Guru', 1.0)">🤖 Robo-Guru</button>
-            <label class="btn-amber">
-              📷 अपनी फोटो लगाएं <input type="file" accept="image/*" class="hidden" onchange="uploadCustomAvatar(event)" />
-            </label>
-          </div>
-          <div class="input-row">
-            <input id="customAvatarNameInput" type="text" placeholder="अपने अवतार का नाम लिखें..." />
-            <button class="btn-primary" onclick="saveCustomAvatarToLocal()">💾 Save Avatar</button>
-          </div>
-        </div>
-      </section>
-
       <!-- HELP & LEAVE REQUEST SCREEN -->
       <section id="scr-help" class="app-screen hidden">
         <div class="card">
@@ -1087,17 +522,17 @@
   <footer id="studentBottomFooter" class="bottom-footer hidden">
     <button class="footer-btn active" data-scr="home" onclick="openFullScreen('home')">🏠<span>Home</span></button>
     <button class="footer-btn" data-scr="academy" onclick="openFullScreen('academy')">🏅<span>QR Certificate</span></button>
-    <button class="footer-btn" onclick="toggleUILanguage()">🌐<span>भाषा बदलें</span></button>
+    <button class="footer-btn" onclick="cycleUILanguage()">🌐<span>भाषा बदलें</span></button>
     <button class="footer-btn" data-scr="help" onclick="openFullScreen('help')">🆘<span>Leave/Help</span></button>
   </footer>
 
-  <!-- ==================== 6. SECRET ADMIN COMMAND CENTER (100% HIDDEN FROM STUDENTS) ==================== -->
+  <!-- ==================== 6. SECRET ADMIN COMMAND CENTER ==================== -->
   <section id="viewAdmin" class="app-workspace hidden" style="top:0;bottom:0;z-index:80;">
     <div class="screen-inner">
       <div class="dark-studio" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
           <h2 style="font-size:18px;">🛠️ Admin Command Center</h2>
-          <p style="font-size:12px;color:#94A3B8;">Single-Admin Protected • Students Isolated</p>
+          <p style="font-size:12px;color:#94A3B8;">Single-Admin Protected • Prompt-Driven Architecture</p>
         </div>
         <div style="display:flex;gap:8px;">
           <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 R&D Scan</button>
@@ -1115,10 +550,11 @@
         <div id="adminCredResults"></div>
       </div>
 
-      <!-- CO-ARCHITECT & PROMPT UPGRADE BUILDER -->
+      <!-- FUTURE-PROOF PROMPT-ONLY UPGRADE ENGINE -->
       <div class="card">
-        <h3 style="font-size:16px;margin-bottom:8px;">🤖 AI Co-Architect (प्रॉम्प्ट से नया फीचर जोड़ें)</h3>
-        <textarea id="architectPrompt" rows="3" placeholder="यहाँ लिखें कि आप ऐप में क्या नया जोड़ना या बदलना चाहते हैं..."></textarea>
+        <h3 style="font-size:16px;margin-bottom:4px;">🤖 AI Co-Architect (केवल प्रॉम्प्ट से कोई भी नया फीचर या बदलाव करें)</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">यहाँ हिंदी या अंग्रेजी में लिखें कि आप क्या जोड़ना/बदलना चाहते हैं—सिस्टम बिना पेज बिगाड़े सुरक्षित रूप से अपडेट कर देगा।</p>
+        <textarea id="architectPrompt" rows="3" placeholder="उदा. होम स्क्रीन पर गणित का क्विज़ जोड़ें, या थीम का रंग हरा करें..."></textarea>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
           <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Prepare Safe Preview</button>
           <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Make Live 🚀</button>
@@ -1128,7 +564,7 @@
 
       <!-- CONFIG VAULT -->
       <div class="card">
-        <h3 style="font-size:16px;margin-bottom:8px;">🔐 API & Config Vault</h3>
+        <h3 style="font-size:16px;margin-bottom:8px;">🔐 API & Voice/Video Vault</h3>
         <div id="configVaultGrid" class="grid-2"></div>
       </div>
     </div>
@@ -1149,20 +585,29 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
-    const SESSION_EXPIRY_MS = 48 * 60 * 60 * 1000; // 48 Hours Persistent Login
+    const SESSION_EXPIRY_MS = 48 * 60 * 60 * 1000;
     let STUDENT_PROFILE = null;
     let ADMIN_PASS = "";
-    let AUTH_MODE = "login"; // 'login' or 'register'
+    let AUTH_MODE = "login";
     let GENERATED_CODE_BUFFER = "";
     let logoTapCount = 0, logoTapTimer = null;
 
-    // Video Call & Speech State
+    // Video Call, Teacher & Voice State
     let callTimerInterval = null, callSeconds = 0, localMediaStream = null;
-    let isMicMuted = false, isAutoLoop = true, isCallActive = false;
+    let isMicMuted = false, isCamHidden = false, isCallActive = false;
+    let activeRecognition = null;
+    let CURRENT_TEACHER = {
+      name: "Didi-Mentor",
+      photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor",
+      pitch: 1.15,
+      rate: 0.96,
+      langMode: "hinglish"
+    };
 
-    // ==================== INITIALIZATION & 48H SESSION CHECK ====================
+    // ==================== 1. INITIALIZATION & 48H SESSION ====================
     window.addEventListener('DOMContentLoaded', () => {
-      loadSavedCustomAvatar();
+      loadDefaultTeacherProfile();
+      renderCommunityAvatars();
       const rawSession = localStorage.getItem('JESH_PERSISTENT_SESSION');
       if (rawSession) {
         try {
@@ -1184,13 +629,12 @@
         student: studentObj,
         loginTime: Date.now()
       }));
-      // Also mirror in local registry for instant offline/admin lookup fallback
       const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
       db[studentObj.contact.toLowerCase()] = studentObj;
       localStorage.setItem('JESH_LOCAL_STUDENTS_DB', JSON.stringify(db));
     }
 
-    // ==================== AUTH GATE LOGIC ====================
+    // ==================== 2. AUTH & ONBOARDING ====================
     function switchAuthRole(role) {
       document.getElementById('roleBtnStudent').classList.toggle('active', role === 'student');
       document.getElementById('roleBtnAdmin').classList.toggle('active', role === 'admin');
@@ -1218,43 +662,29 @@
       const db = JSON.parse(localStorage.getItem('JESH_LOCAL_STUDENTS_DB') || '{}');
       const key = contact.toLowerCase();
 
-      // Try syncing with Google Apps Script backend
       let backendRes = null;
       try {
-        backendRes = await postBackend({
-          action: 'STUDENT_AUTH',
-          mode: AUTH_MODE,
-          contact: contact,
-          pin: pin
-        });
+        backendRes = await postBackend({ action: 'STUDENT_AUTH', mode: AUTH_MODE, contact, pin });
       } catch (e) {}
 
       btn.disabled = false;
       switchStudentMode(AUTH_MODE);
 
       if (AUTH_MODE === 'register') {
-        if (db[key] && db[key].pin) {
-          return alert('यह Phone/Email पहले से रजिस्टर्ड है! कृपया Login करें।');
-        }
+        if (db[key] && db[key].pin) return alert('यह Phone/Email पहले से रजिस्टर्ड है! कृपया Login करें।');
         const newStudent = {
           userId: (backendRes && backendRes.student && backendRes.student.userId) || ('STU-' + Date.now().toString().slice(-6)),
-          contact: contact,
-          pin: pin,
-          name: (backendRes && backendRes.student && backendRes.student.name) || '',
-          age: (backendRes && backendRes.student && backendRes.student.age) || '',
-          xp: 10,
-          streak: 1,
-          mindsetTag: 'Curious Beginner',
+          contact, pin, name: '', age: '', xp: 10, streak: 1,
+          level: 'A1',
+          mindsetTag: 'Motivated Beginner',
           skillMatrix: 'Grammar: A1 | Math: L1 | Logic: L1',
-          oneLineSummary: 'New learner starting personalized journey'
+          oneLineSummary: 'Started learning journey'
         };
         savePersistentSession(newStudent);
         routeAfterAuth();
       } else {
-        // Login Mode
         if (backendRes && backendRes.success && backendRes.student) {
-          const merged = { ...db[key], ...backendRes.student, contact, pin };
-          savePersistentSession(merged);
+          savePersistentSession({ ...db[key], ...backendRes.student, contact, pin });
           routeAfterAuth();
         } else if (db[key] && db[key].pin === pin) {
           savePersistentSession(db[key]);
@@ -1267,7 +697,6 @@
 
     function routeAfterAuth() {
       document.getElementById('authGate').classList.add('hidden');
-      // Mandatory First-Time Profile Setup (Name -> Age)
       if (!STUDENT_PROFILE.name || !STUDENT_PROFILE.age) {
         document.getElementById('profileSetupGate').classList.remove('hidden');
         document.getElementById('setupStepName').classList.remove('hidden');
@@ -1288,20 +717,14 @@
 
     async function finishProfileSetup() {
       const age = document.getElementById('setupAgeInput').value.trim();
-      if (!age || age < 5 || age > 99) return alert('कृपया अपनी सही उम्र (Age) लिखें।');
+      if (!age || age < 5 || age > 99) return alert('कृपया अपनी सही उम्र लिखें।');
       STUDENT_PROFILE.age = age;
       savePersistentSession(STUDENT_PROFILE);
-
       postBackend({
-        action: 'SYNC_STUDENT',
-        userId: STUDENT_PROFILE.userId,
-        contact: STUDENT_PROFILE.contact,
-        name: STUDENT_PROFILE.name,
-        age: STUDENT_PROFILE.age,
-        xp: STUDENT_PROFILE.xp,
+        action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, contact: STUDENT_PROFILE.contact,
+        name: STUDENT_PROFILE.name, age: STUDENT_PROFILE.age, xp: STUDENT_PROFILE.xp,
         summary: `Name: ${STUDENT_PROFILE.name}, Age: ${STUDENT_PROFILE.age}`
       }).catch(() => {});
-
       document.getElementById('profileSetupGate').classList.add('hidden');
       unlockStudentDashboard();
     }
@@ -1313,11 +736,11 @@
 
       document.getElementById('hdrStudentName').textContent = STUDENT_PROFILE.name;
       document.getElementById('dashGreetingName').textContent = STUDENT_PROFILE.name;
+      document.getElementById('studentCamBadge').textContent = '🎥 ' + STUDENT_PROFILE.name + ' (Live)';
+      document.getElementById('pipInitials').textContent = STUDENT_PROFILE.name.slice(0, 2).toUpperCase();
       document.getElementById('userStreak').textContent = STUDENT_PROFILE.streak || 1;
       document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp || 0;
-      document.getElementById('adaptiveSkillBadge').textContent =
-        `Mindset: ${STUDENT_PROFILE.mindsetTag || 'Adaptive'} • ${STUDENT_PROFILE.skillMatrix || 'Grammar: A1 | Math: L1 | Logic: L1'}`;
-
+      updateAdaptiveBadgeUI();
       openFullScreen('home');
     }
 
@@ -1336,7 +759,34 @@
       document.getElementById('forgotModal').classList.add('hidden');
     }
 
-    // ==================== NAVIGATION & ADAPTIVE AI ====================
+    // ==================== 3. ADAPTIVE GROWTH & LEVEL PROGRESSION ====================
+    function updateAdaptiveBadgeUI() {
+      if (!STUDENT_PROFILE) return;
+      document.getElementById('adaptiveSkillBadge').textContent =
+        `Level: ${STUDENT_PROFILE.level || 'A1'} • ${STUDENT_PROFILE.skillMatrix || 'Grammar: A1 | Math: L1 | Logic: L1'}`;
+    }
+
+    function addStudentXP(pts, note) {
+      if (!STUDENT_PROFILE) return;
+      STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + pts;
+      // Auto-level up progression based on XP
+      if (STUDENT_PROFILE.xp >= 300) {
+        STUDENT_PROFILE.level = 'B1 Intermediate';
+        STUDENT_PROFILE.skillMatrix = 'Grammar: B1 | Math: L2 | Logic: L2';
+      } else if (STUDENT_PROFILE.xp >= 120) {
+        STUDENT_PROFILE.level = 'A2 Elementary';
+        STUDENT_PROFILE.skillMatrix = 'Grammar: A2 | Math: L1+ | Logic: L2';
+      }
+      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
+      updateAdaptiveBadgeUI();
+      savePersistentSession(STUDENT_PROFILE);
+
+      postBackend({
+        action: 'SYNC_STUDENT', userId: STUDENT_PROFILE.userId, xp: STUDENT_PROFILE.xp,
+        summary: `${STUDENT_PROFILE.level} | ${STUDENT_PROFILE.skillMatrix} | ${note || ''}`
+      }).catch(() => {});
+    }
+
     function openFullScreen(scr) {
       document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden'));
       const target = document.getElementById('scr-' + scr);
@@ -1345,24 +795,6 @@
         b.classList.toggle('active', b.dataset.scr === scr);
       });
       document.getElementById('viewLearner').scrollTop = 0;
-    }
-
-    function addStudentXP(pts, note, skillUpdate) {
-      if (!STUDENT_PROFILE) return;
-      STUDENT_PROFILE.xp = (STUDENT_PROFILE.xp || 0) + pts;
-      if (skillUpdate) STUDENT_PROFILE.skillMatrix = skillUpdate;
-      if (note) STUDENT_PROFILE.oneLineSummary = note;
-      document.getElementById('userXpCount').textContent = STUDENT_PROFILE.xp;
-      document.getElementById('adaptiveSkillBadge').textContent =
-        `Mindset: ${STUDENT_PROFILE.mindsetTag} • ${STUDENT_PROFILE.skillMatrix}`;
-      savePersistentSession(STUDENT_PROFILE);
-
-      postBackend({
-        action: 'SYNC_STUDENT',
-        userId: STUDENT_PROFILE.userId,
-        xp: STUDENT_PROFILE.xp,
-        summary: `${STUDENT_PROFILE.mindsetTag} | ${STUDENT_PROFILE.skillMatrix} | ${note || ''}`
-      }).catch(() => {});
     }
 
     async function askLearnerAI() {
@@ -1374,24 +806,54 @@
       inp.value = '';
       feed.scrollTop = feed.scrollHeight;
 
-      const context = `Student: ${STUDENT_PROFILE.name}, Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.skillMatrix}, Mindset: ${STUDENT_PROFILE.mindsetTag}.`;
-      const res = await postBackend({
-        action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId,
-        prompt: `${context} Explain simply in friendly Hindi/English adapted to their age & level: ${q}`
-      }).catch(() => ({ success: false }));
-
-      const reply = (res && res.reply) || `बहुत अच्छा सवाल ${STUDENT_PROFILE.name}! इसे आसान उदाहरण से समझते हैं: "${q}" का मुख्य नियम अभ्यास से तुरंत स्पष्ट हो जाता है।`;
+      const prompt = `You are ${CURRENT_TEACHER.name}, a warm, motivating mentor for ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). Answer in simple Hindi with helpful English terms, praise their effort, and gently raise their understanding level. Question: ${q}`;
+      const res = await postBackend({ action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt }).catch(() => ({}));
+      const reply = (res && res.reply) || `शाबाश ${STUDENT_PROFILE.name}! यह बहुत अच्छा सवाल है। आइए इसे आसान तरीके से समझते हैं और एक कदम आगे बढ़ते हैं!`;
       feed.innerHTML += `<div class="msg-ai">${reply}</div>`;
       feed.scrollTop = feed.scrollHeight;
-      addStudentXP(10, 'Asked AI Tutor: ' + q.slice(0, 30));
+      addStudentXP(10, 'Chat doubt: ' + q.slice(0, 25));
     }
 
-    // ==================== 2-WAY AI VIDEO-CALL TUTOR ====================
+    // ==================== 4. 50/50 HANDS-FREE VIDEO CALL & LIP-SYNC ====================
+    function switchCallerFromDropdown() {
+      const v = document.getElementById('quickCallerSelect').value;
+      if (v === 'didi') applyTeacherProfile({ name: 'Didi-Mentor', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor', pitch: 1.15, rate: 0.96 });
+      else if (v === 'arjun') applyTeacherProfile({ name: 'Coach Arjun', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=CoachArjun', pitch: 0.9, rate: 1.0 });
+      else if (v === 'robo') applyTeacherProfile({ name: 'Robo-Guru', photo: 'https://api.dicebear.com/7.x/bottts/svg?seed=RoboGuru', pitch: 1.0, rate: 1.02 });
+      else if (v.startsWith('comm_')) {
+        const list = getCommunityAvatarsList();
+        const item = list[parseInt(v.replace('comm_', ''), 10)];
+        if (item) applyTeacherProfile(item);
+      }
+    }
+
+    function applyTeacherProfile(t) {
+      CURRENT_TEACHER = { ...CURRENT_TEACHER, ...t };
+      document.getElementById('avatarPhotoPreview').src = CURRENT_TEACHER.photo;
+      document.getElementById('activeAvatarTitle').textContent = '👩‍🏫 ' + CURRENT_TEACHER.name;
+      document.getElementById('customAvatarNameInput').value = CURRENT_TEACHER.name;
+    }
+
+    function updateCallLanguageMode() {
+      CURRENT_TEACHER.langMode = document.getElementById('callLanguageMode').value;
+    }
+
+    function cycleUILanguage() {
+      const sel = document.getElementById('callLanguageMode');
+      sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length;
+      updateCallLanguageMode();
+      alert('🌐 भाषा बदली गई: ' + sel.options[sel.selectedIndex].text);
+    }
+
     async function startLiveVideoCall() {
       if (isCallActive) return;
       isCallActive = true;
       callSeconds = 0;
-      document.getElementById('callTimer').textContent = '00:00';
+
+      // Distraction-Free Real Call Mode: Hide text bar & studio during active call
+      document.getElementById('manualCallTextBar').classList.add('hidden');
+      document.getElementById('avatarStudioCard').classList.add('hidden');
+
       callTimerInterval = setInterval(() => {
         callSeconds++;
         const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
@@ -1399,7 +861,7 @@
         document.getElementById('callTimer').textContent = `${m}:${s}`;
       }, 1000);
 
-      // PiP Self Camera with Safe Fallback
+      // Start Student 50% Camera Tile
       try {
         localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         const vid = document.getElementById('selfCameraVideo');
@@ -1407,130 +869,315 @@
         vid.classList.remove('hidden');
         document.getElementById('pipInitials').classList.add('hidden');
       } catch (e) {
-        document.getElementById('pipInitials').textContent = (STUDENT_PROFILE.name || 'YOU').slice(0, 2).toUpperCase();
+        document.getElementById('pipInitials').classList.remove('hidden');
       }
 
-      const greeting = `Hi ${STUDENT_PROFILE.name}! I am your best friend tutor. How was your day today?`;
-      document.getElementById('avatarReplyCaption').textContent = '🗣️ ' + greeting;
-      speakAvatarVoice(greeting, () => { if (isAutoLoop && isCallActive) listenToStudentVoice(); });
+      // First-Time Call Introduction + Asking What Student Wants to Call Them
+      const introMsg = CURRENT_TEACHER.langMode === 'english'
+        ? `Hello ${STUDENT_PROFILE.name}! I am ${CURRENT_TEACHER.name}, your personal AI mentor and friend. You can call me ${CURRENT_TEACHER.name}, or change my name anytime. How are you feeling today?`
+        : `नमस्ते ${STUDENT_PROFILE.name}! मैं ${CURRENT_TEACHER.name} हूँ, आपकी पर्सनल AI मेंटर और दोस्त। आप मुझे ${CURRENT_TEACHER.name} कहकर बुला सकते हैं, या नीचे से मेरा नाम बदल भी सकते हैं। बताइए, आज आप क्या सीखना चाहते हैं?`;
+
+      document.getElementById('avatarReplyCaption').textContent = '🗣️ ' + introMsg;
+      speakWithLipSync(introMsg, () => {
+        if (isCallActive && !isMicMuted) startHandsFreeListening();
+      });
     }
 
     function toggleCallMic() {
       isMicMuted = !isMicMuted;
       document.getElementById('muteCallBtn').textContent = isMicMuted ? '🔇 Unmute' : '🎤 Mute';
+      if (isMicMuted && activeRecognition) { try { activeRecognition.stop(); } catch (e) {} }
+      else if (!isMicMuted && isCallActive) startHandsFreeListening();
     }
 
-    function toggleAutoLoop() {
-      isAutoLoop = !isAutoLoop;
-      document.getElementById('autoLoopBtn').textContent = isAutoLoop ? '🔁 Auto-Loop: ON' : '🔁 Auto-Loop: OFF';
+    function toggleStudentCamera() {
+      isCamHidden = !isCamHidden;
+      document.getElementById('camToggleBtn').textContent = isCamHidden ? '📷 Cam On' : '📷 Cam Off';
+      const vid = document.getElementById('selfCameraVideo');
+      if (isCamHidden) { vid.classList.add('hidden'); document.getElementById('pipInitials').classList.remove('hidden'); }
+      else if (localMediaStream) { vid.classList.remove('hidden'); document.getElementById('pipInitials').classList.add('hidden'); }
     }
 
     function endLiveVideoCall() {
       isCallActive = false;
       clearInterval(callTimerInterval);
-      if (localMediaStream) {
-        localMediaStream.getTracks().forEach(t => t.stop());
-        localMediaStream = null;
-      }
+      if (activeRecognition) { try { activeRecognition.stop(); } catch (e) {} }
+      if (localMediaStream) { localMediaStream.getTracks().forEach(t => t.stop()); localMediaStream = null; }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+      stopLipSyncVisuals();
       document.getElementById('selfCameraVideo').classList.add('hidden');
       document.getElementById('pipInitials').classList.remove('hidden');
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      document.getElementById('avatarStage').classList.remove('avatar-speaking');
-      document.getElementById('avatarReplyCaption').textContent = '✅ कॉल समाप्त हुई। आपकी प्रगति सेव कर ली गई है!';
-      addStudentXP(20, 'Completed 2-Way Video Call practice');
+      document.getElementById('manualCallTextBar').classList.remove('hidden');
+      document.getElementById('avatarStudioCard').classList.remove('hidden');
+      document.getElementById('micListeningPill').textContent = 'कॉल समाप्त';
+      document.getElementById('avatarReplyCaption').textContent = '✅ बहुत बढ़िया बातचीत रही! आपकी प्रोग्रेस और लेवल अपडेट कर दिया गया है।';
+      addStudentXP(25, '50/50 Live Video Call session');
+    }
+
+    function startHandsFreeListening() {
+      if (!isCallActive || isMicMuted) return;
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) return;
+
+      activeRecognition = new SpeechRec();
+      activeRecognition.lang = CURRENT_TEACHER.langMode === 'english' ? 'en-IN' : 'hi-IN';
+      activeRecognition.interimResults = false;
+
+      const pill = document.getElementById('micListeningPill');
+      pill.textContent = '🔴 सुन रहा हूँ... बोलिए!';
+      pill.style.color = '#34D399';
+
+      let capturedSpeech = '';
+      activeRecognition.onresult = e => {
+        capturedSpeech = e.results[0][0].transcript;
+      };
+      activeRecognition.onend = () => {
+        pill.textContent = 'माइक तैयार';
+        pill.style.color = '#94A3B8';
+        if (capturedSpeech.trim()) {
+          handleLiveSpokenTurn(capturedSpeech.trim());
+        } else if (isCallActive && !isMicMuted) {
+          setTimeout(startHandsFreeListening, 600);
+        }
+      };
+      try { activeRecognition.start(); } catch (e) {}
     }
 
     function listenToStudentVoice() {
-      if (isMicMuted) return;
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert('वॉइस कॉल के लिए Chrome ब्राउज़र का उपयोग करें।');
+      if (!SpeechRec) return alert('Chrome ब्राउज़र का उपयोग करें।');
       const rec = new SpeechRec();
-      rec.lang = 'en-IN';
-      document.getElementById('avatarReplyCaption').textContent = '🔴 सुन रहा हूँ... बोलिए!';
+      rec.lang = 'hi-IN';
       rec.onresult = e => {
-        const spoken = e.results[0][0].transcript;
-        document.getElementById('avatarDiscussTopic').value = spoken;
+        document.getElementById('avatarDiscussTopic').value = e.results[0][0].transcript;
         talkWithVideoAvatar();
       };
       rec.start();
     }
 
-    async function talkWithVideoAvatar() {
+    function talkWithVideoAvatar() {
       const inp = document.getElementById('avatarDiscussTopic');
-      const text = inp.value.trim();
-      if (!text) return;
+      const txt = inp.value.trim();
+      if (!txt) return;
       inp.value = '';
-      const cap = document.getElementById('avatarReplyCaption');
-      cap.textContent = '💭 सोच रहा हूँ...';
+      handleLiveSpokenTurn(txt);
+    }
 
-      const sysPrompt = `Act as a warm, encouraging best friend (not a strict teacher) on a video call with ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Skills: ${STUDENT_PROFILE.skillMatrix}). Student said: "${text}". Reply in 2 short natural sentences, gently fix any grammar mistake with a fun example, and ask 1 easy follow-up question.`;
+    async function handleLiveSpokenTurn(userSpokenText) {
+      const cap = document.getElementById('avatarReplyCaption');
+      cap.textContent = `आपने कहा: "${userSpokenText}" • 💭 जवाब सोच रहा हूँ...`;
+
+      // Dynamic Language Switch by Voice Command!
+      const low = userSpokenText.toLowerCase();
+      if (low.includes('hindi mein') || low.includes('हिंदी में')) {
+        CURRENT_TEACHER.langMode = 'hinglish';
+        document.getElementById('callLanguageMode').value = 'hinglish';
+      } else if (low.includes('only english') || low.includes('speak english')) {
+        CURRENT_TEACHER.langMode = 'english';
+        document.getElementById('callLanguageMode').value = 'english';
+      }
+
+      const langRule = CURRENT_TEACHER.langMode === 'english'
+        ? 'Speak in simple, encouraging English.'
+        : CURRENT_TEACHER.langMode === 'bhojpuri'
+          ? 'Speak warmly in Bhojpuri mixed with easy English words.'
+          : 'Speak warmly in natural Hindi while teaching 1-2 useful English words/sentences in between.';
+
+      const sysPrompt = `You are ${CURRENT_TEACHER.name}, a caring, motivating best-friend AI teacher on a live video call with ${STUDENT_PROFILE.name} (Age: ${STUDENT_PROFILE.age}, Level: ${STUDENT_PROFILE.level}). ${langRule} Student said: "${userSpokenText}". Praise their effort, gently fix any mistake, upgrade their knowledge slightly, and ask 1 short friendly follow-up question in 2-3 spoken sentences.`;
+
       const res = await postBackend({
         action: 'CHAT', role: 'student', studentId: STUDENT_PROFILE.userId, prompt: sysPrompt
-      }).catch(() => ({ success: false }));
+      }).catch(() => ({}));
 
-      const reply = (res && res.reply) || `That sounds awesome ${STUDENT_PROFILE.name}! You can also say: "I really enjoyed that!" Tell me, what do you want to learn next?`;
+      const reply = (res && res.reply) || `वाह ${STUDENT_PROFILE.name}, बहुत अच्छा! अंग्रेजी में इसे हम कह सकते हैं: "I am improving every day!" बताइए, क्या आप इसका एक और उदाहरण बनाना चाहेंगे?`;
       cap.textContent = '🗣️ ' + reply;
-      addStudentXP(15, 'Video call turn: ' + text.slice(0, 25));
-      speakAvatarVoice(reply, () => {
-        if (isAutoLoop && isCallActive && !isMicMuted) listenToStudentVoice();
+      addStudentXP(15, 'Live conversation: ' + userSpokenText.slice(0, 25));
+
+      speakWithLipSync(reply, () => {
+        if (isCallActive && !isMicMuted) setTimeout(startHandsFreeListening, 600);
       });
     }
 
-    function speakAvatarVoice(txt, onDoneCallback) {
-      const stage = document.getElementById('avatarStage');
-      stage.classList.add('avatar-speaking');
+    function speakWithLipSync(text, onFinish) {
+      const tile = document.getElementById('aiTutorTile');
+      const face = document.getElementById('avatarStage');
+      const mouth = document.getElementById('lipSyncMouth');
+
+      tile.classList.add('speaking-glow');
+      face.classList.add('head-nod');
+      mouth.classList.add('talking');
+
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(txt);
-        u.rate = 0.95;
+        const u = new SpeechSynthesisUtterance(text);
+        // Choose Hindi/Indian voice automatically when Devanagari characters exist
+        const hasHindi = /[\u0900-\u097F]/.test(text);
+        u.lang = hasHindi ? 'hi-IN' : 'en-IN';
+        u.pitch = CURRENT_TEACHER.pitch || 1.05;
+        u.rate = CURRENT_TEACHER.rate || 0.96;
         u.onend = () => {
-          stage.classList.remove('avatar-speaking');
-          if (onDoneCallback) setTimeout(onDoneCallback, 800);
+          stopLipSyncVisuals();
+          if (onFinish) onFinish();
+        };
+        u.onerror = () => {
+          stopLipSyncVisuals();
+          if (onFinish) onFinish();
         };
         window.speechSynthesis.speak(u);
       } else {
-        setTimeout(() => { stage.classList.remove('avatar-speaking'); }, 2000);
+        setTimeout(() => { stopLipSyncVisuals(); if (onFinish) onFinish(); }, 2500);
       }
     }
 
-    // Persistent Custom Avatar in localStorage
-    function selectPresetAvatar(url, name) {
-      document.getElementById('avatarPhotoPreview').src = url;
-      document.getElementById('activeAvatarTitle').textContent = name + ' (Best-Friend AI)';
+    function stopLipSyncVisuals() {
+      document.getElementById('aiTutorTile').classList.remove('speaking-glow');
+      document.getElementById('avatarStage').classList.remove('head-nod');
+      document.getElementById('lipSyncMouth').classList.remove('talking');
     }
+
+    // ==================== 5. CUSTOM TEACHER, VOICE MODEL & COMMUNITY ====================
+    function applyTeacherNameOnly() {
+      const newName = document.getElementById('customAvatarNameInput').value.trim();
+      if (!newName) return alert('कृपया टीचर का नया नाम लिखें।');
+      applyTeacherProfile({ name: newName });
+      saveCustomAvatarToLocal(false);
+      alert(`✅ अब आपके टीचर का नाम "${newName}" सेट हो गया है!`);
+    }
+
     function uploadCustomAvatar(e) {
       const f = e.target.files[0];
       if (!f) return;
       const r = new FileReader();
-      r.onload = ev => { document.getElementById('avatarPhotoPreview').src = ev.target.result; };
+      r.onload = ev => {
+        applyTeacherProfile({ photo: ev.target.result });
+        alert('✅ फोटो लग गई है! अब नीचे "Save & Set as My Default" दबाएं।');
+      };
       r.readAsDataURL(f);
     }
-    function saveCustomAvatarToLocal() {
-      const name = document.getElementById('customAvatarNameInput').value.trim() || 'My AI Buddy';
-      const photo = document.getElementById('avatarPhotoPreview').src;
-      localStorage.setItem('JESH_CUSTOM_AVATAR', JSON.stringify({ name, photo }));
-      document.getElementById('activeAvatarTitle').textContent = name + ' (Custom Buddy)';
-      alert('✅ आपका अवतार सेव हो गया है!');
-    }
-    function loadSavedCustomAvatar() {
-      const saved = JSON.parse(localStorage.getItem('JESH_CUSTOM_AVATAR') || 'null');
-      if (saved && saved.photo) {
-        document.getElementById('avatarPhotoPreview').src = saved.photo;
-        document.getElementById('activeAvatarTitle').textContent = saved.name;
+
+    async function recordTenSecondVoiceModel() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        const chunks = [];
+        const btn = document.getElementById('recordVoiceModelBtn');
+        const status = document.getElementById('voiceRecordStatus');
+
+        btn.disabled = true;
+        status.textContent = '🔴 10 सेकंड तक वाक्य पढ़ें...';
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(blob);
+          const player = document.getElementById('recordedModelPlayback');
+          player.src = audioUrl;
+          player.classList.remove('hidden');
+          // Calibrate natural vocal pitch profile
+          CURRENT_TEACHER.pitch = 1.02;
+          CURRENT_TEACHER.rate = 0.95;
+          btn.disabled = false;
+          status.textContent = '✅ मॉडल आवाज़ कैप्चर हो गई!';
+        };
+        recorder.start();
+        setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 10000);
+      } catch (e) {
+        alert('माइक की अनुमति दें ताकि आवाज़ रिकॉर्ड हो सके।');
       }
     }
 
-    // ==================== JESHLINGO, READ & ACADEMY ====================
+    function saveCustomAvatarToLocal(showMsg) {
+      const name = document.getElementById('customAvatarNameInput').value.trim() || CURRENT_TEACHER.name;
+      const profile = {
+        name,
+        photo: document.getElementById('avatarPhotoPreview').src,
+        pitch: CURRENT_TEACHER.pitch,
+        rate: CURRENT_TEACHER.rate
+      };
+      localStorage.setItem('JESH_DEFAULT_TEACHER', JSON.stringify(profile));
+      applyTeacherProfile(profile);
+      if (showMsg) alert('⭐ यह टीचर और आवाज़ आपके लिए Default सेट हो गई है!');
+    }
+
+    function loadDefaultTeacherProfile() {
+      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || 'null');
+      if (saved && saved.name) applyTeacherProfile(saved);
+    }
+
+    function getCommunityAvatarsList() {
+      const defaults = [
+        { name: 'Priya Didi (Public)', photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PriyaDidi', pitch: 1.2, rate: 0.95, creator: 'FEA Community' },
+        { name: 'Master Ravi (Public)', photo: 'https://api.dicebear.com/7.x/adventurer/svg?seed=MasterRavi', pitch: 0.88, rate: 0.98, creator: 'FEA Mentor' }
+      ];
+      const custom = JSON.parse(localStorage.getItem('JESH_COMMUNITY_AVATARS') || '[]');
+      return [...defaults, ...custom];
+    }
+
+    function publishAvatarToCommunity() {
+      const name = document.getElementById('customAvatarNameInput').value.trim() || CURRENT_TEACHER.name;
+      const item = {
+        name: name + ' (Community)',
+        photo: document.getElementById('avatarPhotoPreview').src,
+        pitch: CURRENT_TEACHER.pitch,
+        rate: CURRENT_TEACHER.rate,
+        creator: STUDENT_PROFILE ? STUDENT_PROFILE.name : 'Student'
+      };
+      const custom = JSON.parse(localStorage.getItem('JESH_COMMUNITY_AVATARS') || '[]');
+      custom.push(item);
+      localStorage.setItem('JESH_COMMUNITY_AVATARS', JSON.stringify(custom));
+      postBackend({ action: 'SHARE_COMMUNITY_AVATAR', avatar: item }).catch(() => {});
+      renderCommunityAvatars();
+      alert('🌐 बधाई हो! आपका अवतार अब सभी छात्रों के लिए पब्लिक हो गया है।');
+    }
+
+    function renderCommunityAvatars() {
+      const list = getCommunityAvatarsList();
+      const box = document.getElementById('communityAvatarsList');
+      const sel = document.getElementById('quickCallerSelect');
+      // Remove old community options from dropdown
+      sel.querySelectorAll('option.comm-opt').forEach(o => o.remove());
+
+      box.innerHTML = list.map((av, i) => {
+        const opt = document.createElement('option');
+        opt.value = 'comm_' + i;
+        opt.textContent = '🌐 ' + av.name;
+        opt.className = 'comm-opt';
+        sel.appendChild(opt);
+
+        return `
+          <div class="mini-card" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <img src="${av.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" />
+              <div>
+                <strong style="font-size:13px;display:block;">${av.name}</strong>
+                <span style="font-size:11px;color:var(--muted);">By ${av.creator}</span>
+              </div>
+            </div>
+            <button class="btn-primary" style="min-height:36px;padding:6px 10px;font-size:12px;" onclick="selectCommunityAvatar(${i})">चुनें</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectCommunityAvatar(idx) {
+      const item = getCommunityAvatarsList()[idx];
+      if (!item) return;
+      applyTeacherProfile(item);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert(`✅ अब आप "${item.name}" से बात कर सकते हैं!`);
+    }
+
+    // ==================== 6. JESHLINGO, READ & ACADEMY ====================
     async function generateInteractiveCards() {
       const lang = document.getElementById('lingoLangSelect').value;
       const grid = document.getElementById('lingoCardsGrid');
       grid.innerHTML = '<div class="mini-card">⚡ कार्ड्स तैयार हो रहे हैं...</div>';
       const res = await postBackend({
         action: 'CHAT', role: 'student',
-        prompt: `Give 4 daily phrases in ${lang} for ${STUDENT_PROFILE.name} (${STUDENT_PROFILE.skillMatrix}). Format strictly: PHRASE | PRONUNCIATION | HINDI MEANING`
-      }).catch(() => ({ success: false }));
-
-      const lines = (res && res.reply ? res.reply : 'Hello, how are you? | हेलो, हाउ आर यू? | नमस्ते, आप कैसे हैं?\nI am learning fast. | आई एम लर्निंग फास्ट | मैं तेज़ी से सीख रहा हूँ।')
+        prompt: `Give 4 daily phrases in ${lang} for ${STUDENT_PROFILE.name} (${STUDENT_PROFILE.level}). Format strictly: PHRASE | PRONUNCIATION | HINDI MEANING`
+      }).catch(() => ({}));
+      const lines = (res && res.reply ? res.reply : 'I am confident today. | आई एम कॉन्फिडेंट टुडे | मैं आज आत्मविश्वास से भरा हूँ।')
         .split('\n').filter(l => l.includes('|'));
       grid.innerHTML = lines.map(l => {
         const p = l.split('|');
@@ -1542,7 +1189,7 @@
     async function generateNewReadAlongPassage() {
       const el = document.getElementById('readAlongTargetText');
       el.textContent = '⚡ नया वाक्य लोड हो रहा है...';
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 inspiring 2-sentence English reading passage for age ${STUDENT_PROFILE.age}. Output ONLY the English text.` }).catch(() => ({}));
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write 1 inspiring 2-sentence English reading passage for level ${STUDENT_PROFILE.level}. Output ONLY the English text.` }).catch(() => ({}));
       el.textContent = (res && res.reply) || 'Every small step you take today builds a brighter future tomorrow.';
     }
 
@@ -1601,12 +1248,8 @@
       const r = document.getElementById('leaveReasonInput').value.trim();
       if (!r) return alert('कृपया कारण लिखें।');
       await postBackend({ action: 'STUDENT_LEAVE', userId: STUDENT_PROFILE.userId, name: STUDENT_PROFILE.name, reason: r }).catch(() => {});
-      alert('✅ आपकी छुट्टी का आवेदन एडमिन को भेज दिया गया है। आपकी Streak सुरक्षित रहेगी!');
+      alert('✅ आपकी छुट्टी का आवेदन एडमिन को भेज दिया गया है।');
       document.getElementById('leaveReasonInput').value = '';
-    }
-
-    function toggleUILanguage() {
-      alert('🌐 भाषा मोड: हिंदी + सरल अंग्रेजी (Bilingual Mode Active)');
     }
 
     function speakTextAloud(txt) {
@@ -1616,7 +1259,7 @@
       }
     }
 
-    // ==================== SECRET SINGLE-ADMIN COMMAND CENTER ====================
+    // ==================== 7. SECRET ADMIN & FUTURE PROMPT ENGINE ====================
     function handleLogoTap() {
       logoTapCount++;
       clearTimeout(logoTapTimer);
@@ -1654,14 +1297,11 @@
         (s.contact && s.contact.toLowerCase().includes(q)) ||
         (s.userId && s.userId.toLowerCase().includes(q))
       );
-      if (!matches.length) {
-        box.innerHTML = '<p style="font-size:13px;color:var(--muted);">कोई छात्र नहीं मिला।</p>';
-        return;
-      }
+      if (!matches.length) { box.innerHTML = '<p style="font-size:13px;color:var(--muted);">कोई छात्र नहीं मिला।</p>'; return; }
       box.innerHTML = matches.map(s => `
         <div class="mini-card" style="margin-bottom:8px;">
           <strong>${s.name || 'Unnamed'}</strong> (${s.contact})<br/>
-          <span style="font-size:12px;">Age: ${s.age || '-'} | Saved PIN: <strong>${s.pin}</strong> | XP: ${s.xp}</span>
+          <span style="font-size:12px;">Age: ${s.age || '-'} | Saved PIN: <strong>${s.pin}</strong> | Level: ${s.level} | XP: ${s.xp}</span>
         </div>
       `).join('');
     }
@@ -1678,7 +1318,7 @@
 
       const aiRes = await postBackend({
         action: 'CHAT', role: 'admin',
-        prompt: `Create a clean self-contained HTML+JS card widget (DO NOT include <html>, <head>, or <body> tags!) using class="card" and class="btn-primary" for: "${reqText}". Write 3 bullet points starting with "UPGRADE SUMMARY:" then put ONLY the clean widget inside <widget>...</widget>.`
+        prompt: `Create a clean self-contained HTML+JS module widget (DO NOT include <html>, <head>, or <body> tags!) using class="card" and class="btn-primary" for: "${reqText}". Write 3 bullet points starting with "UPGRADE SUMMARY:" then put ONLY the clean widget inside <widget>...</widget>.`
       });
       if (!aiRes.success) { out.textContent = aiRes.reply; return; }
 
@@ -1695,14 +1335,14 @@
       if (!GENERATED_CODE_BUFFER) return;
       const res = await postBackend({
         action: 'GITHUB_PUSH', adminPass: ADMIN_PASS, filePath: 'index.html',
-        content: GENERATED_CODE_BUFFER, message: 'Safe modular upgrade'
+        content: GENERATED_CODE_BUFFER, message: 'Modular prompt upgrade'
       });
       document.getElementById('architectOutput').textContent += '\n\n🎉 ' + res.message;
       document.getElementById('approvePushBtn').classList.add('hidden');
     }
 
     function renderVaultFields(cfg) {
-      const keys = ['BRAND_NAME', 'GROQ_API_KEY', 'OPENROUTER_API_KEY'];
+      const keys = ['BRAND_NAME', 'GROQ_API_KEY', 'OPENROUTER_API_KEY', 'ELEVENLABS_API_KEY'];
       document.getElementById('configVaultGrid').innerHTML = keys.map(k => `
         <div class="mini-card">
           <label style="font-size:12px;font-weight:700;">${k}</label>
