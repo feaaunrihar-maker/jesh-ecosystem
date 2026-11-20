@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jesh AI Ecosystem</title>
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <style>
     :root {
       --primary: #4f46e5;
@@ -19,7 +21,7 @@
     body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
     .hidden { display: none !important; }
     header {
-      background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border); padding: 14px 24px;
       display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50;
     }
@@ -31,10 +33,10 @@
     }
     .brand h1 { font-size: 18px; font-weight: 700; }
     .brand p { font-size: 12px; color: var(--muted); }
-    .nav-btns { display: flex; gap: 10px; }
+    .nav-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     button {
       cursor: pointer; border: none; border-radius: 10px; font-weight: 600; font-size: 13px;
-      padding: 9px 16px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 15px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;
     }
     .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(79,70,229,0.25); }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
@@ -42,11 +44,12 @@
     .btn-dark:hover { background: #1e293b; }
     .btn-emerald { background: #059669; color: #fff; }
     .btn-emerald:hover { background: #047857; }
+    .btn-rose { background: #e11d48; color: #fff; }
     .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
     .btn-outline:hover { background: #f8fafc; }
     .btn-tab-active { background: var(--primary); color: #fff; }
 
-    .container { max-width: 1060px; margin: 24px auto; padding: 0 16px; }
+    .container { max-width: 1080px; margin: 22px auto; padding: 0 16px; }
     .card {
       background: var(--card); border-radius: 18px; border: 1px solid var(--border);
       padding: 24px; box-shadow: 0 4px 20px rgba(15,23,42,0.04); margin-bottom: 20px;
@@ -56,8 +59,8 @@
       display: inline-block; background: #eef2ff; color: var(--primary);
       font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 99px; margin-bottom: 10px;
     }
-    .hero-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-    .subtitle { font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+    .hero-title { font-size: 25px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
     .tabs-bar { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
 
     input[type="text"], input[type="password"], select, textarea {
@@ -66,7 +69,7 @@
     }
     input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
     .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .input-row input { flex: 1; min-width: 220px; }
+    .input-row input { flex: 1; min-width: 210px; }
 
     .response-box {
       margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 12px;
@@ -92,7 +95,6 @@
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
     .mini-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
 
-    /* Admin Banner & Terminal */
     .admin-banner {
       background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #fff;
       border-radius: 16px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
@@ -101,8 +103,10 @@
       background: #020617; color: #34d399; font-family: Consolas, monospace; font-size: 12px;
       padding: 16px; border-radius: 12px; margin-top: 14px; white-space: pre-wrap; max-height: 320px; overflow-y: auto;
     }
-
-    /* Modal */
+    .cert-box {
+      border: 3px double var(--primary); background: linear-gradient(135deg, #ffffff, #eef2ff);
+      border-radius: 16px; padding: 24px; text-align: center; margin-top: 14px;
+    }
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15,23,42,0.65); backdrop-filter: blur(4px);
       display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
@@ -117,10 +121,12 @@
       <div class="logo">J</div>
       <div>
         <h1 id="uiBrandName">Jesh AI Ecosystem</h1>
-        <p>Ultra-Fast Autonomous Learning Studio</p>
+        <p>⚡ XP: <strong id="userXpCount">0</strong> • Autonomous Learning Studio</p>
       </div>
     </div>
     <div class="nav-btns">
+      <!-- EXTENSION HOOK 1: NAVBAR -->
+      <div id="hook-navbar" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
       <button class="btn-outline" onclick="switchView('learner')">🎓 <span id="uiLearnerLabel">Learner</span> Hub</button>
       <button class="btn-dark" onclick="openAdminModal()">🛠️ Admin Command</button>
     </div>
@@ -130,26 +136,35 @@
     <!-- ==================== LEARNER HUB ==================== -->
     <section id="viewLearner">
       <div class="card hero-card">
-        <span class="badge">⚡ Fast AI Engine Active</span>
+        <span class="badge">✨ Future-Proof Personal AI Mentor</span>
         <h2 id="uiHeroHeading" class="hero-title">Learn, Build & Evolve with Personal AI</h2>
-        <p class="subtitle">Practice live voice speaking, master 20+ languages, or learn coding & CCC/CSC with your personal AI mentor.</p>
+        <p class="subtitle">Practice live voice speaking, master 20+ languages, or learn coding & CCC/CSC with verified certificates.</p>
 
-        <div class="tabs-bar">
+        <!-- EXTENSION HOOK 2: HERO TOOLBAR -->
+        <div id="hook-hero-tools" style="margin-bottom:14px;"></div>
+
+        <!-- MODE SWITCHER TABS + EXTENSION HOOK 3: NEW TABS -->
+        <div class="tabs-bar" id="learnerTabsBar">
           <button class="l-tab btn-tab-active" data-ltab="chat" onclick="switchLearnerTab('chat')">💬 AI Tutor Chat</button>
-          <button class="l-tab btn-outline" data-ltab="speaking" onclick="switchLearnerTab('speaking')">🎤 AI Speaking Practice</button>
-          <button class="l-tab btn-outline" data-ltab="lingo" onclick="switchLearnerTab('lingo')">🌍 JeshLingo & Read</button>
-          <button class="l-tab btn-outline" data-ltab="courses" onclick="switchLearnerTab('courses')">📚 Micro-Courses</button>
+          <button id="nav-speaking" class="l-tab btn-outline" data-ltab="speaking" onclick="switchLearnerTab('speaking')">🎤 AI Speaking Practice</button>
+          <button id="nav-lingo" class="l-tab btn-outline" data-ltab="lingo" onclick="switchLearnerTab('lingo')">🌍 JeshLingo & Read</button>
+          <button id="nav-courses" class="l-tab btn-outline" data-ltab="courses" onclick="switchLearnerTab('courses')">📚 Micro-Courses & QR</button>
+          <div id="hook-tabs" style="display:contents;"></div>
         </div>
 
-        <!-- 1. AI CHAT -->
+        <!-- 1. AI CHAT + VISION IMAGE HOOK -->
         <div id="ltab-chat" class="l-panel">
           <div class="input-row">
             <input id="learnerPrompt" type="text" placeholder="Ask anything (e.g., Explain Python loops, CCC shortcut keys)..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
+            <label class="btn-outline" style="padding:9px 12px;font-size:12px;" title="Upload Image/Question Photo">
+              📷 Scan <input type="file" id="visionFileInput" accept="image/*" class="hidden" onchange="previewVisionImage(event)" />
+            </label>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;">
               <input type="checkbox" id="learnerWebToggle" /> Live Web
             </label>
             <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">Ask AI ✨</button>
           </div>
+          <div id="visionBadge" class="hidden" style="margin-top:8px;font-size:12px;color:var(--primary);font-weight:600;">🖼️ Image attached! Ask your question about it.</div>
           <div id="learnerResponseBox" class="response-box hidden"></div>
         </div>
 
@@ -158,7 +173,7 @@
           <div class="speaking-studio">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
               <div>
-                <h3 style="font-size:16px;">🎙️ AI Speaking Practice (Voice Mode)</h3>
+                <h3 style="font-size:16px;">🎙️ AI Speaking Practice (ChatGPT Voice Mode)</h3>
                 <p style="font-size:12px;color:#94a3b8;">Tap Mic, speak naturally, and get instant voice reply + grammar correction.</p>
               </div>
               <select id="speakingMode" style="width:auto;background:#1e293b;color:#fff;border-color:#334155;font-size:12px;">
@@ -192,10 +207,10 @@
             </select>
             <button class="btn-primary" onclick="startLingoLesson()">Generate Interactive Lesson</button>
           </div>
-          <div id="lingoOutputBox" class="response-box">Select any language above to get 5 daily phrases, pronunciation guide, and a reading drill!</div>
+          <div id="lingoOutputBox" class="response-box">Select any of the 20+ global languages above to get daily phrases, pronunciation guide, and a reading drill!</div>
         </div>
 
-        <!-- 4. MICRO-COURSES -->
+        <!-- 4. MICRO-COURSES & QR CERTIFICATE -->
         <div id="ltab-courses" class="l-panel hidden">
           <div class="grid-3">
             <div class="mini-card">
@@ -214,10 +229,28 @@
               <button class="btn-primary" onclick="launchCourse('HTML5 & CSS3 Web Design')">Start Lesson →</button>
             </div>
           </div>
+
+          <div id="certGeneratorSection" class="mini-card" style="margin-top:16px;">
+            <h4 style="margin-bottom:8px;">🏅 Instant QR-Verified Skill Certificate</h4>
+            <div class="input-row">
+              <input id="certStudentName" type="text" placeholder="Enter Student Full Name" />
+              <select id="certCourseSelect" style="max-width:240px;">
+                <option>Python & AI Fundamentals</option>
+                <option>NIELIT CCC & Digital Literacy</option>
+                <option>AI Speaking & English Fluency</option>
+                <option>HTML5 & Modern Web Design</option>
+              </select>
+              <button class="btn-emerald" onclick="generateQRCertificate()">Generate Certificate</button>
+            </div>
+            <div id="certPreviewArea"></div>
+          </div>
         </div>
+
+        <!-- EXTENSION HOOK 4: DYNAMIC TAB PANELS -->
+        <div id="hook-tab-panels"></div>
       </div>
 
-      <!-- AUTO-INJECTED NEW FEATURES APPEAR HERE -->
+      <!-- EXTENSION HOOK 5: AUTO-INJECTED WIDGETS -->
       <div id="dynamicExtensionsZone"></div>
     </section>
 
@@ -225,8 +258,8 @@
     <section id="viewAdmin" class="hidden">
       <div class="admin-banner">
         <div>
-          <h2 style="font-size:20px;">🛠️ Architect & AI Command Center</h2>
-          <p style="font-size:12px;color:#cbd5e1;">Self-Evolving System • Zero-Reload UI & Feature Builder • Active Vault</p>
+          <h2 style="font-size:20px;">🛠️ Architect & AI Command Center (v3.0)</h2>
+          <p style="font-size:12px;color:#cbd5e1;">Multi-Slot Self-Architect • Time-Machine Rollback • Feature Flags • Active Vault</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 Run 48h R&D Radar</button>
@@ -236,15 +269,23 @@
 
       <div class="tabs-bar">
         <button class="admin-tab-btn btn-tab-active" data-tab="architect" onclick="showAdminTab('architect')">🧠 Self-Architect & UI Builder</button>
-        <button class="admin-tab-btn btn-outline" data-tab="vault" onclick="showAdminTab('vault')">🔐 Active vs Last-Input Vault</button>
+        <button class="admin-tab-btn btn-outline" data-tab="vault" onclick="showAdminTab('vault')">🔐 Vault & Feature Flags</button>
         <button class="admin-tab-btn btn-outline" data-tab="connectors" onclick="showAdminTab('connectors')">🔌 Universal MCP & API Hub</button>
-        <button class="admin-tab-btn btn-outline" data-tab="alerts" onclick="showAdminTab('alerts')">🔔 Alerts & Proposals (<span id="alertCount">0</span>)</button>
+        <button class="admin-tab-btn btn-outline" data-tab="alerts" onclick="showAdminTab('alerts')">🔔 Alerts & Time-Machine (<span id="alertCount">0</span>)</button>
       </div>
 
       <!-- TAB 1: SELF-ARCHITECT -->
       <div id="tab-architect" class="admin-tab-panel card">
-        <h3 style="margin-bottom:6px;">🤖 Atmanirbhar Self-Architect (Build & Deploy Features from Inside)</h3>
-        <p class="subtitle">Type any new feature or UI widget below. Preview the impact, then click Approve to push live to GitHub automatically.</p>
+        <h3 style="margin-bottom:6px;">🤖 Atmanirbhar Self-Architect (Zero-GitHub Live Feature Builder)</h3>
+        <p class="subtitle">Choose where to place the new feature, describe what you want, preview impact, and push live in 1 click.</p>
+        <div style="margin-bottom:10px;max-width:340px;">
+          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Target Extension Hook Slot:</label>
+          <select id="architectTargetSlot">
+            <option value="dynamicExtensionsZone">📦 Main Dashboard Widget Card</option>
+            <option value="hook-hero-tools">⚡ Hero Quick-Action Toolbar</option>
+            <option value="hook-navbar">🧭 Top Navigation Bar Button</option>
+          </select>
+        </div>
         <textarea id="architectPrompt" rows="3" placeholder="Example: Add an AI Face & Voice Avatar preview card with live camera test button..."></textarea>
         <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
           <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Analyze & Generate Impact Preview</button>
@@ -253,10 +294,10 @@
         <div id="architectOutput" class="terminal hidden"></div>
       </div>
 
-      <!-- TAB 2: VAULT -->
+      <!-- TAB 2: VAULT & FEATURE FLAGS -->
       <div id="tab-vault" class="admin-tab-panel card hidden">
-        <h3 style="margin-bottom:6px;">🔐 Active vs. Last-Input Config & White-Label Vault</h3>
-        <p class="subtitle">Change brand name, headings, theme color, or API keys anytime. Previous values are safely archived.</p>
+        <h3 style="margin-bottom:6px;">🔐 Active vs. Last-Input Config, Feature Flags & White-Label Vault</h3>
+        <p class="subtitle">Toggle modules (TRUE/FALSE), rename headings, change colors, or update API keys with automatic backup.</p>
         <div id="configVaultGrid" class="grid-2"></div>
       </div>
 
@@ -264,7 +305,7 @@
       <div id="tab-connectors" class="admin-tab-panel card hidden">
         <h3 style="margin-bottom:6px;">🔌 Universal MCP Server, Repo & External API Bridge</h3>
         <div class="grid-2" style="margin-bottom:14px;">
-          <input id="connName" type="text" placeholder="Tool Name (e.g., ElevenLabs / Custom MCP)" />
+          <input id="connName" type="text" placeholder="Tool Name (e.g., ElevenLabs / n8n / Custom MCP)" />
           <select id="connType">
             <option value="REMOTE_MCP">Remote MCP Server URL</option>
             <option value="REST_API">External REST API</option>
@@ -278,10 +319,14 @@
         <div id="connectorsList"></div>
       </div>
 
-      <!-- TAB 4: ALERTS -->
+      <!-- TAB 4: ALERTS & TIME-MACHINE ROLLBACK -->
       <div id="tab-alerts" class="admin-tab-panel card hidden">
-        <h3 style="margin-bottom:12px;">🔔 Central Alerts & Autonomous R&D Proposals</h3>
-        <div id="alertsContainer"></div>
+        <h3 style="margin-bottom:10px;">🔔 Central Alerts, Auto-Bug Healer & R&D Proposals</h3>
+        <div id="alertsContainer" style="margin-bottom:24px;"></div>
+
+        <h3 style="margin-bottom:8px;padding-top:16px;border-top:1px solid var(--border);">⏪ 1-Click Time-Machine Rollback (Last 5 Safe Versions)</h3>
+        <p class="subtitle">Restore any previous live version of your platform in 1 click.</p>
+        <div id="backupsContainer"></div>
       </div>
     </section>
   </main>
@@ -303,7 +348,9 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
     let ADMIN_PASS = "";
     let GENERATED_CODE_BUFFER = "";
+    let ATTACHED_IMAGE_B64 = null;
 
+    // GLOBAL AUTO-ERROR CATCHER
     window.onerror = function(msg, url, line) {
       fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'REPORT_CLIENT_ERROR', errorMsg: msg, location: 'Line ' + line }) }).catch(() => {});
     };
@@ -313,20 +360,24 @@
       { key: 'ROLE_STUDENT_LABEL', label: 'Learner Role Label' },
       { key: 'HERO_HEADING', label: 'Main Home Heading' },
       { key: 'THEME_ACCENT', label: 'Theme Color (Hex e.g. #4f46e5)' },
+      { key: 'ENABLE_SPEAKING', label: 'Show AI Speaking Tab (TRUE/FALSE)' },
+      { key: 'ENABLE_LINGO', label: 'Show JeshLingo Tab (TRUE/FALSE)' },
+      { key: 'ENABLE_COURSES', label: 'Show Micro-Courses Tab (TRUE/FALSE)' },
+      { key: 'ENABLE_CERTIFICATES', label: 'Enable QR Certificates (TRUE/FALSE)' },
       { key: 'GROQ_API_KEY', label: 'Groq AI Key (gsk_...)', secret: true },
       { key: 'OPENROUTER_API_KEY', label: 'OpenRouter Key', secret: true },
       { key: 'STUDENT_SYSTEM_PROMPT', label: 'AI Tutor Behavior Prompt' }
     ];
 
-    // Fast Boot with Local Cache + Live Sync
     window.addEventListener('DOMContentLoaded', async () => {
-      const cached = localStorage.getItem('JESH_UI_CFG');
+      updateXP(0);
+      const cached = localStorage.getItem('JESH_UI_CFG_V3');
       if (cached) applyThemeConfig(JSON.parse(cached));
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
         if (data.status === 'ONLINE' && data.config) {
-          localStorage.setItem('JESH_UI_CFG', JSON.stringify(data.config));
+          localStorage.setItem('JESH_UI_CFG_V3', JSON.stringify(data.config));
           applyThemeConfig(data.config);
         }
       } catch (e) {}
@@ -338,6 +389,18 @@
       document.getElementById('uiLearnerLabel').textContent = c.studentLabel || 'Learner';
       document.getElementById('uiHeroHeading').textContent = c.heroHeading || 'Learn, Build & Evolve with Personal AI';
       if (c.themeAccent) document.documentElement.style.setProperty('--primary', c.themeAccent);
+      if (c.flags) {
+        document.getElementById('nav-speaking').classList.toggle('hidden', !c.flags.speaking);
+        document.getElementById('nav-lingo').classList.toggle('hidden', !c.flags.lingo);
+        document.getElementById('nav-courses').classList.toggle('hidden', !c.flags.courses);
+        document.getElementById('certGeneratorSection').classList.toggle('hidden', !c.flags.certificates);
+      }
+    }
+
+    function updateXP(add) {
+      let xp = parseInt(localStorage.getItem('JESH_USER_XP') || '0', 10) + add;
+      localStorage.setItem('JESH_USER_XP', xp);
+      document.getElementById('userXpCount').textContent = xp;
     }
 
     function switchView(view) {
@@ -347,7 +410,8 @@
 
     function switchLearnerTab(tab) {
       document.querySelectorAll('.l-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById('ltab-' + tab).classList.remove('hidden');
+      const target = document.getElementById('ltab-' + tab);
+      if (target) target.classList.remove('hidden');
       document.querySelectorAll('.l-tab').forEach(b => {
         b.className = (b.dataset.ltab === tab) ? 'l-tab btn-tab-active' : 'l-tab btn-outline';
       });
@@ -371,6 +435,7 @@
         renderVaultFields(res.config);
         renderAlerts(res.alerts || []);
         renderConnectors(res.connectors || []);
+        renderBackups(res.backups || []);
       } else {
         alert(res.message || 'Incorrect Password');
       }
@@ -384,18 +449,33 @@
       });
     }
 
+    // VISION IMAGE SCANNER HOOK
+    function previewVisionImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        ATTACHED_IMAGE_B64 = e.target.result;
+        document.getElementById('visionBadge').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function askLearnerAI() {
       const prompt = document.getElementById('learnerPrompt').value.trim();
-      if (!prompt) return;
+      if (!prompt && !ATTACHED_IMAGE_B64) return;
       const box = document.getElementById('learnerResponseBox');
       const btn = document.getElementById('learnerAskBtn');
       box.classList.remove('hidden');
       box.textContent = "⚡ Thinking...";
       btn.disabled = true;
       const useWeb = document.getElementById('learnerWebToggle').checked;
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt, useWebSearch: useWeb });
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: prompt || 'Explain this image in detail.', useWebSearch: useWeb, imageBase64: ATTACHED_IMAGE_B64 });
       box.textContent = res.reply || res.message;
       btn.disabled = false;
+      ATTACHED_IMAGE_B64 = null;
+      document.getElementById('visionBadge').classList.add('hidden');
+      if (res.success) updateXP(10);
     }
 
     // VOICE SPEAKING STUDIO
@@ -436,6 +516,7 @@
       const aiText = res.reply || "Great effort! Keep speaking.";
       history.innerHTML += `<div class="msg-ai">🤖 ${aiText}</div>`;
       history.scrollTop = history.scrollHeight;
+      updateXP(15);
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -451,12 +532,39 @@
       out.textContent = "⚡ Creating lesson for " + lang + "...";
       const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Give 5 essential daily phrases in ${lang} with pronunciation and 1 short practice dialogue.` });
       out.textContent = res.reply;
+      if (res.success) updateXP(15);
     }
 
     function launchCourse(name) {
       switchLearnerTab('chat');
       document.getElementById('learnerPrompt').value = `Teach me Lesson 1 of ${name} with a clear example and 1 quiz question.`;
       askLearnerAI();
+    }
+
+    function generateQRCertificate() {
+      const name = document.getElementById('certStudentName').value.trim();
+      const course = document.getElementById('certCourseSelect').value;
+      if (!name) return alert('Enter student name first.');
+      const certId = 'JESH-' + Math.floor(100000 + Math.random() * 900000);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent('Verified Jesh AI Certificate: ' + name + ' | ' + course + ' | ID: ' + certId)}`;
+      document.getElementById('certPreviewArea').innerHTML = `
+        <div class="cert-box">
+          <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:1px;">JESH AI AUTONOMOUS ACADEMY</div>
+          <h3 style="font-size:20px;margin:6px 0;">Certificate of Achievement</h3>
+          <p style="font-size:13px;color:#475569;">This certifies that</p>
+          <div style="font-size:22px;font-weight:800;margin:6px 0;color:#0f172a;">${name}</div>
+          <p style="font-size:13px;color:#475569;">has successfully completed <strong>${course}</strong></p>
+          <div style="margin-top:12px;display:flex;justify-content:center;align-items:center;gap:14px;">
+            <img src="${qrUrl}" alt="QR Verify" style="border-radius:8px;border:1px solid #cbd5e1;" />
+            <div style="text-align:left;font-size:11px;color:#64748b;">
+              <div><strong>Credential ID:</strong> ${certId}</div>
+              <div><strong>Issued:</strong> ${new Date().toLocaleDateString()}</div>
+              <button class="btn-outline" style="margin-top:6px;padding:5px 10px;font-size:11px;" onclick="window.print()">🖨️ Print / Save PDF</button>
+            </div>
+          </div>
+        </div>
+      `;
+      updateXP(50);
     }
 
     function renderVaultFields(cfg) {
@@ -476,7 +584,7 @@
       const val = document.getElementById('cfg_' + key).value.trim();
       if (!val) return alert('Enter a value first.');
       const res = await postBackend({ action: 'UPDATE_CONFIG', adminPass: ADMIN_PASS, key, value: val });
-      alert(res.success ? 'Saved & previous value archived!' : res.message);
+      alert(res.success ? 'Saved & archived!' : res.message);
     }
 
     async function restoreVaultKey(key) {
@@ -516,12 +624,28 @@
             <span>${a.type} • ${a.title}</span><span>${a.status}</span>
           </div>
           <p style="font-size:13px;margin:8px 0;">${a.details}</p>
-          ${a.status === 'PENDING' ? `<div style="display:flex;gap:8px;">
-            <button class="btn-emerald" onclick='useProposalInArchitect(${JSON.stringify(a.details)}, ${a.row})'>✅ Send to Self-Architect</button>
+          ${a.status === 'PENDING' ? `<div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-emerald" onclick='useProposalInArchitect(${JSON.stringify(a.details)}, ${a.row}, ${JSON.stringify(a.type)})'>${a.type.includes('BUG') ? '🔧 Auto-Fix Bug in Architect' : '✅ Send to Self-Architect'}</button>
             <button class="btn-outline" onclick="markAlert(${a.row}, 'DISMISSED')">Dismiss</button>
           </div>` : ''}
         </div>
-      `).join('') : '<p style="font-size:12px;color:#64748b;">No alerts yet.</p>';
+      `).join('') : '<p style="font-size:12px;color:#64748b;">No pending alerts.</p>';
+    }
+
+    function renderBackups(backups) {
+      const box = document.getElementById('backupsContainer');
+      box.innerHTML = backups.length ? backups.map(b => `
+        <div class="mini-card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:12px;"><strong>${b.id}</strong> • ${b.reason}</div>
+          <button class="btn-rose" style="padding:6px 12px;font-size:11px;" onclick="triggerRollback(${b.row})">⏪ Restore This Version</button>
+        </div>
+      `).join('') : '<p style="font-size:12px;color:#64748b;">No backups recorded yet (created automatically on every Self-Architect push).</p>';
+    }
+
+    async function triggerRollback(row) {
+      if (!confirm('Restore this previous version live to GitHub?')) return;
+      const res = await postBackend({ action: 'ROLLBACK_BACKUP', adminPass: ADMIN_PASS, row });
+      alert(res.message);
     }
 
     async function markAlert(row, status) {
@@ -529,39 +653,45 @@
       verifyAdminLogin();
     }
 
-    function useProposalInArchitect(details, row) {
+    function useProposalInArchitect(details, row, type) {
       markAlert(row, 'APPROVED');
       showAdminTab('architect');
-      document.getElementById('architectPrompt').value = "Build a clean HTML+JS feature card for: " + details;
+      document.getElementById('architectPrompt').value = type.includes('BUG')
+        ? "Fix this bug safely by adding a defensive patch widget: " + details
+        : "Build a clean HTML+JS feature card for: " + details;
     }
 
     async function generateArchitectPlan() {
       const reqText = document.getElementById('architectPrompt').value.trim();
+      const targetSlot = document.getElementById('architectTargetSlot').value;
       if (!reqText) return;
       const out = document.getElementById('architectOutput');
       const btn = document.getElementById('analyzeArchBtn');
       out.classList.remove('hidden');
       btn.disabled = true;
-      out.textContent = "1. Fetching live index.html...\n2. Designing widget & impact summary...";
+      out.textContent = "1. Reading live index.html from GitHub...\n2. Building self-contained module for slot [" + targetSlot + "]...";
 
       const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASS, filePath: 'index.html' });
       if (!fileRes.success) { out.textContent = "GitHub Error: " + fileRes.message; btn.disabled = false; return; }
 
       const aiRes = await postBackend({
         action: 'CHAT', role: 'admin',
-        prompt: `Create a clean, self-contained HTML+JS card widget using classes "card" and "btn-primary" for this request: "${reqText}". First write 2 lines starting with "IMPACT SUMMARY:". Then put ONLY the HTML/JS snippet inside <widget> ... </widget>.`
+        prompt: `Create a clean, self-contained HTML+JS module using existing CSS classes ("card", "btn-primary", "mini-card") for this request: "${reqText}". First write 2 lines starting with "IMPACT SUMMARY:". Then put ONLY the HTML/JS snippet inside <widget> ... </widget>.`
       });
       btn.disabled = false;
       if (!aiRes.success) { out.textContent = aiRes.reply; return; }
 
       const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
       const widgetHtml = (wMatch && wMatch[1]) ? wMatch[1].trim() : `<div class="card"><h3>✨ AI Upgrade</h3><p>${aiRes.reply}</p></div>`;
-      const marker = '<div id="dynamicExtensionsZone">';
-      GENERATED_CODE_BUFFER = fileRes.content.includes(marker)
-        ? fileRes.content.replace(marker, marker + '\n' + widgetHtml)
-        : fileRes.content.replace('</body>', widgetHtml + '\n</body>');
+      const marker = `id="${targetSlot}"`;
+      if (fileRes.content.includes(marker)) {
+        const idx = fileRes.content.indexOf('>', fileRes.content.indexOf(marker)) + 1;
+        GENERATED_CODE_BUFFER = fileRes.content.slice(0, idx) + '\n' + widgetHtml + fileRes.content.slice(idx);
+      } else {
+        GENERATED_CODE_BUFFER = fileRes.content.replace('</body>', widgetHtml + '\n</body>');
+      }
 
-      out.textContent = `${aiRes.reply.split('<widget>')[0].trim()}\n\n✅ Ready! Click the green "2️⃣ Approve & Push Live to GitHub 🚀" button above.`;
+      out.textContent = `${aiRes.reply.split('<widget>')[0].trim()}\n\n✅ Built & Validated for [${targetSlot}]!\nClick the green "2️⃣ Approve & Push Live to GitHub 🚀" button above.`;
       document.getElementById('approvePushBtn').classList.remove('hidden');
     }
 
@@ -570,10 +700,10 @@
       const out = document.getElementById('architectOutput');
       const pushBtn = document.getElementById('approvePushBtn');
       pushBtn.disabled = true;
-      out.textContent += "\n\nPushing live to GitHub with 5-version backup...";
+      out.textContent += "\n\nSaving Time-Machine backup & pushing live to GitHub...";
       const res = await postBackend({
         action: 'GITHUB_PUSH', adminPass: ADMIN_PASS, filePath: 'index.html',
-        content: GENERATED_CODE_BUFFER, message: 'Self-Architect: ' + document.getElementById('architectPrompt').value.slice(0, 50)
+        content: GENERATED_CODE_BUFFER, message: 'Self-Architect v3: ' + document.getElementById('architectPrompt').value.slice(0, 45)
       });
       out.textContent += "\n🎉 " + res.message + "\nRefresh page in 30 seconds to see it live!";
       pushBtn.classList.add('hidden');
