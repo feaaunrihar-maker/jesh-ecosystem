@@ -446,7 +446,193 @@
         </div>
 
         <!-- ISOLATED AUTONOMOUS SELF-ARCHITECT MOUNT POINT -->
-        <div id="dynamicExtensionsZone"></div>
+        <div id="dynamicExtensionsZone">
+<!-- AUTO-DEPLOYED: Fix the Face & Lip Alignment on #preview -->
+<style>
+    /* ---------- Avatar Widget Styles ---------- */
+    .avatar-widget {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .avatar-widget canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #f0f0f0;
+    }
+    .avatar-widget .crosshair {
+      position: absolute;
+      border: 2px solid #ff4081;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      margin: -6px 0 0 -6px; /* center the dot */
+      pointer-events: none;
+    }
+    .avatar-widget img {
+      display: none; /* hidden helper image */
+    }
+  </style>
+
+  <div class="avatar-widget">
+    <!-- Helper image that receives the uploaded picture -->
+    <img id="loadedAvatarImg" alt="Uploaded avatar" crossorigin="anonymous" />
+
+    <!-- Preview canvas (square cover‑crop) -->
+    <canvas id="previewAvatarCanvas" width="300" height="300"></canvas>
+
+    <!-- Warp canvas (same cropping logic) -->
+    <canvas id="avatarWarpCanvas" width="300" height="300"></canvas>
+
+    <!-- Crosshair that shows the detected lip point -->
+    <div id="lipCrosshair" class="crosshair"></div>
+  </div>
+
+  <script>
+    // ---------- Global Avatar State ----------
+    const AVATAR_STATE = {
+      lipX: 0.5, // normalized (0‑1) – centre by default
+      lipY: 0.45 // default for uploaded photos (mouth line)
+    };
+
+    // ---------- Utility: Square Cover‑Crop ----------
+    function drawCoverCroppedImage(ctx, img) {
+      const canvas = ctx.canvas;
+      const cw = canvas.width, ch = canvas.height;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+
+      // Determine scale to cover the canvas
+      const scale = Math.max(cw / iw, ch / ih);
+      const sw = cw / scale;
+      const sh = ch / scale;
+      const sx = (iw - sw) / 2;
+      const sy = (ih - sh) / 2;
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+    }
+
+    // ---------- Face Detection (native or fallback) ----------
+    async function detectFaceAndMouth(img) {
+      // Try native FaceDetector first
+      if ('FaceDetector' in window) {
+        try {
+          const detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+          const faces = await detector.detect(img);
+          if (faces.length) {
+            const face = faces[0].boundingBox;
+            // Approximate mouth line as 0.55 of the face height from top
+            const mouthY = face.y + face.height * 0.55;
+            const mouthX = face.x + face.width / 2;
+            return {
+              x: mouthX / img.naturalWidth,
+              y: mouthY / img.naturalHeight
+            };
+          }
+        } catch (e) {
+          console.warn('FaceDetector failed, falling back:', e);
+        }
+      }
+
+      // ----------- Simple skin‑tone fallback -----------
+      // Create a temporary canvas to read pixel data
+      const tmp = document.createElement('canvas');
+      const size = Math.min(img.naturalWidth, img.naturalHeight);
+      tmp.width = tmp.height = size;
+      const ctx = tmp.getContext('2d');
+      // Center‑crop the image for analysis
+      const sx = (img.naturalWidth - size) / 2;
+      const sy = (img.naturalHeight - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+      const data = ctx.getImageData(0, 0, size, size).data;
+
+      // Very naive skin‑tone detection (HSV range)
+      const isSkin = (r, g, b) => {
+        // Convert to HSV (fast approximation)
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const v = max / 255;
+        const delta = max - min;
+        if (delta === 0) return false;
+        const s = delta / max;
+        const hue = (() => {
+          if (max === r) return ((g - b) / delta) % 6;
+          if (max === g) return (b - r) / delta + 2;
+          return (r - g) / delta + 4;
+        })() * 60;
+        const h = hue < 0 ? hue + 360 : hue;
+        // Rough skin tone range
+        return (h >= 0 && h <= 50) && (s >= 0.23 && s <= 0.68) && (v >= 0.35 && v <= 1);
+      };
+
+      // Scan rows to find the first and last skin‑tone rows (top & bottom)
+      let top = null, bottom = null;
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const i = (y * size + x) * 4;
+          if (isSkin(data[i], data[i + 1], data[i + 2])) {
+            if (top === null) top = y;
+            bottom = y;
+            break;
+          }
+        }
+      }
+
+      // If we got a plausible region, estimate mouth as ~0.65 of that region
+      if (top !== null && bottom !== null) {
+        const faceHeight = bottom - top;
+        const mouthY = top + faceHeight * 0.65;
+        const mouthX = size / 2;
+        return {
+          x: (sx + mouthX) / img.naturalWidth,
+          y: (sy + mouthY) / img.naturalHeight
+        };
+      }
+
+      // Fallback to centre of image
+      return { x: 0.5, y: 0.45 };
+    }
+
+    // ---------- Main Image Load Handler ----------
+    async function onAvatarImageLoad() {
+      const img = document.getElementById('loadedAvatarImg');
+      const previewCtx = document.getElementById('previewAvatarCanvas').getContext('2d');
+      const warpCtx = document.getElementById('avatarWarpCanvas').getContext('2d');
+
+      // 1️⃣ Detect mouth position
+      const mouthPos = await detectFaceAndMouth(img);
+      AVATAR_STATE.lipX = mouthPos.x;
+      AVATAR_STATE.lipY = mouthPos.y;
+
+      // 2️⃣ Draw cover‑cropped image on both canvases
+      drawCoverCroppedImage(previewCtx, img);
+      drawCoverCroppedImage(warpCtx, img);
+
+      // 3️⃣ Position the crosshair (visual aid)
+      const crosshair = document.getElementById('lipCrosshair');
+      const canvasRect = document.getElementById('previewAvatarCanvas').getBoundingClientRect();
+      const cx = canvasRect.left + AVATAR_STATE.lipX * canvasRect.width;
+      const cy = canvasRect.top + AVATAR_STATE.lipY * canvasRect.height;
+      crosshair.style.left = `${cx}px`;
+      crosshair.style.top = `${cy}px`;
+    }
+
+    // ---------- Hook up image loading ----------
+    const loadedImg = document.getElementById('loadedAvatarImg');
+    loadedImg.addEventListener('load', onAvatarImageLoad);
+
+    // ---------- Example: Simulate an upload ----------
+    // In a real implementation replace this with your file‑input handler.
+    function simulateUpload(url) {
+      loadedImg.src = url;
+    }
+
+    // Example usage (you can remove this line in production)
+    simulateUpload('https://picsum.photos/seed/avatar/500'); // random portrait‑like image
+  </script></div>
       </section>
 
       <!-- TAB 2: QR CERTIFICATE -->
