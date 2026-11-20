@@ -299,6 +299,123 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<style>
+    .admin-panel { max-width: 900px; margin: 20px auto; font-family: Arial, sans-serif; }
+    .card { background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
+    .mini-card { background:#fff; border:1px solid #ccc; border-radius:6px; padding:12px; margin:8px 0; }
+    .btn-primary { background:#0066cc; color:#fff; border:none; border-radius:4px; padding:8px 16px; cursor:pointer; }
+    .btn-primary:hover { background:#0055aa; }
+    .hidden { display:none; }
+    .router-output { margin-top:10px; font-style:italic; color:#555; }
+  </style>
+
+  <div class="admin-panel">
+    <!-- Header -->
+    <div class="card">
+      <h2>🛠️ Admin Command Center – Priority 3 Upgrades</h2>
+      <p>All features below are visible **only** to the authorized admin.</p>
+    </div>
+
+    <!-- Smart Prompt Router -->
+    <div class="card">
+      <h3>Smart Prompt Router</h3>
+      <input type="text" id="adminPrompt" placeholder="Enter your instruction…" style="width:100%;padding:8px;">
+      <button class="btn-primary" onclick="routePrompt()">Route</button>
+      <div id="routerMsg" class="router-output"></div>
+    </div>
+
+    <!-- R&D Discovery List -->
+    <div class="card" id="discoveriesCard">
+      <h3>R&D Discoveries (Admin‑Only)</h3>
+      <div id="discoveriesContainer">
+        <!-- Example discovery (will be populated by JS) -->
+      </div>
+    </div>
+
+    <!-- Integration Section -->
+    <div class="card hidden" id="integrationCard">
+      <h3>Integrate / Add to Vault</h3>
+      <p id="selectedInfo"></p>
+      <button class="btn-primary" onclick="integrateResource()">Integrate</button>
+    </div>
+  </div>
+
+  <script>
+    // Mock admin authentication – replace with real auth in Code.gs
+    function authAdmin() {
+      // In production this would call google.script.run with authAdmin()
+      return true; // assume admin is logged in for demo
+    }
+
+    // Sample data – in real use this comes from the R&D_Discoveries sheet
+    const discoveries = [
+      { name: "Awesome-Repo", category: "GitHub Repo", summary: "AI‑based quiz generator (हिंदी/English)", safety: "Checked", url: "https://github.com/example/awesome-repo" },
+      { name: "FreeWeatherAPI", category: "Free API", summary: "Real‑time weather data (मौसम जानकारी)", safety: "Pending", url: "https://api.weather.com/v1" },
+      { name: "MCP‑Skill‑Chat", category: "Skill", summary: "Context‑aware chat module (संदेश)", safety: "Checked", url: "https://mcp.example.com/skill/chat" }
+    ];
+
+    // Render discovery cards
+    function renderDiscoveries() {
+      if (!authAdmin()) return;
+      const container = document.getElementById('discoveriesContainer');
+      container.innerHTML = '';
+      discoveries.forEach((d, i) => {
+        const card = document.createElement('div');
+        card.className = 'mini-card';
+        card.innerHTML = `
+          <strong>${d.name}</strong> <em>(${d.category})</em><br>
+          ${d.summary}<br>
+          Safety: ${d.safety}<br>
+          <a href="${d.url}" target="_blank">View</a> |
+          <button class="btn-primary" style="margin-top:4px;" onclick="selectForIntegration(${i})">Integrate</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Smart Prompt Router logic
+    function routePrompt() {
+      const txt = document.getElementById('adminPrompt').value.trim().toLowerCase();
+      const msg = document.getElementById('routerMsg');
+      if (!txt) { msg.textContent = 'Please type an instruction.'; return; }
+
+      if (txt.includes('scan') || txt.includes('harvest')) {
+        msg.textContent = '✅ Use the "R&D Harvester" section to start a scan.';
+      } else if (txt.includes('integrate') || txt.includes('add')) {
+        msg.textContent = '🔧 Select a discovery card and click “Integrate”.';
+      } else if (txt.includes('prompt') || txt.includes('router')) {
+        msg.textContent = '🤖 You are already in the Smart Prompt Router.';
+      } else {
+        msg.textContent = '⚠️ Unrecognized command – try “scan”, “integrate”, or “prompt”.';
+      }
+    }
+
+    // Integration flow
+    let selectedIdx = null;
+    function selectForIntegration(idx) {
+      selectedIdx = idx;
+      const d = discoveries[idx];
+      document.getElementById('selectedInfo').innerHTML = `
+        <strong>${d.name}</strong> (${d.category})<br>
+        ${d.summary}<br>
+        URL: <a href="${d.url}" target="_blank">${d.url}</a>
+      `;
+      document.getElementById('integrationCard').classList.remove('hidden');
+    }
+
+    function integrateResource() {
+      if (selectedIdx === null) return alert('No resource selected.');
+      const d = discoveries[selectedIdx];
+      // Placeholder for safe 2‑step upgrade workflow
+      alert(`Integrating "${d.name}" into ActiveConfig…\n(Implement safe push via Code.gs)`);
+      // Reset UI
+      document.getElementById('integrationCard').classList.add('hidden');
+      selectedIdx = null;
+    }
+
+    // Initial render
+    if (authAdmin()) renderDiscoveries();
+  </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
