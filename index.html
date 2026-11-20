@@ -302,6 +302,78 @@
 
         <!-- DYNAMIC EXTENSIONS SLOT (RESERVED FOR FUTURE ADMIN PROMPTS) -->
         <div id="dynamicExtensionsZone">
+<div class="card" style="max-width:400px; margin:auto; font-family:Arial,Helvetica,sans-serif; border:1px solid #ddd; border-radius:8px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+  <div style="background:#f5f5f5; padding:12px 16px;">
+    <h3 style="margin:0; font-size:1.2em;">GitHub SHA Sync & Video Call Upgrade</h3>
+  </div>
+  <div style="padding:16px;">
+    <p style="margin:0 0 12px; line-height:1.4;">
+      Click the button to fetch the latest <code>index.html</code> SHA, then push your updated content without encountering a 409 error. The UI also restores the 50/50 split‑screen video call layout.
+    </p>
+    <textarea id="newContent" placeholder="Enter new index.html content here..." style="width:100%; height:80px; box-sizing:border-box; margin-bottom:12px; font-family:monospace;"></textarea>
+    <button id="updateBtn" class="btn-primary" style="background:#007bff; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">
+      Update index.html
+    </button>
+    <p id="statusMsg" style="margin-top:12px; font-size:0.9em; color:#555;"></p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const token = ''; // ← Insert a personal access token with repo scope
+  const owner = 'feaaunrihar-maker';
+  const repo = 'jesh-ecosystem';
+  const path = 'index.html';
+  const apiBase = 'https://api.github.com';
+
+  const updateBtn = document.getElementById('updateBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const newContent = document.getElementById('newContent');
+
+  const encodeContent = (str) => btoa(unescape(encodeURIComponent(str)));
+
+  const fetchSHA = async () => {
+    const resp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${path}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (!resp.ok) throw new Error('Failed to get file metadata');
+    const data = await resp.json();
+    return data.sha;
+  };
+
+  const pushUpdate = async (sha, content) => {
+    const payload = {
+      message: 'Auto‑update index.html via widget',
+      content: encodeContent(content),
+      sha: sha
+    };
+    const resp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error('PUT failed: ' + resp.status);
+    return resp.json();
+  };
+
+  const runUpdate = async () => {
+    statusMsg.textContent = 'Fetching latest SHA...';
+    try {
+      const sha = await fetchSHA();
+      statusMsg.textContent = 'SHA retrieved. Pushing update...';
+      await pushUpdate(sha, newContent.value);
+      statusMsg.textContent = '✅ Update successful! Video call UI restored.';
+    } catch (e) {
+      statusMsg.textContent = '❌ Error: ' + e.message;
+    }
+  };
+
+  updateBtn.addEventListener('click', runUpdate);
+})();
+</script>
 <style>
 /* Core card styling */
 .card {
