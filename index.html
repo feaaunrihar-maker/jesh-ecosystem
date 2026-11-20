@@ -251,7 +251,201 @@
       </div>
 
       <!-- EXTENSION HOOK 5: AUTO-INJECTED WIDGETS -->
-      <div id="dynamicExtensionsZone"></div>
+      <div id="dynamicExtensionsZone">
+<div class="card" id="adaptive-studio">
+  <h2>Adaptive Level &amp; Interactive Quiz Studio</h2>
+
+  <!-- Level Selector -->
+  <div class="mini-card">
+    <label for="level-select">Student Level:</label>
+    <select id="level-select" class="btn-primary">
+      <option value="beginner">A0‑A1 Beginner</option>
+      <option value="intermediate">B1‑B2 Intermediate</option>
+      <option value="advanced">C1 Advanced</option>
+    </select>
+  </div>
+
+  <!-- Flashcards -->
+  <div id="flashcards" class="mini-card" style="margin-top:1rem;"></div>
+
+  <!-- Quiz -->
+  <div id="quiz" class="mini-card" style="margin-top:1rem;"></div>
+
+  <!-- XP Message -->
+  <div id="xp-msg" style="margin-top:1rem; font-weight:bold;"></div>
+</div>
+
+<script>
+(() => {
+  // ----- Data -----
+  const flashcards = [
+    { phrase: "Hola", definition: "Hello (Spanish)", level: "beginner" },
+    { phrase: "¿Cómo estás?", definition: "How are you? (Spanish)", level: "beginner" },
+    { phrase: "Je suis content", definition: "I am happy (French)", level: "intermediate" },
+    { phrase: "Das Wetter ist schön", definition: "The weather is nice (German)", level: "intermediate" },
+    { phrase: "L'essor de la technologie", definition: "The rise of technology (French)", level: "advanced" },
+    { phrase: "Die Komplexität der Quantenphysik", definition: "The complexity of quantum physics (German)", level: "advanced" }
+  ];
+
+  const quizQuestions = [
+    {
+      q: "What does 'Hola' mean?",
+      options: ["Goodbye", "Hello", "Please", "Thank you"],
+      answer: 1,
+      explanation: "'Hola' is the Spanish word for 'Hello'.",
+      level: "beginner"
+    },
+    {
+      q: "Select the correct translation for 'Je suis content'.",
+      options: ["I am sad", "I am happy", "I am tired", "I am hungry"],
+      answer: 1,
+      explanation: "'Je suis content' translates to 'I am happy' in French.",
+      level: "intermediate"
+    },
+    {
+      q: "What is the meaning of 'Die Komplexität der Quantenphysik'?",
+      options: [
+        "The simplicity of classical physics",
+        "The complexity of quantum physics",
+        "The beauty of mathematics",
+        "The speed of light"
+      ],
+      answer: 1,
+      explanation: "It means 'The complexity of quantum physics' in German.",
+      level: "advanced"
+    }
+  ];
+
+  // ----- Helpers -----
+  const storage = {
+    getLevel: () => localStorage.getItem('duolingoLevel') || 'beginner',
+    setLevel: (lvl) => localStorage.setItem('duolingoLevel', lvl),
+    getXP: () => parseInt(localStorage.getItem('duolingoXP')||'0',10),
+    addXP: (inc) => {
+      const newXP = storage.getXP() + inc;
+      localStorage.setItem('duolingoXP', newXP);
+      return newXP;
+    }
+  };
+
+  const speak = (text) => {
+    const utter = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(utter);
+  };
+
+  // ----- Rendering -----
+  const levelSelect = document.getElementById('level-select');
+  const flashcardsDiv = document.getElementById('flashcards');
+  const quizDiv = document.getElementById('quiz');
+  const xpMsg = document.getElementById('xp-msg');
+
+  const renderFlashcards = () => {
+    flashcardsDiv.innerHTML = '<h3>Flashcards</h3>';
+    const filtered = flashcards.filter(c => c.level === currentLevel);
+    filtered.forEach((card, idx) => {
+      const cardEl = document.createElement('div');
+      cardEl.className = 'mini-card';
+      cardEl.style.border = '1px solid #ccc';
+      cardEl.style.padding = '0.5rem';
+      cardEl.style.marginBottom = '0.5rem';
+      cardEl.innerHTML = `
+        <strong>${card.phrase}</strong>
+        <button class="btn-primary" data-idx="${idx}" style="margin-left:0.5rem;">🔊 Listen</button>
+        <div class="definition" style="display:none; margin-top:0.3rem;">${card.definition}</div>
+        <button class="btn-primary toggle-def" style="margin-top:0.3rem;">Show Answer</button>
+      `;
+      flashcardsDiv.appendChild(cardEl);
+    });
+
+    // Listen button
+    flashcardsDiv.querySelectorAll('button[data-idx]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const i = e.target.dataset.idx;
+        speak(filtered[i].phrase);
+      });
+    });
+    // Toggle definition
+    flashcardsDiv.querySelectorAll('.toggle-def').forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        const def = btn.previousElementSibling;
+        const visible = def.style.display === 'block';
+        def.style.display = visible ? 'none' : 'block';
+        btn.textContent = visible ? 'Show Answer' : 'Hide Answer';
+      });
+    });
+  };
+
+  const renderQuiz = () => {
+    quizDiv.innerHTML = '<h3>Quick Quiz</h3>';
+    const filtered = quizQuestions.filter(q => q.level === currentLevel);
+    let answered = 0;
+    filtered.forEach((qObj, qIdx) => {
+      const qContainer = document.createElement('div');
+      qContainer.className = 'mini-card';
+      qContainer.style.border = '1px solid #ddd';
+      qContainer.style.padding = '0.5rem';
+      qContainer.style.marginBottom = '0.5rem';
+      qContainer.innerHTML = `
+        <p><strong>Q${qIdx+1}:</strong> ${qObj.q}</p>
+        <div class="options"></div>
+        <div class="feedback" style="margin-top:0.5rem;"></div>
+      `;
+      const optionsDiv = qContainer.querySelector('.options');
+      qObj.options.forEach((opt, oIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-primary';
+        btn.style.display = 'block';
+        btn.style.margin = '0.2rem 0';
+        btn.textContent = opt;
+        btn.dataset.correct = oIdx === qObj.answer;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          const feedback = qContainer.querySelector('.feedback');
+          const isCorrect = btn.dataset.correct === 'true';
+          btn.style.backgroundColor = isCorrect ? 'green' : 'red';
+          btn.style.color = 'white';
+          // disable all options
+          optionsDiv.querySelectorAll('button').forEach(b => b.disabled = true);
+          feedback.innerHTML = `
+            <span style="color:${isCorrect?'green':'red'};">
+              ${isCorrect ? 'Correct!' : 'Incorrect.'}
+            </span> ${qObj.explanation}
+          `;
+          answered++;
+          if (answered === filtered.length) {
+            const newXP = storage.addXP(25);
+            xpMsg.textContent = `Quiz complete! +25 XP (Total XP: ${newXP})`;
+          }
+        });
+        optionsDiv.appendChild(btn);
+      });
+      quizDiv.appendChild(qContainer);
+    });
+  };
+
+  // ----- Init -----
+  const init = () => {
+    // Set selector to stored level
+    const saved = storage.getLevel();
+    levelSelect.value = saved;
+    currentLevel = saved;
+    renderFlashcards();
+    renderQuiz();
+  };
+
+  let currentLevel = 'beginner';
+
+  levelSelect.addEventListener('change', (e) => {
+    currentLevel = e.target.value;
+    storage.setLevel(currentLevel);
+    renderFlashcards();
+    renderQuiz();
+    xpMsg.textContent = ''; // reset XP message on level change
+  });
+
+  init();
+})();
+</script></div>
     </section>
 
     <!-- ==================== ADMIN COMMAND CENTER ==================== -->
