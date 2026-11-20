@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Jesh AI Ecosystem — Adaptive Learning & Live AI Tutor</title>
   <meta name="theme-color" content="#4F46E5" />
-  <style>
+  <style id="coreBaseStyles">
     :root {
       --primary: #4F46E5;
       --primary-dark: #3730A3;
@@ -220,6 +220,8 @@
       border-radius: 12px; padding: 12px; font-size: 13px;
     }
   </style>
+  <!-- AUTONOMOUS SELF-ARCHITECT CUSTOM CSS SLOT -->
+  <style id="autonomousCustomCSS"></style>
 </head>
 <body>
 
@@ -425,7 +427,7 @@
           <iframe id="academyOutputFrame" style="width:100%;height:150px;border:1px solid var(--border);border-radius:12px;background:#fff;"></iframe>
         </div>
 
-        <!-- ISOLATED NO-CODE PLUGIN MOUNT POINT -->
+        <!-- ISOLATED AUTONOMOUS SELF-ARCHITECT MOUNT POINT -->
         <div id="dynamicExtensionsZone"></div>
       </section>
 
@@ -495,7 +497,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
             <div>
               <h2 style="font-size:18px;">🛡️ Admin Command Center</h2>
-              <p style="font-size:12px;color:#94A3B8;">Single-Admin Isolated Vault • Students: <strong id="admTotalStudents">0</strong></p>
+              <p style="font-size:12px;color:#94A3B8;">100% Autonomous Mode • Students: <strong id="admTotalStudents">0</strong></p>
             </div>
             <div style="display:flex;gap:8px;">
               <button class="btn-emerald btn-sm" onclick="runAdminRDScanner()">🔍 R&D Scan</button>
@@ -503,7 +505,26 @@
             </div>
           </div>
 
-          <!-- 1. SEARCH HELP FOR CREDENTIALS (STUDENT PIN RECOVERY) -->
+          <!-- 1. AUTONOMOUS CO-ARCHITECT (100% AUTO-DEPLOY TO GITHUB) -->
+          <div class="card" style="border:2px solid #10B981;">
+            <strong style="display:block;font-size:16px;margin-bottom:4px;">💬 Co-Architect — 100% Autonomous Auto-Deploy</strong>
+            <p style="font-size:12px;color:#94A3B8;margin-bottom:8px;">अपनी भाषा में बदलाव लिखें — सिस्टम खुद कोड बनाएगा, GitHub SHA जांचेगा, बैकअप लेगा और 30 सेकंड में लाइव कर देगा!</p>
+            <textarea id="coArchitectPrompt" rows="3" placeholder="उदा. Add a Dark Mode toggle button in the header, या होम स्क्रीन पर एक गणित क्विज़ कार्ड जोड़ें..."></textarea>
+
+            <label style="display:flex;align-items:center;gap:8px;margin:10px 0;font-size:13px;font-weight:700;color:#34D399;cursor:pointer;">
+              <input id="autoDeployImmediateChk" type="checkbox" checked style="width:20px;height:20px;min-height:20px;" />
+              ⚡ Auto-Deploy Immediately (GitHub पर खुद-ब-खुद कमिट करके लाइव करें)
+            </label>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-emerald" id="deployPluginBtn" onclick="runAutonomousCoArchitect()">🚀 Execute & Auto-Deploy</button>
+              <button class="btn-amber btn-sm" onclick="restorePreviousGitHubSnapshot()">⏪ Restore Backup</button>
+              <button class="btn-rose btn-sm" onclick="clearDynamicPlugins()">🧹 Clear Local Widgets</button>
+            </div>
+            <div id="coArchitectStatus" style="margin-top:10px;font-size:12px;color:#A7F3D0;white-space:pre-line;"></div>
+          </div>
+
+          <!-- 2. SEARCH HELP FOR CREDENTIALS (STUDENT PIN RECOVERY) -->
           <div class="card">
             <strong style="display:block;margin-bottom:8px;">🔑 Search Help for Credentials (Student PIN Lookup & Reset)</strong>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
@@ -514,7 +535,7 @@
             <div id="admPinResultBox" style="font-size:13px;color:#34D399;font-weight:700;"></div>
           </div>
 
-          <!-- 2. API & VOICE VAULT -->
+          <!-- 3. API & VOICE VAULT -->
           <div class="card">
             <strong style="display:block;margin-bottom:8px;">🔐 API & ElevenLabs Voice Vault</strong>
             <div class="grid-2">
@@ -548,18 +569,6 @@
               </div>
             </div>
           </div>
-
-          <!-- 3. NO-CODE AI CO-ARCHITECT (ISOLATED WIDGET DEPLOYER) -->
-          <div class="card">
-            <strong style="display:block;margin-bottom:6px;">🤖 No-Code AI Co-Architect (Safe Plugin Deployer)</strong>
-            <p style="font-size:12px;color:#94A3B8;margin-bottom:8px;">Adds isolated widgets to #dynamicExtensionsZone without touching core auth or video-call code.</p>
-            <textarea id="coArchitectPrompt" rows="2" placeholder="Describe a new widget (e.g. Add a Daily Math Speed Challenge card)..."></textarea>
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <button class="btn-emerald btn-sm" id="deployPluginBtn" onclick="deployIsolatedPlugin()">⚡ Build & Mount Widget</button>
-              <button class="btn-rose btn-sm" onclick="clearDynamicPlugins()">🧹 Clear Custom Widgets</button>
-            </div>
-            <div id="coArchitectStatus" style="margin-top:8px;font-size:12px;color:#A7F3D0;"></div>
-          </div>
         </div>
       </section>
 
@@ -588,15 +597,12 @@
       </div>
     </div>
 
-    <!-- 50/50 SPLIT STAGE (SIDE-BY-SIDE LANDSCAPE / TOP-BOTTOM PORTRAIT) -->
     <div class="vc-split-stage">
-      <!-- PANE 1: AI MENTOR CANVAS WITH LIP-SYNC & HEAD-MIRRORING -->
       <div class="vc-pane">
         <span class="vc-badge">🤖 AI Mentor (Live Lip-Sync)</span>
         <canvas id="avatarWarpCanvas" width="320" height="320" onclick="calibrateLipFromClick(event, this)"></canvas>
       </div>
 
-      <!-- PANE 2: STUDENT LIVE SELF-CAMERA & HANDS-FREE WAVE PILL -->
       <div class="vc-pane">
         <span class="vc-badge">👤 You (Live Camera)</span>
         <video id="studentSelfVideo" autoplay playsinline muted></video>
@@ -612,7 +618,6 @@
       Tap "Start Call" — your AI Mentor will greet you and listen automatically!
     </div>
 
-    <!-- 4 SAFE-PADDED BOTTOM CONTROLS -->
     <div class="vc-controls">
       <button id="vcStartBtn" class="btn-emerald" onclick="startHandsFreeCall()">📞 Start Call</button>
       <button id="vcMuteBtn" class="btn-outline" style="background:#1E293B;color:#fff;border-color:#475569;" onclick="toggleCallMute()">🎙️ Mute</button>
@@ -624,26 +629,27 @@
   <!-- ==================== INSTANT STUDENT AUTH & 2-STEP ONBOARDING MODAL ==================== -->
   <div id="authModal" class="modal-backdrop hidden">
     <div class="modal-box">
-      <!-- STEP 1: INSTANT LOCAL+CLOUD LOGIN / CREATE ACCOUNT -->
       <div id="authStepCredentials">
         <h3 style="font-size:20px;margin-bottom:4px;">🎓 Jesh AI Student Login</h3>
         <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Instant 0.1s login with 48-hour session memory. New students can create an account below.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <input id="authContactInput" type="text" placeholder="Mobile Number or Email ID" />
-          <input id="authPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="6-Digit Numeric PIN" />
+          <input id="authPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="6-Digit Numeric PIN" onkeydown="if(event.key==='Enter') handleInstantStudentAuth('login')" />
           <button class="btn-primary" onclick="handleInstantStudentAuth('login')">🚀 Login to My Dashboard</button>
           <button class="btn-emerald" onclick="handleInstantStudentAuth('create')">✨ Create New Account</button>
-          <button class="btn-outline btn-sm" onclick="closeAuthModal()">Continue as Guest</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-outline btn-sm" style="flex:1;" onclick="closeAuthModal()">Guest Mode</button>
+            <button class="btn-navy btn-sm" style="flex:1;" onclick="closeAuthModal(); document.getElementById('adminPassModal').classList.remove('hidden');">🛡️ Admin Login</button>
+          </div>
         </div>
       </div>
 
-      <!-- STEP 2: MANDATORY 2-STEP ONBOARDING (NAME -> AGE) -->
       <div id="authStepOnboarding" class="hidden">
         <h3 style="font-size:19px;margin-bottom:4px;">👋 Welcome! Quick 2-Step Profile</h3>
         <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Tell us your name and age so your AI Mentor teaches at your exact level.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <input id="onboardNameInput" type="text" placeholder="Step 1: Your Full Name" />
-          <input id="onboardAgeInput" type="number" min="5" max="90" placeholder="Step 2: Your Age (e.g. 16)" />
+          <input id="onboardAgeInput" type="number" min="5" max="95" placeholder="Step 2: Your Age (e.g. 16)" onkeydown="if(event.key==='Enter') completeStudentOnboarding()" />
           <button class="btn-primary" onclick="completeStudentOnboarding()">✅ Save Profile & Start Learning</button>
         </div>
       </div>
@@ -657,7 +663,7 @@
       <input id="adminMasterPassInput" type="password" placeholder="Enter Master Admin Password" onkeydown="if(event.key==='Enter') unlockAdminCenter()" />
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
         <button class="btn-outline btn-sm" onclick="document.getElementById('adminPassModal').classList.add('hidden')">Cancel</button>
-        <button class="btn-navy btn-sm" onclick="unlockAdminCenter()">Unlock</button>
+        <button class="btn-navy btn-sm" id="adminUnlockBtn" onclick="unlockAdminCenter()">Unlock</button>
       </div>
     </div>
   </div>
@@ -671,21 +677,19 @@
   </footer>
 
   <script>
-    /* ============================================================================
-       JESH AI ECOSYSTEM — PRODUCTION SINGLE-FILE ENGINE (ZERO HANG, ZERO CLIP)
-       ============================================================================ */
     const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
     const IS_SAFE_MODE = new URLSearchParams(window.location.search).get('safe') === '1';
-    const SESSION_TTL_MS = 48 * 60 * 60 * 1000; // 48 Hours
+    const SESSION_TTL_MS = 48 * 60 * 60 * 1000;
 
     let CURRENT_STUDENT = null;
     let PENDING_NEW_ACCOUNT = null;
     let ADMIN_PASSWORD = "";
     let MENTOR_HISTORY = [];
+    let LAST_BACKUP_HTML = "";
     let logoTapCounter = 0, logoTapTimer = null;
 
-    // 5-SECOND ABORTCONTROLLER FETCH WRAPPER (PREVENTS INFINITE LOGIN/UI HANG)
-    async function postBackend(payload, timeoutMs = 5000) {
+    // 6-SECOND ABORTCONTROLLER FETCH WRAPPER (NEVER HANGS)
+    async function postBackend(payload, timeoutMs = 6000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -698,11 +702,10 @@
         return await res.json();
       } catch (err) {
         clearTimeout(timer);
-        return { success: false, offline: true, message: err.name === 'AbortError' ? 'Network timeout (5s)' : 'Offline mode' };
+        return { success: false, offline: true, message: err.name === 'AbortError' ? 'Network timeout (6s)' : 'Offline mode' };
       }
     }
 
-    // ==================== INITIALIZATION & 48-HOUR SESSION ====================
     window.addEventListener('DOMContentLoaded', () => {
       if (IS_SAFE_MODE) {
         document.getElementById('safeModeAlert').classList.remove('hidden');
@@ -716,7 +719,6 @@
       renderStoryWords("Consistent practice every day turns curious students into confident leaders.");
       runAcademySandbox();
 
-      // Background config sync (non-blocking)
       fetch(API_URL).then(r => r.json()).then(data => {
         if (data && data.config && data.config.brandName) {
           document.getElementById('uiBrandTitle').textContent = data.config.brandName;
@@ -763,7 +765,6 @@
       openAuthModal();
     }
 
-    // ==================== INSTANT 0.1s LOCAL AUTH + ASYNC CLOUD SYNC ====================
     function openAuthModal() {
       document.getElementById('authStepCredentials').classList.remove('hidden');
       document.getElementById('authStepOnboarding').classList.add('hidden');
@@ -790,11 +791,9 @@
           if (db[contact].pin !== pin) return alert('Incorrect 6-digit PIN! Use Leave/Help to recover.');
           applyStudentSession(db[contact]);
           closeAuthModal();
-          // Background cloud sync
           postBackend({ action: 'STUDENT_AUTH', contact, pin });
           return;
         }
-        // Fallback async check if student registered on another device
         postBackend({ action: 'STUDENT_AUTH', contact, pin }).then(res => {
           if (res.success && res.student) {
             const stu = { ...res.student, pin };
@@ -803,7 +802,7 @@
             applyStudentSession(stu);
             closeAuthModal();
           } else {
-            alert('Account not found locally. Tap "Create New Account" to register in 5 seconds!');
+            alert('Account not found on this device. Tap "Create New Account" to register in 5 seconds!');
           }
         });
       } else {
@@ -833,8 +832,6 @@
       saveLocalStudentsDB(db);
       applyStudentSession(newStu);
       closeAuthModal();
-
-      // Async sync to Google Sheets
       postBackend({ action: 'STUDENT_AUTH', name: newStu.name, contact: newStu.contact, pin: newStu.pin, level: 'A1' });
     }
 
@@ -849,16 +846,9 @@
         saveLocalStudentsDB(db);
       }
       applyStudentSession(CURRENT_STUDENT);
-      postBackend({
-        action: 'SYNC_STUDENT',
-        userId: CURRENT_STUDENT.userId,
-        level: CURRENT_STUDENT.level,
-        xp: CURRENT_STUDENT.xp,
-        summary: note || ''
-      });
+      postBackend({ action: 'SYNC_STUDENT', userId: CURRENT_STUDENT.userId, level: CURRENT_STUDENT.level, xp: CURRENT_STUDENT.xp, summary: note || '' });
     }
 
-    // ==================== NAVIGATION (FOOTER & MODULES) ====================
     function switchFooterTab(tabName) {
       document.querySelectorAll('.main-tab').forEach(s => s.classList.add('hidden'));
       const target = document.getElementById('tab-' + tabName);
@@ -875,19 +865,10 @@
       if (activeTile) activeTile.classList.add('mod-active');
     }
 
-    // ==================== MODULE A: PERSONAL AI MENTOR (10-TURN MEMORY) ====================
-    function stripStars(txt) {
-      return String(txt || '').replace(/\*\*/g, '').replace(/###/g, '').trim();
-    }
-
-    function quickMentorPrompt(text) {
-      document.getElementById('mentorInput').value = text;
-      sendMentorMessage();
-    }
-
-    function startLevelAssessmentQuiz() {
-      quickMentorPrompt("Give me a quick 3-question level check quiz to see if I am ready to move from A1 to A2 or B1.");
-    }
+    // ==================== PERSONAL AI MENTOR ====================
+    function stripStars(txt) { return String(txt || '').replace(/\*\*/g, '').replace(/###/g, '').trim(); }
+    function quickMentorPrompt(text) { document.getElementById('mentorInput').value = text; sendMentorMessage(); }
+    function startLevelAssessmentQuiz() { quickMentorPrompt("Give me a quick 3-question level check quiz to see if I am ready to move from A1 to A2 or B1."); }
 
     async function sendMentorMessage() {
       const input = document.getElementById('mentorInput');
@@ -909,11 +890,10 @@
       const historyContext = MENTOR_HISTORY.map(m => `${m.role}: ${m.text}`).join('\n');
 
       const res = await postBackend({
-        action: 'CHAT',
-        role: 'student',
+        action: 'CHAT', role: 'student',
         studentId: CURRENT_STUDENT ? CURRENT_STUDENT.userId : '',
         prompt: `Student Profile: [${stuMeta}]. Preferred Language: ${lang}. Recent 10-turn context:\n${historyContext}\nRespond warmly without markdown asterisks (**). If student answers a quiz well, add "[LEVEL_UP]" at the end.`
-      }, 8000);
+      }, 9000);
 
       btn.disabled = false;
       let reply = res.success ? stripStars(res.reply) : "Great question! Let's break this down step by step: focus on the core concept first and practice one example.";
@@ -934,25 +914,19 @@
       awardXP(10, `Chatted with AI Mentor (${userMsg.slice(0, 28)})`);
     }
 
-    // ==================== MODULE B & PHASE 2: CANVAS LIP-SYNC + 50/50 VIDEO CALL ====================
+    // ==================== CANVAS LIP-SYNC & 50/50 VIDEO CALL ====================
     let AVATAR_STATE = {
       name: 'Didi-Mentor',
       imgUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DidiMentor',
-      lipY: 0.63,
-      lipX: 0.50,
-      pitch: 1.15
+      lipY: 0.63, lipX: 0.50, pitch: 1.15
     };
     let loadedAvatarImg = new Image();
     loadedAvatarImg.crossOrigin = 'anonymous';
-    let mouthOpenAmount = 0;
-    let headTiltAngle = 0;
-    let avatarAnimFrame = null;
+    let mouthOpenAmount = 0, headTiltAngle = 0, avatarAnimFrame = null;
 
     function initAvatarSystem() {
       const saved = localStorage.getItem('JESH_CUSTOM_AVATAR');
-      if (saved) {
-        try { AVATAR_STATE = { ...AVATAR_STATE, ...JSON.parse(saved) }; } catch (e) {}
-      }
+      if (saved) { try { AVATAR_STATE = { ...AVATAR_STATE, ...JSON.parse(saved) }; } catch (e) {} }
       document.getElementById('customTeacherName').value = AVATAR_STATE.name;
       document.getElementById('lipYSlider').value = AVATAR_STATE.lipY;
       document.getElementById('voicePitchInput').value = AVATAR_STATE.pitch;
@@ -967,11 +941,7 @@
     }
 
     function selectBuiltInCaller(name, url, lipY, pitch) {
-      AVATAR_STATE.name = name;
-      AVATAR_STATE.imgUrl = url;
-      AVATAR_STATE.lipY = lipY;
-      AVATAR_STATE.lipX = 0.50;
-      AVATAR_STATE.pitch = pitch;
+      AVATAR_STATE = { ...AVATAR_STATE, name, imgUrl: url, lipY, lipX: 0.50, pitch };
       document.getElementById('customTeacherName').value = name;
       document.getElementById('lipYSlider').value = lipY;
       document.getElementById('voicePitchInput').value = pitch;
@@ -982,10 +952,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = e => {
-        AVATAR_STATE.imgUrl = e.target.result;
-        loadAvatarImageSource(e.target.result);
-      };
+      reader.onload = e => { AVATAR_STATE.imgUrl = e.target.result; loadAvatarImageSource(e.target.result); };
       reader.readAsDataURL(file);
     }
 
@@ -1005,7 +972,6 @@
       AVATAR_STATE.lipX = (event.clientX - rect.left) / rect.width;
       AVATAR_STATE.lipY = (event.clientY - rect.top) / rect.height;
       document.getElementById('lipYSlider').value = AVATAR_STATE.lipY.toFixed(2);
-      // Quick test pulse so user sees lip-sync immediately
       mouthOpenAmount = 1;
       setTimeout(() => { mouthOpenAmount = 0; }, 350);
     }
@@ -1016,7 +982,6 @@
       setTimeout(() => { mouthOpenAmount = 0; }, 250);
     }
 
-    // HTML5 CANVAS PIXEL-LEVEL LOWER-LIP & JAW ANIMATOR + HEAD MIRRORING
     function startCanvasRenderLoop() {
       if (avatarAnimFrame) cancelAnimationFrame(avatarAnimFrame);
       function render() {
@@ -1034,8 +999,6 @@
 
           if (loadedAvatarImg.complete && loadedAvatarImg.naturalWidth > 0) {
             ctx.drawImage(loadedAvatarImg, 0, 0, w, h);
-
-            // Pixel-level jaw/lower-lip stretch around calibrated (lipX, lipY)
             const lx = AVATAR_STATE.lipX * w;
             const ly = AVATAR_STATE.lipY * h;
             const mouthW = w * 0.24;
@@ -1043,21 +1006,14 @@
             const jawDrop = mouthOpenAmount * (h * 0.032);
 
             if (jawDrop > 0.5) {
-              // Subtle inner mouth shadow
               ctx.fillStyle = 'rgba(45, 12, 18, 0.72)';
               ctx.beginPath();
               ctx.ellipse(lx, ly + jawDrop * 0.4, mouthW * 0.36, jawDrop * 0.55, 0, 0, Math.PI * 2);
               ctx.fill();
 
-              // Stretch lower-lip pixels downward smoothly
-              ctx.drawImage(
-                canvas,
-                lx - mouthW / 2, ly, mouthW, mouthH,
-                lx - mouthW / 2, ly + jawDrop, mouthW, mouthH
-              );
+              ctx.drawImage(canvas, lx - mouthW / 2, ly, mouthW, mouthH, lx - mouthW / 2, ly + jawDrop, mouthW, mouthH);
             }
 
-            // Calibration crosshair on preview canvas only
             if (id === 'previewAvatarCanvas') {
               ctx.strokeStyle = 'rgba(16, 185, 129, 0.85)';
               ctx.lineWidth = 2;
@@ -1073,7 +1029,6 @@
       render();
     }
 
-    // 15-SECOND VOICE WAVEFORM RECORDER
     let voiceRecActive = false, voiceRecTimer = null;
     function toggle15sVoiceRecord() {
       const btn = document.getElementById('recVoiceModelBtn');
@@ -1097,11 +1052,8 @@
           const barH = 6 + Math.random() * 34;
           ctx.fillRect(x, (canvas.height - barH) / 2, 4, barH);
         }
-        if (sec <= 0) {
-          toggle15sVoiceRecord();
-        } else {
-          btn.textContent = `⏹️ Stop (${sec}s)`;
-        }
+        if (sec <= 0) toggle15sVoiceRecord();
+        else btn.textContent = `⏹️ Stop (${sec}s)`;
       }, 250);
     }
 
@@ -1127,7 +1079,6 @@
       alert(`🌐 "${AVATAR_STATE.name}" is now public in the Caller Switcher!`);
     }
 
-    // ==================== 50/50 FULL-SCREEN HANDS-FREE VIDEO CALL ====================
     let callTimerInterval = null, callSeconds = 0, isCallActive = false, isCallMuted = false, isCamOff = false;
     let selfMediaStream = null, callRecognition = null, lipInterval = null, headMirrorInterval = null;
 
@@ -1173,17 +1124,13 @@
 
     function toggleCallCamera() {
       isCamOff = !isCamOff;
-      const btn = document.getElementById('vcCamBtn');
-      btn.textContent = isCamOff ? '📷 Cam On' : '📷 Cam Off';
-      if (selfMediaStream) {
-        selfMediaStream.getVideoTracks().forEach(t => { t.enabled = !isCamOff; });
-      }
+      document.getElementById('vcCamBtn').textContent = isCamOff ? '📷 Cam On' : '📷 Cam Off';
+      if (selfMediaStream) selfMediaStream.getVideoTracks().forEach(t => { t.enabled = !isCamOff; });
     }
 
     function toggleCallMute() {
       isCallMuted = !isCallMuted;
-      const btn = document.getElementById('vcMuteBtn');
-      btn.textContent = isCallMuted ? '🔇 Unmute' : '🎙️ Mute';
+      document.getElementById('vcMuteBtn').textContent = isCallMuted ? '🔇 Unmute' : '🎙️ Mute';
       if (isCallMuted && callRecognition) {
         try { callRecognition.stop(); } catch (e) {}
         document.getElementById('micListeningPill').classList.add('hidden');
@@ -1211,18 +1158,13 @@
         document.getElementById('vcCallTimer').textContent = `${m}:${s}`;
       }, 1000);
 
-      // Gentle lifelike head-mirroring motion
       clearInterval(headMirrorInterval);
-      headMirrorInterval = setInterval(() => {
-        headTiltAngle = Math.sin(Date.now() / 900) * 0.035;
-      }, 50);
+      headMirrorInterval = setInterval(() => { headTiltAngle = Math.sin(Date.now() / 900) * 0.035; }, 50);
 
       const stuName = CURRENT_STUDENT ? CURRENT_STUDENT.name : 'my friend';
       const greeting = `Namaste ${stuName}! I am ${AVATAR_STATE.name}. What would you like to call me, and which topic shall we talk about today?`;
       document.getElementById('vcLiveCaption').textContent = '🗣️ ' + greeting;
-      speakWithLipSync(greeting, () => {
-        if (isCallActive && !isCallMuted) listenHandsFreeTurn();
-      });
+      speakWithLipSync(greeting, () => { if (isCallActive && !isCallMuted) listenHandsFreeTurn(); });
     }
 
     function listenHandsFreeTurn() {
@@ -1244,36 +1186,27 @@
         const spoken = event.results[0][0].transcript;
         document.getElementById('vcLiveCaption').textContent = '👤 You: ' + spoken;
 
-        // Dynamic language switcher if student asks
         const low = spoken.toLowerCase();
-        if (low.includes('hindi mein') || low.includes('हिंदी में')) {
-          document.getElementById('vcLangSwitcher').value = 'Hindi + English';
-        } else if (low.includes('only english')) {
-          document.getElementById('vcLangSwitcher').value = 'Only English';
-        }
+        if (low.includes('hindi mein') || low.includes('हिंदी में')) document.getElementById('vcLangSwitcher').value = 'Hindi + English';
+        else if (low.includes('only english')) document.getElementById('vcLangSwitcher').value = 'Only English';
 
         const langMode = document.getElementById('vcLangSwitcher').value;
         const res = await postBackend({
-          action: 'CHAT',
-          role: 'student',
+          action: 'CHAT', role: 'student',
           studentId: CURRENT_STUDENT ? CURRENT_STUDENT.userId : '',
           prompt: `You are ${AVATAR_STATE.name}, a warm best-friend AI tutor on a live video call. Language: ${langMode}. Student said: "${spoken}". Reply naturally in 2 short spoken sentences without markdown stars.`
-        }, 7000);
+        }, 8000);
 
         const aiReply = res.success ? stripStars(res.reply) : "That sounds really interesting! Tell me a little more about what you think.";
         document.getElementById('vcLiveCaption').textContent = `🗣️ ${AVATAR_STATE.name}: ${aiReply}`;
         awardXP(15, `Video Call practice with ${AVATAR_STATE.name}`);
 
-        speakWithLipSync(aiReply, () => {
-          if (isCallActive && !isCallMuted) listenHandsFreeTurn();
-        });
+        speakWithLipSync(aiReply, () => { if (isCallActive && !isCallMuted) listenHandsFreeTurn(); });
       };
 
       callRecognition.onerror = () => {
         pill.classList.add('hidden');
-        if (isCallActive && !isCallMuted) {
-          setTimeout(() => listenHandsFreeTurn(), 900);
-        }
+        if (isCallActive && !isCallMuted) setTimeout(() => listenHandsFreeTurn(), 900);
       };
 
       try { callRecognition.start(); } catch (e) {}
@@ -1281,32 +1214,18 @@
 
     function speakWithLipSync(text, onDone) {
       clearInterval(lipInterval);
-      lipInterval = setInterval(() => {
-        mouthOpenAmount = 0.25 + Math.random() * 0.75;
-      }, 95);
+      lipInterval = setInterval(() => { mouthOpenAmount = 0.25 + Math.random() * 0.75; }, 95);
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         utter.pitch = AVATAR_STATE.pitch || 1.05;
         utter.rate = 0.98;
-        utter.onend = () => {
-          clearInterval(lipInterval);
-          mouthOpenAmount = 0;
-          if (onDone) onDone();
-        };
-        utter.onerror = () => {
-          clearInterval(lipInterval);
-          mouthOpenAmount = 0;
-          if (onDone) onDone();
-        };
+        utter.onend = () => { clearInterval(lipInterval); mouthOpenAmount = 0; if (onDone) onDone(); };
+        utter.onerror = () => { clearInterval(lipInterval); mouthOpenAmount = 0; if (onDone) onDone(); };
         window.speechSynthesis.speak(utter);
       } else {
-        setTimeout(() => {
-          clearInterval(lipInterval);
-          mouthOpenAmount = 0;
-          if (onDone) onDone();
-        }, 2500);
+        setTimeout(() => { clearInterval(lipInterval); mouthOpenAmount = 0; if (onDone) onDone(); }, 2500);
       }
     }
 
@@ -1317,7 +1236,7 @@
       }
     }
 
-    // ==================== MODULE C: JESHLINGO (PATH & WEAK WORDS) ====================
+    // ==================== JESHLINGO, JESHREAD & ACADEMY ====================
     const LINGO_DECK = [
       { hindi: 'मैं हर दिन अंग्रेज़ी का अभ्यास करता हूँ।', target: 'I practice English every day', bank: ['every', 'I', 'English', 'day', 'practice', 'tomorrow'] },
       { hindi: 'मुझे कंप्यूटर और एआई सीखना पसंद है।', target: 'I love learning computers and AI', bank: ['computers', 'AI', 'I', 'and', 'learning', 'love'] },
@@ -1325,9 +1244,7 @@
     ];
     let currentLingoIdx = 0, selectedLingoWords = [];
 
-    function getWeakWords() {
-      try { return JSON.parse(localStorage.getItem('JESH_WEAK_WORDS') || '[]'); } catch (e) { return []; }
-    }
+    function getWeakWords() { try { return JSON.parse(localStorage.getItem('JESH_WEAK_WORDS') || '[]'); } catch (e) { return []; } }
     function saveWeakWord(w) {
       const list = getWeakWords();
       if (!list.includes(w)) { list.push(w); localStorage.setItem('JESH_WEAK_WORDS', JSON.stringify(list)); }
@@ -1355,16 +1272,8 @@
       document.getElementById('lingoAnswerBox').innerHTML = selectedLingoWords.map(w => `<span class="word-chip">${w}</span>`).join('');
       document.getElementById('lingoWordBank').innerHTML = words.map(w => `<button class="word-chip" onclick="pickLingoWord('${w}')">${w}</button>`).join('');
     }
-
-    function pickLingoWord(w) {
-      selectedLingoWords.push(w);
-      const item = LINGO_DECK[currentLingoIdx];
-      renderLingoBank(item.bank);
-    }
-    function resetLingoSelection() {
-      selectedLingoWords = [];
-      renderLingoBank(LINGO_DECK[currentLingoIdx].bank);
-    }
+    function pickLingoWord(w) { selectedLingoWords.push(w); renderLingoBank(LINGO_DECK[currentLingoIdx].bank); }
+    function resetLingoSelection() { selectedLingoWords = []; renderLingoBank(LINGO_DECK[currentLingoIdx].bank); }
 
     function checkLingoSentence() {
       const item = LINGO_DECK[currentLingoIdx];
@@ -1381,7 +1290,6 @@
       }
     }
 
-    // ==================== MODULE D: JESHREAD STUDIO ====================
     const HINDI_MINI_DICT = {
       consistent: 'लगातार / नियमित', practice: 'अभ्यास', every: 'हर / प्रत्येक', day: 'दिन',
       turns: 'बदल देता है', curious: 'जिज्ञासु', students: 'छात्रों को', into: 'में',
@@ -1414,10 +1322,7 @@
     async function generateCustomStory() {
       const topic = document.getElementById('storyTopicInput').value.trim() || 'A curious student building an AI robot';
       document.getElementById('storyReaderBox').textContent = '⚡ Generating personalized story...';
-      const res = await postBackend({
-        action: 'CHAT', role: 'student',
-        prompt: `Write a short 3-sentence inspiring English story about "${topic}" for a student. Output ONLY the story.`
-      });
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Write a short 3-sentence inspiring English story about "${topic}" for a student. Output ONLY the story.` });
       renderStoryWords(res.success ? stripStars(res.reply) : "A young student practiced coding every evening. Soon she built a helpful AI tutor for her village school. Everyone celebrated her curiosity and hard work.");
     }
 
@@ -1456,7 +1361,6 @@
       rec.start();
     }
 
-    // ==================== MODULE E: JESH ACADEMY SANDBOX ====================
     function setSandboxTemplate(type) {
       const ed = document.getElementById('academyCodeEditor');
       if (type === 'html') ed.value = `<h3>Jesh Web Card</h3>\n<button onclick="alert('Awesome!')">Click Me</button>`;
@@ -1481,7 +1385,6 @@
       quickMentorPrompt(`Explain this code simply in 3 bullet points:\n${code}`);
     }
 
-    // ==================== QR CERTIFICATE & HELP ====================
     function renderStudentCertificate() {
       const name = document.getElementById('certNameField').value.trim();
       const course = document.getElementById('certCourseField').value;
@@ -1531,7 +1434,7 @@
       box.textContent = res.message || '✅ Request logged! Your teacher/admin will check Alerts and assist you shortly.';
     }
 
-    // ==================== SINGLE-ADMIN ISOLATION & NO-CODE PLUGIN ENGINE ====================
+    // ==================== SINGLE-ADMIN & 100% AUTONOMOUS AUTO-DEPLOY ====================
     function handleSecretAdminTap() {
       logoTapCounter++;
       clearTimeout(logoTapTimer);
@@ -1552,14 +1455,20 @@
     async function unlockAdminCenter() {
       const pass = document.getElementById('adminMasterPassInput').value.trim();
       if (!pass) return;
-      const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass }, 6000);
-      if (res.success || pass === 'admin123') {
+      const btn = document.getElementById('adminUnlockBtn');
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+      const res = await postBackend({ action: 'VERIFY_ADMIN', adminPass: pass }, 7000);
+      btn.disabled = false;
+      btn.textContent = 'Unlock';
+
+      if (res.success) {
         ADMIN_PASSWORD = pass;
         document.getElementById('adminPassModal').classList.add('hidden');
         document.getElementById('admTotalStudents').textContent = res.studentCount || Object.keys(getLocalStudentsDB()).length;
         switchFooterTab('admin');
       } else {
-        alert('Invalid Master Admin Password.');
+        alert(res.message || 'Invalid Master Admin Password.');
       }
     }
 
@@ -1569,7 +1478,6 @@
       const out = document.getElementById('admPinResultBox');
       if (!contact) return alert('Enter student phone or email.');
 
-      // Update local DB if present
       const db = getLocalStudentsDB();
       if (db[contact]) {
         if (/^\d{6}$/.test(newPin)) {
@@ -1581,7 +1489,6 @@
         }
       }
 
-      // Sync with Google Sheets backend
       const res = await postBackend({ action: 'ADMIN_STUDENT_PIN', adminPass: ADMIN_PASSWORD, contact, newPin });
       if (res.success && res.message) out.textContent = res.message;
     }
@@ -1590,15 +1497,14 @@
       const val = document.getElementById('vault_' + key).value.trim();
       if (!val) return alert('Enter a value first.');
       const res = await postBackend({ action: 'UPDATE_CONFIG', adminPass: ADMIN_PASSWORD, key, value: val });
-      alert(res.success ? `✅ ${key} saved securely!` : 'Saved locally (Check network for Sheet sync).');
+      alert(res.success ? `✅ ${key} saved securely!` : (res.message || 'Failed to save key.'));
     }
 
     async function runAdminRDScanner() {
-      const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASSWORD }, 8000);
+      const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASSWORD }, 9000);
       alert(res.message || 'R&D Scan triggered.');
     }
 
-    // DECLARATIVE JSON/WIDGET PLUGIN ENGINE (NEVER TOUCHES CORE HTML/JS)
     function mountSavedPlugins() {
       try {
         const plugins = JSON.parse(localStorage.getItem('JESH_DYNAMIC_PLUGINS') || '[]');
@@ -1614,34 +1520,86 @@
       } catch (e) {}
     }
 
-    async function deployIsolatedPlugin() {
+    // 100% AUTONOMOUS SELF-ARCHITECT (FETCHES LATEST SHA, BACKS UP, GENERATES & PUSHES TO GITHUB)
+    async function runAutonomousCoArchitect() {
       const prompt = document.getElementById('coArchitectPrompt').value.trim();
-      if (!prompt) return;
+      if (!prompt) return alert('कृपया लिखें कि आप क्या बदलाव या नया फीचर चाहते हैं।');
+      const autoDeploy = document.getElementById('autoDeployImmediateChk').checked;
       const status = document.getElementById('coArchitectStatus');
       const btn = document.getElementById('deployPluginBtn');
+
       btn.disabled = true;
-      status.textContent = '⚡ Generating isolated self-contained widget...';
+      status.textContent = '1️⃣ Fetching latest index.html & GitHub SHA...';
 
-      const res = await postBackend({
+      const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASSWORD, filePath: 'index.html' }, 9000);
+      if (!fileRes.success || !fileRes.content) {
+        btn.disabled = false;
+        status.textContent = '❌ GitHub fetch failed: ' + (fileRes.message || 'Check GITHUB_TOKEN in Admin Vault');
+        return;
+      }
+
+      LAST_BACKUP_HTML = fileRes.content;
+      status.textContent = '2️⃣ AI Architect building safe, self-contained upgrade...';
+
+      const aiRes = await postBackend({
         action: 'CHAT', role: 'admin',
-        prompt: `Create a clean, self-contained HTML card widget using class="card" for: "${prompt}". Put ONLY the HTML inside <widget>...</widget>.`
-      }, 8000);
+        prompt: `You are the Self-Architect for Jesh AI Ecosystem. Create a safe, self-contained HTML+CSS+JS feature block for: "${prompt}". Wrap any CSS in <style>...</style> and HTML/JS inside <widget>...</widget>. Do NOT output full <html> or <body> tags.`
+      }, 12000);
 
-      btn.disabled = false;
-      const match = res.reply ? res.reply.match(/<widget>([\s\S]*?)<\/widget>/i) : null;
-      const widgetHtml = match ? match[1].trim() : `<div class="card"><strong>✨ Custom Activity:</strong><p style="font-size:13px;margin-top:4px;">${prompt}</p></div>`;
+      if (!aiRes.success || !aiRes.reply) {
+        btn.disabled = false;
+        status.textContent = '❌ AI generation failed: ' + (aiRes.reply || 'Check API key');
+        return;
+      }
 
+      const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
+      const widgetHtml = wMatch ? wMatch[1].trim() : `<div class="card"><strong>✨ ${prompt}</strong><p style="font-size:13px;margin-top:4px;">${stripStars(aiRes.reply)}</p></div>`;
+
+      // Also mount immediately in local preview
       const plugins = JSON.parse(localStorage.getItem('JESH_DYNAMIC_PLUGINS') || '[]');
       plugins.push(widgetHtml);
       localStorage.setItem('JESH_DYNAMIC_PLUGINS', JSON.stringify(plugins));
       mountSavedPlugins();
-      status.textContent = '✅ Widget mounted safely in #dynamicExtensionsZone!';
+
+      if (!autoDeploy) {
+        btn.disabled = false;
+        status.textContent = '✅ Mounted locally! Check "Auto-Deploy Immediately" to push live to GitHub for all students.';
+        return;
+      }
+
+      status.textContent = '3️⃣ Auto-Deploying directly to GitHub (with fresh SHA)...';
+      const marker = 'id="dynamicExtensionsZone">';
+      const updatedHtml = fileRes.content.replace(marker, `${marker}\n<!-- AUTO-DEPLOYED: ${prompt.slice(0, 40)} -->\n${widgetHtml}`);
+
+      const pushRes = await postBackend({
+        action: 'GITHUB_PUSH',
+        adminPass: ADMIN_PASSWORD,
+        filePath: 'index.html',
+        content: updatedHtml,
+        message: 'Autonomous Co-Architect: ' + prompt.slice(0, 50)
+      }, 12000);
+
+      btn.disabled = false;
+      if (pushRes.success) {
+        status.textContent = '🎉 LIVE ON GITHUB! ' + (pushRes.message || 'Changes will reflect for all students in ~30 seconds.');
+      } else {
+        status.textContent = '⚠️ GitHub Push message: ' + (pushRes.message || 'Check GITHUB_TOKEN / Repo permissions');
+      }
+    }
+
+    async function restorePreviousGitHubSnapshot() {
+      if (!LAST_BACKUP_HTML) return alert('No backup snapshot in current session.');
+      const res = await postBackend({
+        action: 'GITHUB_PUSH', adminPass: ADMIN_PASSWORD, filePath: 'index.html',
+        content: LAST_BACKUP_HTML, message: 'Rollback to previous verified snapshot'
+      }, 10000);
+      alert(res.success ? '⏪ Backup restored to GitHub!' : res.message);
     }
 
     function clearDynamicPlugins() {
       localStorage.removeItem('JESH_DYNAMIC_PLUGINS');
       mountSavedPlugins();
-      document.getElementById('coArchitectStatus').textContent = '🧹 All custom widgets cleared.';
+      document.getElementById('coArchitectStatus').textContent = '🧹 Local custom widgets cleared.';
     }
   </script>
 </body>
