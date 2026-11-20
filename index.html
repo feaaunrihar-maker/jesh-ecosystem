@@ -324,7 +324,200 @@
         </div>
 
         <!-- FUTURE PROMPT-DRIVEN WIDGETS & SCRIPTS ZONE -->
-        <div id="dynamicExtensionsZone"></div>
+        <div id="dynamicExtensionsZone">
+<div class="card" id="avatarStudioCard" style="padding:1rem; max-width:320px;">
+    <h3 style="margin-top:0;">Lip‑Sync Fine‑Tuner</h3>
+
+    <label for="lipVertSlider">Vertical Position (होंठ ऊपर/नीचे)</label>
+    <input type="range" id="lipVertSlider" min="-30" max="30" value="0" style="width:100%;">
+
+    <label for="lipWidthSlider" style="margin-top:0.5rem;">Mouth Width (आकार)</label>
+    <input type="range" id="lipWidthSlider" min="50" max="150" value="100" style="width:100%;">
+
+    <button id="testLipBtn" class="btn-primary" style="margin-top:0.75rem; width:100%;">👄 Test Lip Position</button>
+  </div>
+
+  <script>
+    // ---------- Utility: Face detection (native + fallback) ----------
+    async function detectFace(img) {
+      // Try native FaceDetector
+      if ('FaceDetector' in window) {
+        try {
+          const detector = new FaceDetector({ fastMode: true });
+          const faces = await detector.detect(img);
+          if (faces.length) return faces[0].boundingBox;
+        } catch (e) { console.warn('FaceDetector error:', e); }
+      }
+
+      // ----- Simple skin‑tone fallback (very rough) -----
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      // Scan for a cluster of skin‑like pixels (HSV approx 0‑50° hue, 0.2‑0.6 sat, 0.4‑0.9 val)
+      let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0, count = 0;
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          // Convert to HSV quickly
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          const v = max / 255;
+          const delta = max - min;
+          const s = max ? delta / max : 0;
+          const hue = delta ? (() => {
+            switch (max) {
+              case r: return ((g - b) / delta) % 6;
+              case g: return ((b - r) / delta) + 2;
+              case b: return ((r - g) / delta) + 4;
+            }
+          })() * 60 : 0;
+          const h = hue < 0 ? hue + 360 : hue;
+
+          // Rough skin range
+          if (h >= 0 && h <= 50 && s >= 0.2 && s <= 0.6 && v >= 0.4 && v <= 0.9) {
+            count++;
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      if (count > 500) { // arbitrary threshold
+        return {
+          x: minX,
+          y: minY,
+          width: maxX - minX,
+          height: maxY - minY
+        };
+      }
+      // Fallback to centre of image
+      return {
+        x: canvas.width * 0.25,
+        y: canvas.height * 0.25,
+        width: canvas.width * 0.5,
+        height: canvas.height * 0.5
+      };
+    }
+
+    // ---------- Apply lip‑sync geometry ----------
+    async function positionMouthFromFace() {
+      const img = document.getElementById('avatarPhotoPreview');
+      if (!img) return;
+      const box = await detectFace(img);
+      const stage = document.getElementById('avatarStage');
+      const mouth = document.getElementById('lipSyncMouth');
+      if (!stage || !mouth) return;
+
+      // Convert image coordinates to stage coordinates (assume same size)
+      const stageRect = stage.getBoundingClientRect();
+
+      const faceTop = box.y;
+      const faceHeight = box.height;
+      const faceWidth = box.width;
+      const faceCenterX = box.x + faceWidth / 2;
+
+      // Base lip geometry
+      const lipTop = faceTop + faceHeight * 0.74;
+      const lipWidth = faceWidth * 0.24;
+
+      // Apply saved manual offsets (if any)
+      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || '{}');
+      const avatarKey = img.dataset.avatarId || 'default';
+      const avatarAdjust = saved[avatarKey] || {};
+
+      const finalTop = lipTop + (avatarAdjust.lipTop || 0);
+      const finalLeft = faceCenterX - (lipWidth / 2) + (avatarAdjust.lipLeft || 0);
+      const finalWidth = lipWidth * (avatarAdjust.lipScale || 1);
+
+      // Position the mouth element (assumes absolute positioning inside #avatarStage)
+      mouth.style.position = 'absolute';
+      mouth.style.top = `${finalTop}px`;
+      mouth.style.left = `${finalLeft}px`;
+      mouth.style.width = `${finalWidth}px`;
+      mouth.style.height = 'auto'; // keep aspect ratio
+    }
+
+    // ---------- Hook image load ----------
+    const avatarImg = document.getElementById('avatarPhotoPreview');
+    if (avatarImg) {
+      avatarImg.addEventListener('load', () => {
+        positionMouthFromFace();
+      });
+    }
+
+    // ---------- Slider handling ----------
+    const vertSlider = document.getElementById('lipVertSlider');
+    const widthSlider = document.getElementById('lipWidthSlider');
+    const testBtn = document.getElementById('testLipBtn');
+
+    // Load saved adjustments for current avatar
+    function loadAdjustments() {
+      const img = document.getElementById('avatarPhotoPreview');
+      if (!img) return;
+      const avatarKey = img.dataset.avatarId || 'default';
+      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || '{}');
+      const adj = saved[avatarKey] || { lipTop: 0, lipLeft: 0, lipScale: 1 };
+      vertSlider.value = adj.lipTop;
+      widthSlider.value = adj.lipScale * 100; // store as percent
+    }
+
+    // Save adjustments
+    function saveAdjustments() {
+      const img = document.getElementById('avatarPhotoPreview');
+      if (!img) return;
+      const avatarKey = img.dataset.avatarId || 'default';
+      const saved = JSON.parse(localStorage.getItem('JESH_DEFAULT_TEACHER') || '{}');
+      saved[avatarKey] = {
+        lipTop: parseInt(vertSlider.value, 10),
+        lipLeft: 0, // left offset not exposed in UI (could be added later)
+        lipScale: parseInt(widthSlider.value, 10) / 100
+      };
+      localStorage.setItem('JESH_DEFAULT_TEACHER', JSON.stringify(saved));
+    }
+
+    testBtn.addEventListener('click', () => {
+      // Apply temporary offsets for preview
+      const mouth = document.getElementById('lipSyncMouth');
+      if (!mouth) return;
+      const currentTop = parseFloat(mouth.style.top) || 0;
+      const currentWidth = parseFloat(mouth.style.width) || 0;
+
+      const newTop = currentTop + parseInt(vertSlider.value, 10);
+      const newWidth = currentWidth * (parseInt(widthSlider.value, 10) / 100);
+
+      mouth.style.top = `${newTop}px`;
+      mouth.style.width = `${newWidth}px`;
+
+      // Persist after 2 seconds
+      setTimeout(() => {
+        saveAdjustments();
+        // Re‑run auto‑position to combine base + saved offsets
+        positionMouthFromFace();
+      }, 2000);
+    });
+
+    // Initialise sliders when avatar is ready
+    if (avatarImg) {
+      avatarImg.addEventListener('load', loadAdjustments);
+    }
+
+    // ---------- Mic‑status pill patch ----------
+    (function () {
+      const original = window.startLiveVideoCall;
+      if (typeof original === 'function') {
+        window.startLiveVideoCall = function (...args) {
+          const pill = document.getElementById('micListeningPill');
+          if (pill) pill.textContent = '🔴 सुन रहा हूँ... बोलिए!';
+          return original.apply(this, args);
+        };
+      }
+    })();
+  </script></div>
       </section>
 
       <!-- JESHLIVE 50/50 SPLIT-SCREEN VIDEO CALL & AVATAR STUDIO -->
