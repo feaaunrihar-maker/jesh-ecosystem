@@ -300,6 +300,190 @@
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
 <style>
+    /* Basic layout – keep it ultra‑clean and mobile‑friendly */
+    #smart-typing-card.card {
+      max-width: 600px;
+      margin: 1rem auto;
+      padding: 1.2rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+      background: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    #smart-typing-card .card-header {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 0.8rem;
+    }
+    #smart-typing-card .mini-card {
+      background:#f9f9f9;
+      border:1px solid #e0e0e0;
+      border-radius:6px;
+      padding:0.8rem;
+      margin:0.8rem 0;
+      font-size:0.9rem;
+      line-height:1.4;
+    }
+    #smart-typing-card .btn-primary {
+      background:#0069d9;
+      color:#fff;
+      border:none;
+      padding:0.5rem 1rem;
+      border-radius:4px;
+      cursor:pointer;
+      font-size:0.95rem;
+    }
+    #smart-typing-card .btn-primary:disabled {
+      background:#a0c4ff;
+      cursor:not-allowed;
+    }
+    #smart-typing-card select,
+    #smart-typing-card textarea {
+      width:100%;
+      padding:0.5rem;
+      margin-top:0.4rem;
+      border:1px solid #ccc;
+      border-radius:4px;
+      font-size:1rem;
+      box-sizing:border-box;
+    }
+    #smart-typing-card .stats {
+      margin-top:0.8rem;
+      font-size:0.95rem;
+    }
+    #smart-typing-card .xp-reward {
+      margin-top:0.6rem;
+      font-weight:bold;
+      color:#28a745;
+    }
+  </style>
+
+  <div id="smart-typing-card" class="card">
+    <div class="card-header">⌨️ Smart Typing &amp; Hand‑Posture Tutor</div>
+
+    <!-- Finger‑placement guide -->
+    <div class="mini-card">
+      <strong>Finger‑Placement Guide (Home Row)</strong><br>
+      <pre style="font-family:monospace; margin:0.5rem 0;">
+Left Hand:  A S D F   →  Pinky → Ring → Middle → Index
+Right Hand: J K L ;   →  Index → Middle → Ring → Pinky
+      </pre>
+      <em>Keep your wrists relaxed and fingers curved over the home row.</em>
+    </div>
+
+    <!-- Difficulty selector -->
+    <label for="difficulty-select">Select Difficulty:</label>
+    <select id="difficulty-select">
+      <option value="beginner">Beginner – Home Row (ASDF JKL;)</option>
+      <option value="intermediate">Intermediate – Short Sentences</option>
+      <option value="advanced">Advanced – Coding / CCC Terms</option>
+    </select>
+
+    <!-- Target text display -->
+    <div id="target-text" class="mini-card" style="min-height:4rem;"></div>
+
+    <!-- Typing area -->
+    <textarea id="typing-input" rows="4" placeholder="Start typing here..." disabled></textarea>
+
+    <!-- Controls -->
+    <button id="start-btn" class="btn-primary">Start Practice</button>
+    <button id="reset-btn" class="btn-primary" style="margin-left:0.5rem;" disabled>Reset</button>
+
+    <!-- Live stats -->
+    <div class="stats">
+      <span id="wpm-display">WPM: 0</span> |
+      <span id="accuracy-display">Accuracy: 0%</span>
+    </div>
+
+    <!-- XP reward -->
+    <div id="xp-reward" class="xp-reward" style="display:none;">🎉 +20 XP earned!</div>
+  </div>
+
+  <script>
+    (function(){
+      const texts = {
+        beginner: "asdf jkl; asdf jkl; asdf jkl;",
+        intermediate: "The quick brown fox jumps over the lazy dog.",
+        advanced: "function calculateWPM(chars, timeSec){ return (chars/5)/(timeSec/60); }"
+      };
+
+      const difficultySelect = document.getElementById('difficulty-select');
+      const targetDiv = document.getElementById('target-text');
+      const textarea = document.getElementById('typing-input');
+      const startBtn = document.getElementById('start-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const wpmSpan = document.getElementById('wpm-display');
+      const accSpan = document.getElementById('accuracy-display');
+      const xpDiv = document.getElementById('xp-reward');
+
+      let startTime = null;
+      let timer = null;
+      let currentText = "";
+
+      function loadTarget(){
+        const level = difficultySelect.value;
+        currentText = texts[level];
+        targetDiv.textContent = currentText;
+        textarea.value = "";
+        textarea.disabled = true;
+        startBtn.disabled = false;
+        resetBtn.disabled = true;
+        wpmSpan.textContent = "WPM: 0";
+        accSpan.textContent = "Accuracy: 0%";
+        xpDiv.style.display = "none";
+      }
+
+      function startPractice(){
+        textarea.disabled = false;
+        textarea.focus();
+        startBtn.disabled = true;
+        resetBtn.disabled = false;
+        startTime = performance.now();
+        timer = setInterval(updateStats, 500);
+      }
+
+      function resetPractice(){
+        clearInterval(timer);
+        loadTarget();
+      }
+
+      function updateStats(){
+        const typed = textarea.value;
+        const elapsedSec = (performance.now() - startTime) / 1000;
+        const charsTyped = typed.length;
+        const wordsTyped = charsTyped / 5;
+        const wpm = Math.round(wordsTyped / (elapsedSec/60));
+        // Accuracy
+        let correct = 0;
+        for(let i=0;i<typed.length;i++){
+          if(typed[i]===currentText[i]) correct++;
+        }
+        const accuracy = typed.length ? Math.round((correct/typed.length)*100) : 0;
+        wpmSpan.textContent = "WPM: " + wpm;
+        accSpan.textContent = "Accuracy: " + accuracy + "%";
+
+        // Completion check
+        if(typed === currentText){
+          clearInterval(timer);
+          textarea.disabled = true;
+          startBtn.disabled = true;
+          resetBtn.disabled = false;
+          xpDiv.style.display = "block";
+        }
+      }
+
+      // Event listeners
+      difficultySelect.addEventListener('change', loadTarget);
+      startBtn.addEventListener('click', startPractice);
+      resetBtn.addEventListener('click', resetPractice);
+      textarea.addEventListener('input', updateStats);
+
+      // Initial load
+      loadTarget();
+    })();
+  </script>
+<style>
     .card {
       border: 1px solid #ddd;
       border-radius: 8px;
