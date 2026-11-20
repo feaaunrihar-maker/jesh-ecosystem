@@ -340,6 +340,165 @@
 
         <div id="dynamicExtensionsZone">
 <style>
+    /* --- Core Overrides --- */
+    .dark-studio.fullscreen-call {
+      padding-bottom: 24px !important;
+      z-index: 99999 !important;
+    }
+    .hidden‑ui {
+      display: none !important;
+    }
+    /* Target ring for lip‑sync positioning */
+    #avatarWarpCanvas {
+      position: relative;
+    }
+    #avatarWarpCanvas::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 62%;               /* default lipY for generated avatar */
+      width: 30px;
+      height: 30px;
+      margin-left: -15px;
+      margin-top: -15px;
+      border: 2px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+    /* Card & button styling (reuse existing classes) */
+    .card {
+      background: #1e1e1e;
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+    .btn-primary {
+      background: #0066ff;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #0052cc;
+    }
+  </style>
+
+  <div class="card" id="upgradeWidget">
+    <h3>Video Call & Avatar Enhancements</h3>
+
+    <button class="btn-primary" id="applyOverridesBtn">Apply Call UI Overrides</button>
+    <button class="btn-primary" id="generateAvatarBtn">Generate Ghibli Avatar</button>
+    <button class="btn-primary" id="recordVoiceBtn">Record 15‑sec Voice Model</button>
+
+    <canvas id="avatarWarpCanvas" width="300" height="300"></canvas>
+    <audio id="voicePlayback" hidden></audio>
+  </div>
+
+  <script>
+    // ---------- 1. UI Overrides ----------
+    const applyOverrides = () => {
+      const videoContainer = document.getElementById('videoCallContainer');
+      if (!videoContainer) return;
+
+      const updateUI = () => {
+        const isFull = videoContainer.classList.contains('fullscreen-call');
+        const header = document.getElementById('mainAppHeader');
+        const footer = document.getElementById('studentBottomFooter');
+
+        if (header) header.classList.toggle('hidden‑ui', isFull);
+        if (footer) footer.classList.toggle('hidden‑ui', isFull);
+      };
+
+      // Initial check
+      updateUI();
+
+      // Observe class changes on the video container
+      const observer = new MutationObserver(updateUI);
+      observer.observe(videoContainer, { attributes: true, attributeFilter: ['class'] });
+    };
+
+    document.getElementById('applyOverridesBtn').addEventListener('click', applyOverrides);
+
+    // ---------- 2. Ghibli Avatar Generator ----------
+    const generateGhibliAvatar = async () => {
+      const canvas = document.getElementById('avatarWarpCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Example: retrieve user gender/style from a data attribute or fallback
+      const gender = document.body.dataset.userGender || 'female';
+      const style = document.body.dataset.userStyle || 'anime';
+
+      const prompt = `${gender} portrait in Studio Ghibli style, soft lighting, expressive eyes`;
+      const apiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+
+      try {
+        const response = await fetch(apiUrl);
+        const blob = await response.blob();
+        const img = new Image();
+        img.onload = () => {
+          // Clear canvas and draw centered image
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+          const w = img.width * scale;
+          const h = img.height * scale;
+          const x = (canvas.width - w) / 2;
+          const y = (canvas.height - h) / 2;
+          ctx.drawImage(img, x, y, w, h);
+        };
+        img.src = URL.createObjectURL(blob);
+      } catch (e) {
+        console.error('Avatar generation failed:', e);
+      }
+    };
+
+    // Adjust target ring for uploaded selfies (lipY = 0.46)
+    const setSelfieTargetRing = () => {
+      const canvas = document.getElementById('avatarWarpCanvas');
+      canvas.style.setProperty('--lipY', '46%');
+      canvas.style.setProperty('--lipX', '50%');
+      // Update pseudo‑element position via CSS variable (fallback to default if not supported)
+      const style = document.createElement('style');
+      style.textContent = `
+        #avatarWarpCanvas::after {
+          top: var(--lipY, 62%);
+          left: var(--lipX, 50%);
+        }
+      `;
+      document.head.appendChild(style);
+    };
+
+    document.getElementById('generateAvatarBtn').addEventListener('click', async () => {
+      await generateGhibliAvatar();
+      setSelfieTargetRing(); // apply ring positioning after generation
+    });
+
+    // ---------- 3. Voice Model Recording & Playback ----------
+    const recordFifteenSecondVoiceModel = () => {
+      // Placeholder: replace with real recording logic
+      return new Promise((resolve) => {
+        const fakeAudioUrl = 'https://cdn.jsdelivr.net/gh/elevenlabs/elevenlabs-samples/hello.mp3';
+        setTimeout(() => resolve(fakeAudioUrl), 1500); // simulate async work
+      });
+    };
+
+    const playVoiceSample = (url) => {
+      const audio = document.getElementById('voicePlayback');
+      audio.src = url;
+      audio.play().catch(err => console.warn('Playback failed:', err));
+    };
+
+    document.getElementById('recordVoiceBtn').addEventListener('click', async () => {
+      const sampleUrl = await recordFifteenSecondVoiceModel();
+      if (sampleUrl) {
+        playVoiceSample(sampleUrl);
+      }
+    });
+  </script>
+<style>
     /* Core widget styling */
     .card {
       max-width: 380px;
