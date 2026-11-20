@@ -303,6 +303,273 @@
         <!-- DYNAMIC EXTENSIONS SLOT (RESERVED FOR FUTURE ADMIN PROMPTS) -->
         <div id="dynamicExtensionsZone">
 <style>
+/* Core card styling */
+.card {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  background:#fff;
+}
+
+/* Avatar studio */
+.avatar-studio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background:#f9f9f9;
+}
+.avatar-studio .btn-primary {
+  min-height:48px;
+  border-radius:12px;
+  padding:0 16px;
+  background:#ff9800;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+.avatar-studio .photo-label {
+  min-height:48px;
+  border-radius:12px;
+  display:inline-flex;
+  align-items:center;
+  padding:0 12px;
+  background:#e0e0e0;
+  font-size:14px;
+}
+
+/* Input bar */
+.input-bar {
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid #eee;
+}
+.input-bar input {
+  flex:1;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:8px;
+}
+.input-bar .send-btn {
+  min-height:48px;
+}
+
+/* Call screen */
+.call-screen {
+  display:none;
+  height:100vh;
+  background:#000;
+}
+.call-screen.active {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+@media (max-width:600px) {
+  .call-screen.active {
+    grid-template-columns:1fr;
+    grid-template-rows:1fr 1fr;
+  }
+}
+
+/* Panels */
+.panel {
+  position:relative;
+  background:#111;
+  overflow:hidden;
+}
+.panel video, .panel .avatar-placeholder {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.panel .avatar-placeholder {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:24px;
+  background:#222;
+}
+.avatar-glow {
+  animation:glow 2s infinite;
+}
+@keyframes glow {
+  0%,100% { box-shadow:0 0 10px 2px rgba(0,255,0,0.5); }
+  50% { box-shadow:0 0 20px 4px rgba(0,255,0,1); }
+}
+
+/* Subtitle & timer */
+.sub-bar, .timer {
+  position:absolute;
+  left:0;
+  width:100%;
+  text-align:center;
+  color:#fff;
+  background:rgba(0,0,0,0.5);
+  padding:4px 0;
+  font-size:14px;
+}
+.sub-bar { bottom:0; }
+.timer { top:0; }
+
+/* Call controls */
+.controls {
+  display:none;
+  justify-content:center;
+  gap:12px;
+  padding:12px;
+  background:#222;
+}
+.controls.active {
+  display:flex;
+}
+.controls button {
+  min-height:48px;
+  border-radius:12px;
+  background:#ff5722;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+.controls button.toggled {
+  background:#4caf50;
+}
+</style>
+
+<div class="card">
+  <!-- Studio view -->
+  <div class="studio">
+    <div class="avatar-studio">
+      <button class="btn-primary">Didi-Mentor</button>
+      <button class="btn-primary">Robo-Guru</button>
+      <span class="photo-label">अपनी फोटो लगाएं</span>
+    </div>
+    <div class="input-bar">
+      <input type="text" placeholder="बोलें / Send">
+      <button class="btn-primary send-btn">Send</button>
+    </div>
+    <button id="startCallBtn" class="btn-primary" style="margin:12px;">📞 Start Call</button>
+  </div>
+
+  <!-- Call screen -->
+  <div class="call-screen" id="callScreen">
+    <div class="panel" id="aiPanel">
+      <div class="avatar-placeholder avatar-glow">AI Avatar</div>
+      <div class="timer" id="callTimer">00:00</div>
+      <div class="sub-bar" id="subtitleBar">Listening...</div>
+    </div>
+    <div class="panel" id="studentPanel">
+      <video id="webcamVideo" autoplay muted playsinline></video>
+      <div class="subtitle" id="studentName" style="position:absolute;bottom:8px;left:8px;color:#fff;background:rgba(0,0,0,0.5);padding:4px 8px;border-radius:8px;">Brijesh</div>
+    </div>
+    <div class="controls" id="callControls">
+      <button id="muteBtn">🎤 Mute</button>
+      <button id="cameraBtn">📷 Camera Off</button>
+      <button id="loopBtn" class="toggled">🔁 Auto-Loop: ON</button>
+      <button id="endCallBtn">📵 End Call</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const startBtn = document.getElementById('startCallBtn');
+  const callScreen = document.getElementById('callScreen');
+  const studio = document.querySelector('.studio');
+  const controls = document.getElementById('callControls');
+  const timerEl = document.getElementById('callTimer');
+  const webcamVideo = document.getElementById('webcamVideo');
+  const muteBtn = document.getElementById('muteBtn');
+  const cameraBtn = document.getElementById('cameraBtn');
+  const loopBtn = document.getElementById('loopBtn');
+  const endCallBtn = document.getElementById('endCallBtn');
+
+  let timerInterval = null;
+  let seconds = 0;
+  let stream = null;
+  let audioEnabled = true;
+  let videoEnabled = true;
+
+  const formatTime = s => {
+    const m = String(Math.floor(s/60)).padStart(2,'0');
+    const sec = String(s%60).padStart(2,'0');
+    return `${m}:${sec}`;
+  };
+
+  const startTimer = () => {
+    timerEl.textContent = formatTime(seconds);
+    timerInterval = setInterval(() => {
+      seconds++;
+      timerEl.textContent = formatTime(seconds);
+    },1000);
+  };
+  const stopTimer = () => {
+    clearInterval(timerInterval);
+    seconds = 0;
+    timerEl.textContent = '00:00';
+  };
+
+  const startWebcam = async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      webcamVideo.srcObject = stream;
+      webcamVideo.style.transform = 'scaleX(-1)'; // mirror
+    } catch (e) {
+      console.warn('Webcam not available, showing placeholder');
+      webcamVideo.style.display='none';
+    }
+  };
+  const stopWebcam = () => {
+    if (stream) {
+      stream.getTracks().forEach(t=>t.stop());
+      stream = null;
+    }
+    webcamVideo.srcObject = null;
+  };
+
+  startBtn.addEventListener('click', async () => {
+    studio.style.display='none';
+    callScreen.classList.add('active');
+    controls.classList.add('active');
+    await startWebcam();
+    startTimer();
+  });
+
+  endCallBtn.addEventListener('click', () => {
+    stopWebcam();
+    stopTimer();
+    callScreen.classList.remove('active');
+    controls.classList.remove('active');
+    studio.style.display='block';
+  });
+
+  muteBtn.addEventListener('click', () => {
+    if (!stream) return;
+    audioEnabled = !audioEnabled;
+    stream.getAudioTracks().forEach(t=>t.enabled = audioEnabled);
+    muteBtn.textContent = audioEnabled ? '🎤 Mute' : '🔊 Unmute';
+  });
+
+  cameraBtn.addEventListener('click', () => {
+    if (!stream) return;
+    videoEnabled = !videoEnabled;
+    stream.getVideoTracks().forEach(t=>t.enabled = videoEnabled);
+    cameraBtn.textContent = videoEnabled ? '📷 Camera Off' : '📷 Camera On';
+  });
+
+  loopBtn.addEventListener('click', () => {
+    loopBtn.classList.toggle('toggled');
+    const on = loopBtn.classList.contains('toggled');
+    loopBtn.textContent = on ? '🔁 Auto-Loop: ON' : '🔁 Auto-Loop: OFF';
+    // placeholder: no actual looping logic
+  });
+})();
+</script>
+<style>
     .card {
       max-width: 420px;
       margin: 20px auto;
