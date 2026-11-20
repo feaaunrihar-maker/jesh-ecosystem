@@ -299,6 +299,74 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<div id="leaderboard-widget" class="card">
+  <h2 class="mini-card">🏆 Top Learners Leaderboard &amp; Badges</h2>
+  
+  <!-- Current Student Section -->
+  <div id="current-student" class="mini-card">
+    <h3>Your Rank</h3>
+    <p id="student-rank">Loading…</p>
+    <h4>Earned Badges</h4>
+    <ul id="student-badges"></ul>
+  </div>
+  
+  <!-- Top 5 Learners -->
+  <div id="top-learners" class="mini-card">
+    <h3>Top 5 Learners</h3>
+    <ol id="leader-list"></ol>
+    <button class="btn-primary" id="refresh-btn">Refresh</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Sample data – in production replace with API call
+  const learners = [
+    { name: "Alex", xp: 520, badges: ["First Step", "Fast Learner"] },
+    { name: "Sam", xp: 480, badges: ["First Step"] },
+    { name: "Jordan", xp: 450, badges: ["Fast Learner"] },
+    { name: "Taylor", xp: 430, badges: [] },
+    { name: "Riley", xp: 410, badges: [] },
+    { name: "You",   xp: 395, badges: ["First Step", "Streak Master"] }
+  ];
+
+  // Sort learners by XP descending
+  const sorted = [...learners].sort((a, b) => b.xp - a.xp);
+
+  // Populate top‑5 list
+  const leaderList = document.getElementById('leader-list');
+  leaderList.innerHTML = '';
+  sorted.slice(0,5).forEach((l, i) => {
+    const li = document.createElement('li');
+    li.textContent = `${i + 1}. ${l.name} – ${l.xp} XP`;
+    leaderList.appendChild(li);
+  });
+
+  // Show current student rank & badges
+  const current = learners.find(l => l.name === "You");
+  const rank = sorted.findIndex(l => l.name === "You") + 1;
+  document.getElementById('student-rank').textContent = `#${rank} with ${current.xp} XP`;
+
+  const badgesContainer = document.getElementById('student-badges');
+  badgesContainer.innerHTML = '';
+  const badgeMap = {
+    "First Step": "First Step – 25 XP",
+    "Fast Learner": "Fast Learner – 100 XP",
+    "Streak Master": "Streak Master – 200 XP"
+  };
+  current.badges.forEach(b => {
+    const li = document.createElement('li');
+    li.textContent = badgeMap[b] || b;
+    badgesContainer.appendChild(li);
+  });
+
+  // Refresh button (simulated new data)
+  document.getElementById('refresh-btn').addEventListener('click', () => {
+    // In a real app, re‑fetch data here.
+    alert('Data refreshed!');
+  });
+})();
+</script>
 <style>
     /* Basic layout – keep it ultra‑clean and mobile‑friendly */
     #smart-typing-card.card {
