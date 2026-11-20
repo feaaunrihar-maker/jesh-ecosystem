@@ -328,6 +328,129 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+<div class="card" id="quest-widget">
+  <h2 class="mini-card">📜 Interactive Quest Engine</h2>
+  <div id="quest-list">
+    <!-- quests will be injected here -->
+  </div>
+  <hr>
+  <h3 class="mini-card">Your Progress</h3>
+  <div id="progress-area">
+    <p>No quest started yet.</p>
+  </div>
+  <hr>
+  <h3 class="mini-card">Badge & QR Certificate</h3>
+  <div id="reward-area"></div>
+  <hr>
+  <h3 class="mini-card">Leaderboard</h3>
+  <ul id="leaderboard"></ul>
+</div>
+
+<script>
+(() => {
+  const quests = [
+    { id: 1, title: "Python Basics Quest", description: "Learn variables and loops.", reward: "Python Novice Badge" },
+    { id: 2, title: "Finance Fundamentals", description: "Understand interest & inflation.", reward: "Finance Explorer Badge" },
+    { id: 3, title: "Data Crunch Challenge", description: "Manipulate CSV data with Python.", reward: "Data Wrangler Badge" }
+  ];
+
+  const questListEl = document.getElementById('quest-list');
+  const progressEl = document.getElementById('progress-area');
+  const rewardEl = document.getElementById('reward-area');
+  const leaderboardEl = document.getElementById('leaderboard');
+
+  // Load or init user data
+  const user = JSON.parse(localStorage.getItem('questUser')) || { completed: [], points: 0 };
+  const leaderboard = JSON.parse(localStorage.getItem('questLeaderboard')) || [];
+
+  function renderQuests() {
+    questListEl.innerHTML = '';
+    quests.forEach(q => {
+      const completed = user.completed.includes(q.id);
+      const btnText = completed ? 'Completed ✅' : 'Start Quest';
+      const btnClass = completed ? 'btn-primary' : 'btn-primary';
+      const questDiv = document.createElement('div');
+      questDiv.className = 'mini-card';
+      questDiv.innerHTML = `
+        <strong>${q.title}</strong><br>
+        <small>${q.description}</small><br>
+        <button class="${btnClass}" ${completed ? 'disabled' : ''} data-id="${q.id}">${btnText}</button>
+      `;
+      questListEl.appendChild(questDiv);
+    });
+  }
+
+  function startQuest(id) {
+    const quest = quests.find(q => q.id === id);
+    if (!quest) return;
+    // Simulate instant completion for demo purposes
+    user.completed.push(id);
+    user.points += 10;
+    saveUser();
+    showReward(quest);
+    renderProgress();
+    renderLeaderboard();
+    renderQuests();
+  }
+
+  function showReward(quest) {
+    rewardEl.innerHTML = `
+      <p>🎉 You earned: <strong>${quest.reward}</strong></p>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(quest.reward)}" alt="QR Certificate">
+    `;
+  }
+
+  function renderProgress() {
+    if (user.completed.length === 0) {
+      progressEl.innerHTML = '<p>No quest started yet.</p>';
+      return;
+    }
+    const completedTitles = quests.filter(q => user.completed.includes(q.id)).map(q => q.title);
+    progressEl.innerHTML = `
+      <p>Completed quests: ${completedTitles.join(', ')}</p>
+      <p>Total points: ${user.points}</p>
+    `;
+  }
+
+  function renderLeaderboard() {
+    // Update local leaderboard with current user (simple demo using name "You")
+    const existing = leaderboard.find(e => e.name === 'You');
+    if (existing) {
+      existing.points = user.points;
+    } else {
+      leaderboard.push({ name: 'You', points: user.points });
+    }
+    // Sort descending
+    leaderboard.sort((a, b) => b.points - a.points);
+    // Keep top 5
+    const top = leaderboard.slice(0, 5);
+    leaderboardEl.innerHTML = '';
+    top.forEach(entry => {
+      const li = document.createElement('li');
+      li.textContent = `${entry.name}: ${entry.points} pts`;
+      leaderboardEl.appendChild(li);
+    });
+    localStorage.setItem('questLeaderboard', JSON.stringify(leaderboard));
+  }
+
+  function saveUser() {
+    localStorage.setItem('questUser', JSON.stringify(user));
+  }
+
+  // Event delegation for quest buttons
+  questListEl.addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON' && !e.target.disabled) {
+      const id = parseInt(e.target.dataset.id, 10);
+      startQuest(id);
+    }
+  });
+
+  // Initial render
+  renderQuests();
+  renderProgress();
+  renderLeaderboard();
+})();
+</script>
 ```html
 <!DOCTYPE html>
 <html lang="en">
