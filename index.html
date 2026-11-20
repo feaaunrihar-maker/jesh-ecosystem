@@ -447,6 +447,157 @@
 
         <!-- ISOLATED AUTONOMOUS SELF-ARCHITECT MOUNT POINT -->
         <div id="dynamicExtensionsZone">
+<!-- AUTO-DEPLOYED: Inside `#tab-admin` (above `#coArchitect -->
+<style>
+    /* Container inside #tab-admin */
+    #architectDiscussContainer {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      background-color: #f9f9f9;
+      font-family: Arial, sans-serif;
+    }
+    #architectDiscussHeader {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 1.1em;
+    }
+    #architectDiscussFeed {
+      height: 180px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .architect-msg {
+      margin: 4px 0;
+    }
+    .architect-msg.user {
+      color: #0066cc;
+    }
+    .architect-msg.ai {
+      color: #333;
+    }
+    #architectInputWrapper {
+      display: flex;
+      gap: 6px;
+    }
+    #architectInput {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    .architect-btn {
+      background-color: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .architect-btn:hover {
+      background-color: #0055aa;
+    }
+    #moveToDeployBtn {
+      background-color: #28a745;
+    }
+    #moveToDeployBtn:hover {
+      background-color: #218838;
+    }
+  </style>
+
+  <div id="architectDiscussContainer">
+    <div id="architectDiscussHeader">💬 1. Discuss & Finalize Plan with Co‑Architect</div>
+    <div id="architectDiscussFeed"></div>
+    <div id="architectInputWrapper">
+      <input type="text" id="architectInput" placeholder="Type your question or comment…" />
+      <button id="discussBtn" class="architect-btn">💬 Discuss</button>
+      <button id="moveToDeployBtn" class="architect-btn">📋 Move Finalized Plan to Deploy Box</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Simple in‑memory store for the chat history
+      const chatHistory = [];
+
+      const feedEl = document.getElementById('architectDiscussFeed');
+      const inputEl = document.getElementById('architectInput');
+      const discussBtn = document.getElementById('discussBtn');
+      const moveBtn = document.getElementById('moveToDeployBtn');
+
+      // Helper to append a message to the feed
+      function appendMessage(text, type) {
+        const msgEl = document.createElement('div');
+        msgEl.className = `architect-msg ${type}`;
+        msgEl.textContent = (type === 'user' ? 'You: ' : 'Co‑Architect: ') + text;
+        feedEl.appendChild(msgEl);
+        feedEl.scrollTop = feedEl.scrollHeight;
+      }
+
+      // Send user message to backend and display AI reply
+      async function sendMessage() {
+        const prompt = inputEl.value.trim();
+        if (!prompt) return;
+        // Show user message
+        appendMessage(prompt, 'user');
+        chatHistory.push({ role: 'user', content: prompt });
+        inputEl.value = '';
+        // Call the assumed global postBackend function
+        try {
+          const response = await postBackend({
+            action: 'CHAT',
+            role: 'architect_chat',
+            prompt: prompt
+          });
+          const reply = response?.reply || '…';
+          appendMessage(reply, 'ai');
+          chatHistory.push({ role: 'assistant', content: reply });
+        } catch (e) {
+          console.error('Chat error:', e);
+          appendMessage('Error contacting Co‑Architect.', 'ai');
+        }
+      }
+
+      // Summarize discussion and move to #coArchitectPrompt
+      function moveToDeploy() {
+        // Very simple summarisation: concatenate AI messages
+        const aiMessages = chatHistory
+          .filter(m => m.role === 'assistant')
+          .map(m => m.content)
+          .join(' ');
+        const summary = aiMessages || 'No finalized plan yet.';
+        const target = document.querySelector('#coArchitectPrompt');
+        if (target) {
+          // If it's a textarea/input use value, otherwise innerText
+          if ('value' in target) {
+            target.value = summary;
+          } else {
+            target.innerText = summary;
+          }
+          // Optionally give visual feedback
+          target.style.border = '2px solid #28a745';
+          setTimeout(() => (target.style.border = ''), 2000);
+        } else {
+          console.warn('#coArchitectPrompt not found in the DOM.');
+        }
+      }
+
+      // Event listeners
+      discussBtn.addEventListener('click', sendMessage);
+      inputEl.addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendMessage();
+      });
+      moveBtn.addEventListener('click', moveToDeploy);
+    })();
+  </script>
 <!-- AUTO-DEPLOYED: Perform a live Self-Verification Check o -->
 <div class="card"><strong>✨ Perform a live Self-Verification Check on all core modules (Auth, 50/50 Video Call, JeshLingo, JeshRead, Jesh Academy, and Ads Readiness) and deploy an interactive "Engagement & Fun Booster" upgrade across JeshLive Video Call, JeshLingo, and JeshRead:
 
