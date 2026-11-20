@@ -338,7 +338,161 @@
           </div>
         </div>
 
-        <div id="dynamicExtensionsZone"></div>
+        <div id="dynamicExtensionsZone">
+<style>
+  .card { 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    padding: 1rem; 
+    max-width: 600px; 
+    margin: auto; 
+    font-family: Arial, sans-serif; 
+    background:#fafafa;
+  }
+  .card h3 { margin-top:0; }
+  .btn-primary { 
+    background:#2563eb; 
+    color:#fff; 
+    border:none; 
+    padding:0.5rem 1rem; 
+    border-radius:4px; 
+    cursor:pointer; 
+    margin:0.3rem 0;
+  }
+  .btn-primary:hover { background:#1e40af; }
+  .word { cursor:pointer; }
+  .highlight-current { background:yellow; }
+  .correct { background:#059669; color:#fff; }
+  .incorrect { background:#E11D48; color:#fff; }
+  #vocabList { list-style:none; padding:0; }
+  #vocabList li { background:#e0f2fe; margin:0.2rem 0; padding:0.3rem 0.5rem; border-radius:4px; }
+</style>
+
+<div class="card" id="readWidget">
+  <h3>📖 JeshRead Studio – Interactive Reading Coach</h3>
+  <p id="storyContainer"></p>
+
+  <button class="btn-primary" id="playBtn">🔊 पूरी कहानी सुनें</button>
+  <button class="btn-primary" id="readBtn">🗣️ Read‑Along Check</button>
+  <button class="btn-primary" id="flashBtn">⚡ Quick Flashcard Test</button>
+
+  <h4>📒 My Vocabulary Bank</h4>
+  <ul id="vocabList"></ul>
+</div>
+
+<script>
+(() => {
+  // ---- Data ----
+  const storyText = "एक छोटा बच्चा जंगल में खेल रहा था। वह पेड़ की शाखा से फल तोड़ रहा था।";
+  const words = storyText.split(/\s+/);
+  const storyContainer = document.getElementById('storyContainer');
+
+  // Render story with clickable spans
+  words.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.textContent = w + ' ';
+    span.className = 'word';
+    span.dataset.idx = i;
+    span.addEventListener('click', () => addToVocab(w));
+    storyContainer.appendChild(span);
+  });
+
+  // ---- Vocabulary Bank ----
+  const vocabSet = new Set();
+  const vocabList = document.getElementById('vocabList');
+
+  function addToVocab(word) {
+    if (vocabSet.has(word)) return;
+    vocabSet.add(word);
+    const li = document.createElement('li');
+    li.textContent = word;
+    vocabList.appendChild(li);
+  }
+
+  // ---- Flashcard Test ----
+  document.getElementById('flashBtn').addEventListener('click', () => {
+    const arr = Array.from(vocabSet);
+    if (!arr.length) { alert('Vocabulary bank is empty! Tap words in the story to add them.'); return; }
+    const randomWord = arr[Math.floor(Math.random()*arr.length)];
+    const answer = prompt(`Flashcard:\nWhat is the meaning of "${randomWord}"? (Just type anything to continue)`);
+    if (answer !== null) alert(`Great! Keep practicing "${randomWord}".`);
+  });
+
+  // ---- Play Story (Karaoke) ----
+  document.getElementById('playBtn').addEventListener('click', () => {
+    if (!('speechSynthesis' in window)) { alert('Speech Synthesis not supported'); return; }
+
+    // Reset highlights
+    document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-current'));
+
+    const utter = new SpeechSynthesisUtterance(storyText);
+    utter.lang = 'hi-IN';
+
+    // Build char index map → word index
+    const charMap = [];
+    let cum = 0;
+    words.forEach((w, i) => {
+      const start = cum;
+      const end = cum + w.length;
+      charMap.push({start, end, idx:i});
+      cum = end + 1; // +1 for the space
+    });
+
+    utter.onboundary = (e) => {
+      if (e.name !== 'word') return;
+      const charIdx = e.charIndex;
+      const entry = charMap.find(m => charIdx >= m.start && charIdx <= m.end);
+      if (entry) {
+        document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-current'));
+        const span = document.querySelector(`.word[data-idx="${entry.idx}"]`);
+        if (span) span.classList.add('highlight-current');
+      }
+    };
+
+    utter.onend = () => {
+      document.querySelectorAll('.word').forEach(w => w.classList.remove('highlight-current'));
+    };
+
+    speechSynthesis.speak(utter);
+  });
+
+  // ---- Read‑Along Check ----
+  document.getElementById('readBtn').addEventListener('click', () => {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) { alert('Speech Recognition not supported'); return; }
+
+    const recognizer = new SpeechRec();
+    recognizer.lang = 'hi-IN';
+    recognizer.interimResults = false;
+    recognizer.maxAlternatives = 1;
+
+    recognizer.start();
+
+    recognizer.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.trim();
+      const spoken = transcript.split(/\s+/);
+      // Clear previous markings
+      document.querySelectorAll('.word').forEach(w => {
+        w.classList.remove('correct','incorrect');
+      });
+      // Compare word‑by‑word
+      words.forEach((orig, i) => {
+        const span = document.querySelector(`.word[data-idx="${i}"]`);
+        if (!span) return;
+        if (spoken[i] && spoken[i] === orig) {
+          span.classList.add('correct');
+        } else {
+          span.classList.add('incorrect');
+        }
+      });
+    };
+
+    recognizer.onerror = (e) => alert('Recognition error: ' + e.error);
+    recognizer.onend = () => console.log('Read‑along session ended');
+  });
+
+})();
+</script></div>
       </section>
 
       <!-- JESHLIVE FULL-SCREEN 50/50 VIDEO CALL & AVATAR STUDIO -->
