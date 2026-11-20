@@ -299,6 +299,120 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Session Persistence & Adaptive Learner Card</title>
+<style>
+  body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
+  .top-bar {display:flex; justify-content:space-between; align-items:center; background:#2c3e50; color:#fff; padding:10px 20px;}
+  .top-bar h1 {margin:0; font-size:1.2rem;}
+  .btn-primary {background:#3498db; color:#fff; border:none; padding:10px 20px; font-size:1rem; cursor:pointer; border-radius:4px;}
+  .btn-primary:hover {background:#2980b9;}
+  .card {background:#fff; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin:20px; padding:20px;}
+  .mini-card {background:#e8f4fd; border-left:4px solid #3498db; padding:10px; margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>Jesh Learner Dashboard</h1>
+  <button id="logoutBtn" class="btn-primary" style="font-size:48px; line-height:1;">⎋</button>
+</div>
+
+<div class="card" id="welcomeCard">
+  <h2 id="greeting">Welcome, Student!</h2>
+  <p id="streakInfo">Streak: -- | XP: --</p>
+  <div class="mini-card" id="profileSummary">
+    <strong>Profile:</strong> <span id="profileDetails">Loading...</span>
+  </div>
+</div>
+
+<script>
+// ---------- Session Management ----------
+const SESSION_KEY = 'jesh_session';
+const TOKEN_KEY = 'jesh_token';
+const EXPIRY_HOURS = 48;
+
+// Simulated login (replace with real auth flow)
+function mockLogin() {
+  const token = 'demo-token-' + Date.now();
+  const session = {
+    token,
+    loginTime: Date.now()
+  };
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+
+// Check session validity
+function isSessionValid() {
+  const sessionStr = localStorage.getItem(SESSION_KEY);
+  if (!sessionStr) return false;
+  try {
+    const session = JSON.parse(sessionStr);
+    const ageMs = Date.now() - session.loginTime;
+    return ageMs < EXPIRY_HOURS * 60 * 60 * 1000;
+  } catch {
+    return false;
+  }
+}
+
+// Logout handler
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(SESSION_KEY);
+  location.reload();
+});
+
+// Auto-login on page load
+if (!isSessionValid()) {
+  // No valid session – simulate a fresh login for demo purposes
+  mockLogin();
+}
+
+// ---------- Profile Loading ----------
+async function loadStudentProfile() {
+  // Placeholder: Replace with actual Google Sheets API call
+  // Expected response format:
+  // { name: 'Anita', age: 14, streak: 5, xp: 1200,
+  //   mindsetTag: 'Growth', skillMatrix: 'Grammar:A1|Math:L1|Logic:L2',
+  //   oneLineSummary: 'Strong in grammar, needs math practice' }
+
+  // Demo static data
+  const profile = {
+    name: 'Anita',
+    age: 14,
+    streak: 5,
+    xp: 1200,
+    mindsetTag: 'Growth',
+    skillMatrix: 'Grammar:A1 | Math:L1 | Logic:L2',
+    oneLineSummary: 'Strong in grammar, needs math practice'
+  };
+
+  // Update UI
+  document.getElementById('greeting').textContent = `Welcome, ${profile.name}!`;
+  document.getElementById('streakInfo').textContent = `Streak: ${profile.streak} | XP: ${profile.xp}`;
+  document.getElementById('profileDetails').innerHTML = `
+    Age: ${profile.age}<br>
+    Mindset: ${profile.mindsetTag}<br>
+    Skills: ${profile.skillMatrix}<br>
+    Note: ${profile.oneLineSummary}
+  `;
+
+  // Store profile for later AI module calls
+  window.currentStudentProfile = profile;
+}
+
+// ---------- Initialization ----------
+window.addEventListener('DOMContentLoaded', () => {
+  loadStudentProfile();
+});
+</script>
+
+</body>
+</html>
 <style>
     .card {
       background: #fff;
