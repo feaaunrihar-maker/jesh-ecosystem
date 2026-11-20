@@ -299,6 +299,240 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Jesh Ecosystem – Secure UI</title>
+<style>
+  :root {
+    --bg-login: #F8FAFC;
+    --text-primary: #0F172A;      /* Deep Navy */
+    --card-bg: #FFFFFF;           /* Pure White */
+    --btn-primary-bg: #4F46E5;    /* Vibrant Indigo */
+    --footer-height: 48px;
+    --footer-bg: #F1F5F9;
+  }
+  body, html {
+    margin:0; padding:0; height:100%; font-family:Arial,Helvetica,sans-serif;
+    background:#fff;
+  }
+  /* Full‑screen login gate */
+  #login-gate {
+    position:fixed; inset:0; background:var(--bg-login);
+    display:flex; align-items:center; justify-content:center;
+    z-index:1000;
+  }
+  .login-card {
+    background:var(--card-bg);
+    padding:2rem;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    width:320px;
+    text-align:center;
+  }
+  .login-card h2 {
+    color:var(--text-primary);
+    margin-bottom:1rem;
+  }
+  .btn-primary {
+    background:var(--btn-primary-bg);
+    color:#fff;
+    border:none;
+    padding:0.5rem 1rem;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:1rem;
+  }
+  .btn-primary:hover { opacity:0.9; }
+  .toggle-group {
+    margin:1rem 0;
+    display:flex; justify-content:center; gap:0.5rem;
+  }
+  .toggle-group button {
+    background:#e2e8f0;
+    border:none;
+    padding:0.4rem 0.8rem;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .toggle-group button.active {
+    background:var(--btn-primary-bg);
+    color:#fff;
+  }
+  .forgot-link {
+    display:block; margin-top:0.5rem; font-size:0.9rem;
+    color:#2563eb; text-decoration:none;
+  }
+  .forgot-link:hover { text-decoration:underline; }
+
+  /* Main dashboard (hidden until login) */
+  #dashboard { display:none; min-height:100vh; padding-bottom:var(--footer-height); }
+  .hero { padding:2rem; text-align:center; }
+  .hero button {
+    background:var(--btn-primary-bg);
+    color:#fff; border:none; padding:0.8rem 1.5rem;
+    border-radius:4px; font-size:1.1rem; cursor:pointer;
+  }
+  .grid {
+    display:grid; gap:1rem; padding:1rem;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+  }
+  .card {
+    background:var(--card-bg);
+    border-radius:8px; padding:1rem;
+    box-shadow:0 1px 4px rgba(0,0,0,0.08);
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .card h3 { color:var(--text-primary); margin:0 0 0.5rem; }
+  .card p { flex-grow:1; margin:0 0 0.5rem; color:#334155; }
+  .mini-card {
+    background:#f1f5f9; border-radius:4px;
+    padding:0.5rem; margin-top:0.5rem; text-align:center;
+    font-size:0.9rem; color:#1e293b;
+  }
+
+  /* Footer */
+  .footer {
+    position:fixed; bottom:0; left:0; right:0;
+    height:var(--footer-height);
+    background:var(--footer-bg);
+    display:flex; align-items:center; justify-content:space-around;
+    font-size:0.9rem; color:#1e293b;
+    border-top:1px solid #cbd5e1;
+  }
+  .footer a { color:inherit; text-decoration:none; }
+  .footer a:hover { text-decoration:underline; }
+
+  /* Admin only sections */
+  .admin-only { display:none; }
+</style>
+</head>
+<body>
+
+<!-- Login Gate -->
+<div id="login-gate">
+  <div class="login-card">
+    <h2 id="login-title">Student Login</h2>
+    <div class="toggle-group">
+      <button id="btn-student" class="active">Student Login</button>
+      <button id="btn-admin">Admin Login</button>
+    </div>
+    <input type="password" id="pin-input" placeholder="Enter PIN" style="width:100%; padding:0.5rem; margin-bottom:1rem;">
+    <button class="btn-primary" id="login-btn">Login</button>
+    <a href="#" class="forgot-link">Forgot PIN?</a>
+  </div>
+</div>
+
+<!-- Main Dashboard -->
+<div id="dashboard">
+  <section class="hero">
+    <h1>Welcome to Jesh Ecosystem</h1>
+    <button class="btn-primary" id="start-lesson">शुरू करें / Start Lesson</button>
+  </section>
+
+  <section class="grid" id="student-modules">
+    <div class="card">
+      <h3>JeshLingo</h3>
+      <p>Learn languages with AI‑powered lessons.</p>
+    </div>
+    <div class="card">
+      <h3>JeshRead Studio</h3>
+      <p>Read and comprehend texts across subjects.</p>
+    </div>
+    <div class="card">
+      <h3>Jesh Academy</h3>
+      <p>Micro‑courses in coding, finance, and more.</p>
+    </div>
+    <div class="card">
+      <h3>JeshLive Avatar</h3>
+      <p>Live AI tutor with avatar interaction.</p>
+    </div>
+  </section>
+
+  <!-- Admin Command Center (hidden by default) -->
+  <section class="admin-only" id="admin-panel">
+    <h2 style="color:var(--text-primary); margin:1rem;">Admin Command Center - Priority 3 Upgrades</h2>
+    <div class="grid" id="admin-rd">
+      <div class="card">
+        <h3>Awesome-GitHub Repo</h3>
+        <p>Explore curated repositories for learning.</p>
+        <button class="btn-primary">Integrate</button>
+      </div>
+      <div class="card">
+        <h3>MCP‑Skill‑Chat</h3>
+        <p>Chat interface for skill‑building exercises.</p>
+        <button class="btn-primary">Integrate</button>
+      </div>
+      <div class="card">
+        <h3>Integrate</h3>
+        <p>Connect new tools and services securely.</p>
+        <button class="btn-primary">Integrate</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Persistent Footer -->
+<div class="footer">
+  <a href="#">Home</a>
+  <a href="#">QR Certificate</a>
+  <a href="#">भाषा बदलें</a>
+  <a href="#">Leave/Help</a>
+</div>
+
+<script>
+  // Mock authentication – replace with real auth logic
+  function authAdmin(pin) {
+    // Example: admin PIN is "1234"
+    return pin === '1234';
+  }
+
+  const loginGate = document.getElementById('login-gate');
+  const dashboard = document.getElementById('dashboard');
+  const loginTitle = document.getElementById('login-title');
+  const btnStudent = document.getElementById('btn-student');
+  const btnAdmin = document.getElementById('btn-admin');
+  const loginBtn = document.getElementById('login-btn');
+  const pinInput = document.getElementById('pin-input');
+  const adminPanel = document.getElementById('admin-panel');
+
+  // Role toggle UI
+  btnStudent.addEventListener('click', () => {
+    btnStudent.classList.add('active');
+    btnAdmin.classList.remove('active');
+    loginTitle.textContent = 'Student Login';
+  });
+  btnAdmin.addEventListener('click', () => {
+    btnAdmin.classList.add('active');
+    btnStudent.classList.remove('active');
+    loginTitle.textContent = 'Admin Login';
+  });
+
+  // Login handler
+  loginBtn.addEventListener('click', () => {
+    const pin = pinInput.value.trim();
+    const isAdmin = btnAdmin.classList.contains('active');
+
+    if (isAdmin) {
+      if (authAdmin(pin)) {
+        // Show admin UI
+        adminPanel.style.display = 'block';
+        loginGate.style.display = 'none';
+        dashboard.style.display = 'block';
+      } else {
+        alert('Invalid admin PIN.');
+      }
+    } else {
+      // Simple student login (no PIN check)
+      loginGate.style.display = 'none';
+      dashboard.style.display = 'block';
+    }
+    pinInput.value = '';
+  });
+</script>
+</body>
+</html>
 <style>
     .admin-panel { max-width: 900px; margin: 20px auto; font-family: Arial, sans-serif; }
     .card { background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
