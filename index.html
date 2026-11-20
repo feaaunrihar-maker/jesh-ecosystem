@@ -299,6 +299,99 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+<style>
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: #fafafa;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .mini-card {
+      margin-bottom: 12px;
+    }
+    .btn-primary {
+      background-color: #0069d9;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-primary:hover {
+      background-color: #0053ba;
+    }
+    label {
+      font-size: 14px;
+      user-select: none;
+    }
+  </style>
+
+  <div class="card">
+    <div class="mini-card">
+      <label for="autoDeployToggle">
+        <input type="checkbox" id="autoDeployToggle" style="margin-right:6px;">
+        ⚡ Auto‑Deploy Immediately (Skip 2nd Click)
+      </label>
+    </div>
+    <button id="analyzeArchBtn" class="btn-primary">Analyze Architecture</button>
+  </div>
+
+  <script>
+    // Placeholder functions – replace with real implementations
+    async function generateUpgradePreview() {
+      console.log('Generating upgrade preview...');
+      // Simulate async work
+      return new Promise(r => setTimeout(r, 500));
+    }
+    async function validateWidgetHTML() {
+      console.log('Validating widget HTML...');
+      // Simulate validation (return true for success)
+      return new Promise(r => setTimeout(() => r(true), 300));
+    }
+    async function createBackup() {
+      console.log('Creating backup...');
+      return new Promise(r => setTimeout(r, 300));
+    }
+    async function executeArchitectPush() {
+      console.log('Executing architect push...');
+      return new Promise(r => setTimeout(r, 500));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const analyzeBtn = document.getElementById('analyzeArchBtn');
+      const autoToggle = document.getElementById('autoDeployToggle');
+
+      analyzeBtn.addEventListener('click', async () => {
+        // Step 1: always generate the preview and show the summary
+        await generateUpgradePreview();
+
+        // Show plain‑language UPGRADE SUMMARY (implementation depends on your UI)
+        // For demo purposes we just log it:
+        console.log('UPGRADE SUMMARY: Preview generated.');
+
+        if (autoToggle.checked) {
+          // Auto‑deploy flow
+          const isValid = await validateWidgetHTML();
+          if (!isValid) {
+            alert('Validation failed. Please review the preview before deploying.');
+            return;
+          }
+          await createBackup();
+          await executeArchitectPush();
+
+          // Keep the 1‑Click Rollback button active in Alerts (implementation specific)
+          console.log('Auto‑deploy completed. Rollback button remains active.');
+        } else {
+          // Normal two‑click flow – you can trigger the next step elsewhere
+          console.log('Auto‑deploy disabled – awaiting second click for push.');
+        }
+      });
+    });
+  </script>
 <div class="card"><h3>✨ Upgrade</h3><p>UPGRADE SUMMARY:
 - Adds a realistic 2‑way video‑call interface with timer, PiP preview, mute, auto‑conversation loop and end‑call controls.  
 - Provides a Photo & Voice Clone Studio where students can snap or upload a selfie, name their avatar, record a 10‑second voice sample and store it locally for later use.  
