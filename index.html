@@ -328,6 +328,236 @@
       </div>
 
       <div id="dynamicExtensionsZone">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Co‑Architect Upgrade & JeshLive Tutor</title>
+<style>
+/* Minimal helpers – rely on existing .card, .btn-primary, .mini-card */
+#coArchChatBox {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+#coArchChatInput {
+    width: 100%;
+    min-height: 50px;
+    resize: none;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-top: 8px;
+    font-family: inherit;
+}
+.avatar-option {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+.avatar-option.selected {
+    border-color: #007bff;
+}
+#videoCallScreen {
+    width: 100%;
+    height: 200px;
+    background:#000;
+    position: relative;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.2rem;
+}
+</style>
+</head>
+<body>
+
+<!-- 1️⃣ Co‑Architect Chat -->
+<div id="coArchitectChat" class="card">
+    <div id="coArchChatBox"></div>
+    <textarea id="coArchChatInput" class="mini-card" placeholder="Type a message…"></textarea>
+</div>
+
+<!-- 2️⃣ JeshLive Cartoon & Face Video‑Call Tutor -->
+<div id="jeshLiveCard" class="card">
+    <h3>📹 JeshLive Cartoon & Face Video‑Call Tutor</h3>
+
+    <!-- Avatar selection -->
+    <div id="avatarSelection">
+        <label><input type="radio" name="avatar" value="robo" checked hidden>
+            <img src="https://i.imgur.com/1XkzU5b.png" alt="Robo‑Guru" class="avatar-option selected" data-name="Robo‑Guru">
+        </label>
+        <label><input type="radio" name="avatar" value="didi" hidden>
+            <img src="https://i.imgur.com/2yZ3bK9.png" alt="Didi‑Mentor" class="avatar-option" data-name="Didi‑Mentor">
+        </label>
+        <label><input type="radio" name="avatar" value="captain" hidden>
+            <img src="https://i.imgur.com/3cJ4nL0.png" alt="Captain‑Code" class="avatar-option" data-name="Captain‑Code">
+        </label>
+        <label><input type="radio" name="avatar" value="global" hidden>
+            <img src="https://i.imgur.com/4dK5mQ1.png" alt="Global‑Guide" class="avatar-option" data-name="Global‑Guide">
+        </label>
+    </div>
+
+    <!-- Custom photo upload -->
+    <div style="margin-top:8px;">
+        <input type="file" id="customPhoto" accept="image/*">
+    </div>
+
+    <!-- Voice pitch selector -->
+    <div style="margin-top:8px;">
+        <label for="pitchRange">Voice Pitch: </label>
+        <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1">
+        <span id="pitchValue">1.0</span>
+    </div>
+
+    <!-- Start call button -->
+    <div style="margin-top:8px;">
+        <button id="startCallBtn" class="btn-primary">Start Video‑Call</button>
+    </div>
+
+    <!-- Video‑call screen (simulated) -->
+    <div id="videoCallScreen" class="mini-card" style="margin-top:8px;">
+        <span id="callStatus">Press “Start Video‑Call”</span>
+    </div>
+
+    <!-- Transcript / feedback -->
+    <div id="callTranscript" style="margin-top:8px; max-height:120px; overflow-y:auto; font-size:0.9rem;"></div>
+</div>
+
+<script>
+/* ---------- 1️⃣ Chat Logic ---------- */
+const chatBox = document.getElementById('coArchChatBox');
+const chatInput = document.getElementById('coArchChatInput');
+
+function autoExpand(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+}
+chatInput.addEventListener('input', () => autoExpand(chatInput));
+
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const raw = chatInput.value.trim();
+        if (raw) sendMessage(raw);
+        chatInput.value = '';
+        autoExpand(chatInput);
+    }
+});
+
+function sendMessage(text) {
+    const msgDiv = document.createElement('div');
+    // Convert **bold** to <strong>
+    const html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    msgDiv.innerHTML = `<span style="font-weight:bold;">You:</span> ${html}`;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* ---------- 2️⃣ JeshLive Tutor Logic ---------- */
+const avatarOptions = document.querySelectorAll('.avatar-option');
+let selectedAvatar = 'Robo‑Guru';
+avatarOptions.forEach(img => {
+    img.addEventListener('click', () => {
+        avatarOptions.forEach(i => i.classList.remove('selected'));
+        img.classList.add('selected');
+        selectedAvatar = img.dataset.name;
+    });
+});
+
+const customPhotoInput = document.getElementById('customPhoto');
+let customPhotoURL = null;
+customPhotoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            customPhotoURL = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+const pitchRange = document.getElementById('pitchRange');
+const pitchValue = document.getElementById('pitchValue');
+pitchRange.addEventListener('input', () => {
+    pitchValue.textContent = pitchRange.value;
+});
+
+const startBtn = document.getElementById('startCallBtn');
+const videoScreen = document.getElementById('videoCallScreen');
+const callStatus = document.getElementById('callStatus');
+const transcript = document.getElementById('callTranscript');
+
+let synth = window.speechSynthesis;
+
+function simulateTutorReply(userText) {
+    const reply = `Hello! I am ${selectedAvatar}. You said: "${userText}"`;
+    const utter = new SpeechSynthesisUtterance(reply);
+    utter.pitch = parseFloat(pitchRange.value);
+    synth.speak(utter);
+    addToTranscript('Tutor', reply);
+}
+
+function addToTranscript(sender, text) {
+    const p = document.createElement('p');
+    p.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    transcript.appendChild(p);
+    transcript.scrollTop = transcript.scrollHeight;
+}
+
+startBtn.addEventListener('click', async () => {
+    // Show avatar (custom photo overrides preset)
+    videoScreen.innerHTML = '';
+    const img = document.createElement('img');
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '100%';
+    img.style.objectFit = 'contain';
+    if (customPhotoURL) {
+        img.src = customPhotoURL;
+    } else {
+        // Use placeholder cartoon avatar based on selection
+        const map = {
+            'Robo‑Guru': 'https://i.imgur.com/1XkzU5b.png',
+            'Didi‑Mentor': 'https://i.imgur.com/2yZ3bK9.png',
+            'Captain‑Code': 'https://i.imgur.com/3cJ4nL0.png',
+            'Global‑Guide': 'https://i.imgur.com/4dK5mQ1.png'
+        };
+        img.src = map[selectedAvatar];
+    }
+    videoScreen.appendChild(img);
+    callStatus.textContent = 'Listening… (speak into your mic)';
+
+    // Capture microphone (simple permission request)
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        let chunks = [];
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            // For demo we just use a placeholder text as "what the student said"
+            const placeholderText = 'I need help with loops.';
+            addToTranscript('You', placeholderText);
+            simulateTutorReply(placeholderText);
+            callStatus.textContent = 'Ready';
+            chunks = [];
+        };
+
+        // Record for 2 seconds then stop (simulates quick utterance)
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 2000);
+    } catch (err) {
+        callStatus.textContent = 'Mic access denied';
+    }
+});
+</script>
+</body>
+</html>
 <style>
     .widget-container {
       max-width: 800px;
