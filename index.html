@@ -299,6 +299,58 @@
 
       <!-- DYNAMIC EXTENSIONS SLOT -->
       <div id="dynamicExtensionsZone">
+```html
+<!-- Student Dashboard UI Adjustments -->
+<div class="dashboard">
+
+  <!-- GitHub Repository Panel (to be hidden for students) -->
+  <div class="card github-panel">
+    <h3>GitHub Repository</h3>
+    <p>Access your project repositories here.</p>
+  </div>
+
+  <!-- Upgrade Forms / Buttons (to be removed for students) -->
+  <div class="mini-card upgrade-form">
+    <h4>Upgrade Your Plan</h4>
+    <button class="btn-primary">Upgrade Now</button>
+  </div>
+
+  <div class="mini-card upgrade-form">
+    <h4>Feature Toggles</h4>
+    <button class="btn-primary">Enable Premium Feature</button>
+  </div>
+
+  <!-- Ad Banner (must stay visible) -->
+  <div class="card ad-banner">
+    <h3>Sponsored Ad</h3>
+    <p>Stay tuned for great offers!</p>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    // Assume a global variable or data attribute defines the current role.
+    // For demonstration, we read from a data attribute on <body>.
+    const role = document.body.getAttribute('data-user-role') || 'student';
+
+    if (role.toLowerCase() === 'student') {
+      // Hide GitHub Repository panel
+      const githubPanel = document.querySelector('.github-panel');
+      if (githubPanel) githubPanel.style.display = 'none';
+
+      // Remove all upgrade forms and primary buttons within them
+      const upgradeForms = document.querySelectorAll('.upgrade-form');
+      upgradeForms.forEach(form => form.style.display = 'none');
+
+      // Ensure the ad banner stays visible (optional explicit show)
+      const adBanner = document.querySelector('.ad-banner');
+      if (adBanner) adBanner.style.display = '';
+    }
+    // Admin view remains untouched
+  })();
+</script>
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
