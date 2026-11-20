@@ -4,291 +4,341 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jesh AI Ecosystem</title>
-  <meta name="description" content="Jesh AI Ecosystem - Free Autonomous AI Tutor, Speaking Practice, JeshLingo 20+ Languages, Python, CCC & CSC Learning." />
-  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
   <style>
-    :root { --accent: #4f46e5; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
-    .accent-bg { background-color: var(--accent); }
-    .accent-text { color: var(--accent); }
-    .glass-card { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
-    @keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.8; } 70% { transform: scale(1.15); opacity: 0; } 100% { transform: scale(0.95); opacity: 0; } }
-    .mic-recording::before { content: ''; position: absolute; inset: -6px; border-radius: 9999px; background: #ef4444; animation: pulse-ring 1.2s infinite; z-index: -1; }
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --dark: #0f172a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+    .hidden { display: none !important; }
+    header {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 14px 24px;
+      display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+    .brand h1 { font-size: 18px; font-weight: 700; }
+    .brand p { font-size: 12px; color: var(--muted); }
+    .nav-btns { display: flex; gap: 10px; }
+    button {
+      cursor: pointer; border: none; border-radius: 10px; font-weight: 600; font-size: 13px;
+      padding: 9px 16px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(79,70,229,0.25); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-dark { background: var(--dark); color: #fff; }
+    .btn-dark:hover { background: #1e293b; }
+    .btn-emerald { background: #059669; color: #fff; }
+    .btn-emerald:hover { background: #047857; }
+    .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-tab-active { background: var(--primary); color: #fff; }
+
+    .container { max-width: 1060px; margin: 24px auto; padding: 0 16px; }
+    .card {
+      background: var(--card); border-radius: 18px; border: 1px solid var(--border);
+      padding: 24px; box-shadow: 0 4px 20px rgba(15,23,42,0.04); margin-bottom: 20px;
+    }
+    .hero-card { border-left: 5px solid var(--primary); }
+    .badge {
+      display: inline-block; background: #eef2ff; color: var(--primary);
+      font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 99px; margin-bottom: 10px;
+    }
+    .hero-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+    .tabs-bar { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid #cbd5e1;
+      font-size: 14px; font-family: inherit; outline: none; background: #fff;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+    .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .input-row input { flex: 1; min-width: 220px; }
+
+    .response-box {
+      margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 12px;
+      border: 1px solid var(--border); font-size: 14px; white-space: pre-line;
+    }
+
+    /* Speaking Studio Dark UI */
+    .speaking-studio { background: #0f172a; color: #f8fafc; border-radius: 16px; padding: 20px; }
+    .chat-feed {
+      height: 260px; overflow-y: auto; background: #020617; border: 1px solid #1e293b;
+      border-radius: 12px; padding: 14px; margin: 14px 0; display: flex; flex-direction: column; gap: 10px;
+    }
+    .msg-ai { background: #1e293b; color: #f1f5f9; padding: 10px 14px; border-radius: 12px; max-width: 82%; align-self: flex-start; font-size: 13px; white-space: pre-line; }
+    .msg-user { background: var(--primary); color: #fff; padding: 10px 14px; border-radius: 12px; max-width: 82%; align-self: flex-end; font-size: 13px; }
+    .mic-btn {
+      width: 46px; height: 46px; border-radius: 50%; background: #e11d48; color: #fff;
+      font-size: 20px; justify-content: center; flex-shrink: 0;
+    }
+    .mic-active { animation: pulse 1s infinite; background: #be123c; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(225,29,72,0.7); } 70% { box-shadow: 0 0 0 12px rgba(225,29,72,0); } 100% { box-shadow: 0 0 0 0 rgba(225,29,72,0); } }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+    .mini-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+
+    /* Admin Banner & Terminal */
+    .admin-banner {
+      background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #fff;
+      border-radius: 16px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+    }
+    .terminal {
+      background: #020617; color: #34d399; font-family: Consolas, monospace; font-size: 12px;
+      padding: 16px; border-radius: 12px; margin-top: 14px; white-space: pre-wrap; max-height: 320px; overflow-y: auto;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.65); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .modal-box { background: #fff; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
 
-  <!-- TOP NAVBAR -->
-  <header class="glass-card sticky top-0 z-40 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl accent-bg text-white flex items-center justify-center font-bold text-xl shadow">J</div>
+  <header>
+    <div class="brand">
+      <div class="logo">J</div>
       <div>
-        <h1 id="uiBrandName" class="font-bold text-lg md:text-xl tracking-tight">Jesh AI Ecosystem</h1>
-        <p class="text-xs text-slate-500">Autonomous Learning & AI Studio</p>
+        <h1 id="uiBrandName">Jesh AI Ecosystem</h1>
+        <p>Ultra-Fast Autonomous Learning Studio</p>
       </div>
     </div>
-
-    <div class="flex items-center gap-2 md:gap-3">
-      <button onclick="switchView('learner')" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold bg-indigo-50 accent-text">
-        <span id="uiLearnerLabel">Learner</span> Hub
-      </button>
-      <button onclick="openAdminModal()" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition">
-        🛠️ Admin Command
-      </button>
+    <div class="nav-btns">
+      <button class="btn-outline" onclick="switchView('learner')">🎓 <span id="uiLearnerLabel">Learner</span> Hub</button>
+      <button class="btn-dark" onclick="openAdminModal()">🛠️ Admin Command</button>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">
+  <main class="container">
+    <!-- ==================== LEARNER HUB ==================== -->
+    <section id="viewLearner">
+      <div class="card hero-card">
+        <span class="badge">⚡ Fast AI Engine Active</span>
+        <h2 id="uiHeroHeading" class="hero-title">Learn, Build & Evolve with Personal AI</h2>
+        <p class="subtitle">Practice live voice speaking, master 20+ languages, or learn coding & CCC/CSC with your personal AI mentor.</p>
 
-    <!-- ==================== LEARNER HUB VIEW ==================== -->
-    <section id="viewLearner" class="space-y-6">
-      <div class="glass-card rounded-2xl p-6 md:p-8 shadow-sm border-l-4 border-indigo-600">
-        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 mb-2">
-          ✨ Personal AI Mentor Active
-        </span>
-        <h2 id="uiHeroHeading" class="text-2xl md:text-3xl font-extrabold text-slate-900">
-          Learn, Build & Evolve with Personal AI
-        </h2>
-        <p class="text-slate-600 mt-1 text-sm">
-          Practice speaking with live voice AI, learn 20+ languages, or master coding & CCC/CSC.
-        </p>
-
-        <!-- MODE SWITCHER PILLS FOR USERS -->
-        <div class="flex flex-wrap gap-2 mt-5 border-b border-slate-200 pb-3">
-          <button onclick="switchLearnerTab('chat')" class="l-tab px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white" data-ltab="chat">💬 AI Tutor Chat</button>
-          <button onclick="switchLearnerTab('speaking')" class="l-tab px-4 py-2 rounded-xl text-xs font-bold bg-white border text-slate-700" data-ltab="speaking">🎤 AI Speaking Practice (Voice)</button>
-          <button onclick="switchLearnerTab('lingo')" class="l-tab px-4 py-2 rounded-xl text-xs font-bold bg-white border text-slate-700" data-ltab="lingo">🌍 JeshLingo & Read</button>
-          <button onclick="switchLearnerTab('courses')" class="l-tab px-4 py-2 rounded-xl text-xs font-bold bg-white border text-slate-700" data-ltab="courses">🎓 Micro-Courses</button>
+        <div class="tabs-bar">
+          <button class="l-tab btn-tab-active" data-ltab="chat" onclick="switchLearnerTab('chat')">💬 AI Tutor Chat</button>
+          <button class="l-tab btn-outline" data-ltab="speaking" onclick="switchLearnerTab('speaking')">🎤 AI Speaking Practice</button>
+          <button class="l-tab btn-outline" data-ltab="lingo" onclick="switchLearnerTab('lingo')">🌍 JeshLingo & Read</button>
+          <button class="l-tab btn-outline" data-ltab="courses" onclick="switchLearnerTab('courses')">📚 Micro-Courses</button>
         </div>
 
-        <!-- 1. STANDARD AI CHAT -->
-        <div id="ltab-chat" class="l-panel mt-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-          <div class="flex flex-col md:flex-row gap-3">
-            <input id="learnerPrompt" type="text" placeholder="Ask anything (e.g., Explain Python loops, CCC shortcut keys)..."
-              class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm" />
-            <label class="flex items-center gap-2 text-xs font-medium text-slate-600 px-2">
-              <input type="checkbox" id="learnerWebToggle" class="rounded text-indigo-600" /> Live Web
+        <!-- 1. AI CHAT -->
+        <div id="ltab-chat" class="l-panel">
+          <div class="input-row">
+            <input id="learnerPrompt" type="text" placeholder="Ask anything (e.g., Explain Python loops, CCC shortcut keys)..." onkeydown="if(event.key==='Enter') askLearnerAI()" />
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;">
+              <input type="checkbox" id="learnerWebToggle" /> Live Web
             </label>
-            <button onclick="askLearnerAI()" id="learnerAskBtn"
-              class="accent-bg text-white px-6 py-3 rounded-xl font-semibold text-sm hover:opacity-90 transition shadow">
-              Ask AI ✨
-            </button>
+            <button class="btn-primary" id="learnerAskBtn" onclick="askLearnerAI()">Ask AI ✨</button>
           </div>
-          <div id="learnerResponseBox" class="hidden mt-4 p-4 bg-white rounded-xl border border-slate-200 text-sm leading-relaxed whitespace-pre-line text-slate-800"></div>
+          <div id="learnerResponseBox" class="response-box hidden"></div>
         </div>
 
-        <!-- 2. CHATGPT-STYLE AI SPEAKING PRACTICE (MIC + TRANSCRIBE + VOICE REPLY) -->
-        <div id="ltab-speaking" class="l-panel hidden mt-4 bg-slate-900 text-white p-5 rounded-2xl space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 pb-3">
-            <div>
-              <h3 class="font-bold text-base flex items-center gap-2">🎙️ AI Speaking Practice Studio</h3>
-              <p class="text-xs text-slate-400">Press Mic, speak naturally, and get instant voice reply + grammar correction.</p>
+        <!-- 2. AI SPEAKING PRACTICE -->
+        <div id="ltab-speaking" class="l-panel hidden">
+          <div class="speaking-studio">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+              <div>
+                <h3 style="font-size:16px;">🎙️ AI Speaking Practice (Voice Mode)</h3>
+                <p style="font-size:12px;color:#94a3b8;">Tap Mic, speak naturally, and get instant voice reply + grammar correction.</p>
+              </div>
+              <select id="speakingMode" style="width:auto;background:#1e293b;color:#fff;border-color:#334155;font-size:12px;">
+                <option value="Daily English Conversation">🗣️ Daily English Conversation</option>
+                <option value="Job Interview Practice">💼 Job Interview Practice</option>
+                <option value="Hindi/Bhojpuri to English Coach">🇮🇳 Hindi/Bhojpuri → English</option>
+                <option value="Public Speaking">🎤 Public Speaking</option>
+              </select>
             </div>
-            <select id="speakingMode" class="bg-slate-800 text-xs px-3 py-2 rounded-xl border border-slate-700 text-white">
-              <option value="Daily English Conversation">🗣️ Daily English Conversation</option>
-              <option value="Job Interview Practice">💼 Job Interview Practice</option>
-              <option value="Hindi/Bhojpuri to English Bridge">🇮🇳 Hindi/Bhojpuri → English Coach</option>
-              <option value="Public Speaking & Confidence">🎤 Public Speaking & Confidence</option>
-            </select>
-          </div>
 
-          <div id="speakingChatHistory" class="h-64 overflow-y-auto space-y-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-xs md:text-sm">
-            <div class="p-3 rounded-xl bg-slate-800/90 text-slate-200 max-w-[85%]">
-              👋 Hello! I am your AI Speaking Coach. Tap the <strong>Mic</strong> button below, say something in English (or Hindi), and hit <strong>Send</strong>!
+            <div id="speakingChatHistory" class="chat-feed">
+              <div class="msg-ai">👋 Hello! Tap the red <strong>Mic</strong> button below, speak a sentence, and press <strong>Send</strong>!</div>
             </div>
-          </div>
 
-          <div class="flex items-center gap-3">
-            <button id="micRecordBtn" onclick="toggleVoiceMic()"
-              class="relative w-12 h-12 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center text-xl shadow-lg transition shrink-0" title="Tap to Speak">
-              🎤
-            </button>
-            <input id="speakingTranscriptInput" type="text" placeholder="Tap Mic to speak or type your sentence here..."
-              class="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <button onclick="sendSpeakingTurn()" id="speakingSendBtn"
-              class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow">
-              Send 🔊
-            </button>
+            <div class="input-row" style="align-items:center;">
+              <button id="micRecordBtn" class="mic-btn" onclick="toggleVoiceMic()" title="Tap to Speak">🎤</button>
+              <input id="speakingTranscriptInput" type="text" style="background:#1e293b;color:#fff;border-color:#334155;" placeholder="Tap Mic to speak or type here..." onkeydown="if(event.key==='Enter') sendSpeakingTurn()" />
+              <button class="btn-primary" onclick="sendSpeakingTurn()">Send 🔊</button>
+            </div>
+            <p id="micStatusText" style="font-size:11px;color:#94a3b8;margin-top:8px;">Mic Ready • Instant Voice Reply Enabled</p>
           </div>
-          <p id="micStatusText" class="text-[11px] text-slate-400">Mic Ready • Works best in Chrome/Edge</p>
         </div>
 
-        <!-- 3. JESHLINGO & JESHREAD -->
-        <div id="ltab-lingo" class="l-panel hidden mt-4 bg-slate-50 p-5 rounded-xl border space-y-3">
-          <div class="flex flex-wrap gap-2 items-center">
-            <span class="text-xs font-bold">Choose Language:</span>
-            <select id="lingoLangSelect" class="px-3 py-2 rounded-lg border text-xs bg-white">
+        <!-- 3. JESHLINGO -->
+        <div id="ltab-lingo" class="l-panel hidden">
+          <div class="input-row" style="margin-bottom:12px;">
+            <select id="lingoLangSelect" style="max-width:260px;">
               <option>English (Global)</option><option>Hindi (हिन्दी)</option><option>Bhojpuri (भोजपुरी)</option>
               <option>Sanskrit (संस्कृत)</option><option>Mandarin Chinese (中文)</option><option>Japanese (日本語)</option>
-              <option>Swahili (Africa)</option><option>Amharic (Ethiopia)</option><option>Arabic (العربية)</option>
-              <option>French (Français)</option><option>Spanish (Español)</option><option>German (Deutsch)</option>
+              <option>Swahili (Africa)</option><option>Arabic (العربية)</option><option>French (Français)</option><option>Spanish (Español)</option>
             </select>
-            <button onclick="startLingoLesson()" class="px-4 py-2 rounded-lg accent-bg text-white text-xs font-bold">Generate Interactive Lesson</button>
+            <button class="btn-primary" onclick="startLingoLesson()">Generate Interactive Lesson</button>
           </div>
-          <div id="lingoOutputBox" class="p-4 bg-white rounded-xl border text-xs md:text-sm whitespace-pre-line text-slate-700">
-            Select any of the 20+ global languages above to start a quick vocabulary, pronunciation & reading drill!
-          </div>
+          <div id="lingoOutputBox" class="response-box">Select any language above to get 5 daily phrases, pronunciation guide, and a reading drill!</div>
         </div>
 
         <!-- 4. MICRO-COURSES -->
-        <div id="ltab-courses" class="l-panel hidden mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="p-4 rounded-xl bg-white border space-y-2">
-            <h4 class="font-bold text-sm">🐍 Python & AI Basics</h4>
-            <p class="text-xs text-slate-500">Interactive bite-sized coding lessons with instant AI mentor.</p>
-            <button onclick="launchCourse('Python Programming Basics')" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">Start Lesson →</button>
-          </div>
-          <div class="p-4 rounded-xl bg-white border space-y-2">
-            <h4 class="font-bold text-sm">💻 CCC & CSC Digital</h4>
-            <p class="text-xs text-slate-500">NIELIT CCC shortcuts, LibreOffice & e-Governance services.</p>
-            <button onclick="launchCourse('NIELIT CCC & CSC Digital Services')" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">Start Lesson →</button>
-          </div>
-          <div class="p-4 rounded-xl bg-white border space-y-2">
-            <h4 class="font-bold text-sm">🌐 HTML, CSS & Web</h4>
-            <p class="text-xs text-slate-500">Build real web pages from scratch with live AI guidance.</p>
-            <button onclick="launchCourse('HTML5 & CSS3 Web Design')" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">Start Lesson →</button>
+        <div id="ltab-courses" class="l-panel hidden">
+          <div class="grid-3">
+            <div class="mini-card">
+              <h4 style="margin-bottom:6px;">🐍 Python & AI Basics</h4>
+              <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Bite-sized coding lessons with instant AI mentor.</p>
+              <button class="btn-primary" onclick="launchCourse('Python Programming Basics')">Start Lesson →</button>
+            </div>
+            <div class="mini-card">
+              <h4 style="margin-bottom:6px;">💻 NIELIT CCC & CSC</h4>
+              <p style="font-size:12px;color:#64748b;margin-bottom:12px;">CCC exam shortcuts, LibreOffice & digital services.</p>
+              <button class="btn-primary" onclick="launchCourse('NIELIT CCC & CSC Digital Services')">Start Lesson →</button>
+            </div>
+            <div class="mini-card">
+              <h4 style="margin-bottom:6px;">🌐 HTML, CSS & Web</h4>
+              <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Build real web pages from scratch.</p>
+              <button class="btn-primary" onclick="launchCourse('HTML5 & CSS3 Web Design')">Start Lesson →</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- DYNAMIC SELF-EVOLVING EXTENSIONS CONTAINER (Auto-injected features appear here) -->
-      <div id="dynamicExtensionsZone" class="space-y-4"></div>
+      <!-- AUTO-INJECTED NEW FEATURES APPEAR HERE -->
+      <div id="dynamicExtensionsZone"></div>
     </section>
 
-    <!-- ==================== ADMIN COMMAND CENTER VIEW ==================== -->
-    <section id="viewAdmin" class="hidden space-y-6">
-      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white p-5 rounded-2xl shadow">
+    <!-- ==================== ADMIN COMMAND CENTER ==================== -->
+    <section id="viewAdmin" class="hidden">
+      <div class="admin-banner">
         <div>
-          <h2 class="text-xl font-bold flex items-center gap-2">🛠️ Architect & AI Command Center</h2>
-          <p class="text-xs text-slate-300 mt-0.5">Self-Evolving System • Active vs. Last-Input Vault • Universal MCP/API Hub</p>
+          <h2 style="font-size:20px;">🛠️ Architect & AI Command Center</h2>
+          <p style="font-size:12px;color:#cbd5e1;">Self-Evolving System • Zero-Reload UI & Feature Builder • Active Vault</p>
         </div>
-        <div class="flex gap-2">
-          <button onclick="triggerAutonomousRD()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold">
-            🔍 Run 48h R&D Radar Now
-          </button>
-          <button onclick="switchView('learner')" class="px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold">
-            Exit Admin
-          </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-emerald" onclick="triggerAutonomousRD()">🔍 Run 48h R&D Radar</button>
+          <button class="btn-outline" onclick="switchView('learner')">Exit Admin</button>
         </div>
       </div>
 
-      <!-- Admin Sub-Navigation Tabs -->
-      <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
-        <button onclick="showAdminTab('architect')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white" data-tab="architect">🧠 Self-Architect & UI Builder</button>
-        <button onclick="showAdminTab('vault')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border" data-tab="vault">🔐 Active vs Last-Input Vault</button>
-        <button onclick="showAdminTab('connectors')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border" data-tab="connectors">🔌 Universal MCP & API Hub</button>
-        <button onclick="showAdminTab('alerts')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border" data-tab="alerts">🔔 Alerts & R&D Proposals (<span id="alertCount">0</span>)</button>
+      <div class="tabs-bar">
+        <button class="admin-tab-btn btn-tab-active" data-tab="architect" onclick="showAdminTab('architect')">🧠 Self-Architect & UI Builder</button>
+        <button class="admin-tab-btn btn-outline" data-tab="vault" onclick="showAdminTab('vault')">🔐 Active vs Last-Input Vault</button>
+        <button class="admin-tab-btn btn-outline" data-tab="connectors" onclick="showAdminTab('connectors')">🔌 Universal MCP & API Hub</button>
+        <button class="admin-tab-btn btn-outline" data-tab="alerts" onclick="showAdminTab('alerts')">🔔 Alerts & Proposals (<span id="alertCount">0</span>)</button>
       </div>
 
-      <!-- TAB 1: SELF-ARCHITECT & CO-PILOT -->
-      <div id="tab-architect" class="admin-tab-panel glass-card p-6 rounded-2xl space-y-4">
-        <h3 class="font-bold text-lg text-slate-900">🤖 Atmanirbhar Self-Architect (AI Co-Pilot & Live GitHub Deployer)</h3>
-        <p class="text-xs text-slate-600">
-          Describe any new feature, widget, or UI upgrade. Click Analyze to generate code, then Approve to push live to GitHub (with automatic 5-version backup).
-        </p>
-
-        <textarea id="architectPrompt" rows="3" placeholder="Example: Add a Daily Quiz & XP Leaderboard widget on the Learner Hub..."
-          class="w-full p-4 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-
-        <div class="flex flex-wrap gap-3">
-          <button onclick="generateArchitectPlan()" id="analyzeArchBtn" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">
-            1️⃣ Analyze & Generate Impact Preview
-          </button>
-          <button onclick="executeArchitectPush()" id="approvePushBtn" class="hidden px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 shadow-lg">
-            2️⃣ Approve & Push Live to GitHub 🚀
-          </button>
+      <!-- TAB 1: SELF-ARCHITECT -->
+      <div id="tab-architect" class="admin-tab-panel card">
+        <h3 style="margin-bottom:6px;">🤖 Atmanirbhar Self-Architect (Build & Deploy Features from Inside)</h3>
+        <p class="subtitle">Type any new feature or UI widget below. Preview the impact, then click Approve to push live to GitHub automatically.</p>
+        <textarea id="architectPrompt" rows="3" placeholder="Example: Add an AI Face & Voice Avatar preview card with live camera test button..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+          <button class="btn-primary" id="analyzeArchBtn" onclick="generateArchitectPlan()">1️⃣ Analyze & Generate Impact Preview</button>
+          <button class="btn-emerald hidden" id="approvePushBtn" onclick="executeArchitectPush()">2️⃣ Approve & Push Live to GitHub 🚀</button>
         </div>
-
-        <div id="architectOutput" class="hidden p-4 rounded-xl bg-slate-900 text-emerald-300 text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-96 overflow-y-auto"></div>
+        <div id="architectOutput" class="terminal hidden"></div>
       </div>
 
-      <!-- TAB 2: ACTIVE vs LAST-INPUT VAULT -->
-      <div id="tab-vault" class="admin-tab-panel hidden glass-card p-6 rounded-2xl space-y-5">
-        <h3 class="font-bold text-lg text-slate-900">🔐 Active vs. Last-Input Config & White-Label Vault</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="configVaultGrid"></div>
+      <!-- TAB 2: VAULT -->
+      <div id="tab-vault" class="admin-tab-panel card hidden">
+        <h3 style="margin-bottom:6px;">🔐 Active vs. Last-Input Config & White-Label Vault</h3>
+        <p class="subtitle">Change brand name, headings, theme color, or API keys anytime. Previous values are safely archived.</p>
+        <div id="configVaultGrid" class="grid-2"></div>
       </div>
 
-      <!-- TAB 3: UNIVERSAL MCP & API CONNECTOR -->
-      <div id="tab-connectors" class="admin-tab-panel hidden glass-card p-6 rounded-2xl space-y-5">
-        <h3 class="font-bold text-lg text-slate-900">🔌 Universal MCP Server, Repo & External API Bridge</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border">
-          <input id="connName" type="text" placeholder="Tool Name (e.g., ElevenLabs / Custom MCP)" class="px-3 py-2 rounded-lg border text-xs" />
-          <select id="connType" class="px-3 py-2 rounded-lg border text-xs bg-white">
+      <!-- TAB 3: CONNECTORS -->
+      <div id="tab-connectors" class="admin-tab-panel card hidden">
+        <h3 style="margin-bottom:6px;">🔌 Universal MCP Server, Repo & External API Bridge</h3>
+        <div class="grid-2" style="margin-bottom:14px;">
+          <input id="connName" type="text" placeholder="Tool Name (e.g., ElevenLabs / Custom MCP)" />
+          <select id="connType">
             <option value="REMOTE_MCP">Remote MCP Server URL</option>
             <option value="REST_API">External REST API</option>
             <option value="WEBHOOK">Automation Webhook (n8n/Make)</option>
-            <option value="GITHUB_REPO">External GitHub Repo</option>
           </select>
-          <input id="connUrl" type="text" placeholder="Endpoint URL (https://...)" class="px-3 py-2 rounded-lg border text-xs" />
-          <input id="connAuth" type="password" placeholder="API Key / Bearer Token (Optional)" class="px-3 py-2 rounded-lg border text-xs" />
-          <input id="connDesc" type="text" placeholder="What does this tool do?" class="md:col-span-2 px-3 py-2 rounded-lg border text-xs" />
-          <button onclick="saveConnector()" class="md:col-span-2 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold">➕ Connect Tool</button>
+          <input id="connUrl" type="text" placeholder="Endpoint URL (https://...)" />
+          <input id="connAuth" type="password" placeholder="API Key / Bearer Token (Optional)" />
+          <input id="connDesc" type="text" placeholder="What does this tool do?" />
+          <button class="btn-dark" onclick="saveConnector()">➕ Connect Tool</button>
         </div>
-        <div id="connectorsList" class="space-y-2"></div>
+        <div id="connectorsList"></div>
       </div>
 
-      <!-- TAB 4: ALERTS & AUTONOMOUS R&D PROPOSALS -->
-      <div id="tab-alerts" class="admin-tab-panel hidden glass-card p-6 rounded-2xl space-y-4">
-        <h3 class="font-bold text-lg text-slate-900">🔔 Central Alerts & Autonomous R&D Proposals</h3>
-        <div id="alertsContainer" class="space-y-3"></div>
+      <!-- TAB 4: ALERTS -->
+      <div id="tab-alerts" class="admin-tab-panel card hidden">
+        <h3 style="margin-bottom:12px;">🔔 Central Alerts & Autonomous R&D Proposals</h3>
+        <div id="alertsContainer"></div>
       </div>
     </section>
-
   </main>
 
   <!-- ADMIN LOGIN MODAL -->
-  <div id="adminLoginModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4">
-      <h3 class="font-bold text-lg">🔐 Admin Verification</h3>
-      <input id="adminPassInput" type="password" placeholder="Enter Admin Password" class="w-full px-4 py-2.5 rounded-xl border text-sm" />
-      <div class="flex justify-end gap-2">
-        <button onclick="closeAdminModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600">Cancel</button>
-        <button onclick="verifyAdminLogin()" class="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold">Unlock Command Center</button>
+  <div id="adminLoginModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <h3 style="margin-bottom:8px;">🔐 Admin Verification</h3>
+      <p style="font-size:12px;color:#64748b;margin-bottom:14px;">Enter Master Admin Password from ActiveConfig.</p>
+      <input id="adminPassInput" type="password" placeholder="Admin Password" onkeydown="if(event.key==='Enter') verifyAdminLogin()" />
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+        <button class="btn-outline" onclick="closeAdminModal()">Cancel</button>
+        <button class="btn-dark" onclick="verifyAdminLogin()">Unlock</button>
       </div>
     </div>
   </div>
 
   <script>
-    const API_URL = "[https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec](https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec)";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzQB2T-aT6y7cMFpr5_S-2jq1Xa86GWDwIqaZ7MM0GuJBTi5mU_sJnfrCcb2Ixoj1BW/exec";
     let ADMIN_PASS = "";
     let GENERATED_CODE_BUFFER = "";
-    let CURRENT_GITHUB_HTML = "";
 
-    // GLOBAL AUTO-ERROR CATCHER (SELF-HEALING SENSOR)
     window.onerror = function(msg, url, line) {
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'REPORT_CLIENT_ERROR', errorMsg: msg, location: 'Line ' + line })
-      }).catch(() => {});
+      fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'REPORT_CLIENT_ERROR', errorMsg: msg, location: 'Line ' + line }) }).catch(() => {});
     };
 
     const VAULT_FIELDS = [
-      { key: 'BRAND_NAME', label: 'Platform Brand Name (White-Label)' },
-      { key: 'ROLE_STUDENT_LABEL', label: 'Student Role Name' },
-      { key: 'ROLE_TEACHER_LABEL', label: 'Teacher Role Name' },
-      { key: 'HERO_HEADING', label: 'Main Home Page Heading' },
-      { key: 'THEME_ACCENT', label: 'Primary Accent Color (Hex)' },
-      { key: 'GROQ_API_KEY', label: 'Groq AI API Key (gsk_...)', secret: true },
-      { key: 'OPENROUTER_API_KEY', label: 'OpenRouter Backup Key', secret: true },
-      { key: 'GOOGLE_SEARCH_API_KEY', label: 'Google Search API Key', secret: true },
-      { key: 'GOOGLE_SEARCH_CX', label: 'Google Search Engine ID (CX)' },
-      { key: 'STUDENT_SYSTEM_PROMPT', label: 'Learner AI Tutor Behavior Prompt' },
-      { key: 'AI_REMOVE_STARS', label: 'Auto-Remove ** Stars (TRUE/FALSE)' }
+      { key: 'BRAND_NAME', label: 'Platform Brand Name' },
+      { key: 'ROLE_STUDENT_LABEL', label: 'Learner Role Label' },
+      { key: 'HERO_HEADING', label: 'Main Home Heading' },
+      { key: 'THEME_ACCENT', label: 'Theme Color (Hex e.g. #4f46e5)' },
+      { key: 'GROQ_API_KEY', label: 'Groq AI Key (gsk_...)', secret: true },
+      { key: 'OPENROUTER_API_KEY', label: 'OpenRouter Key', secret: true },
+      { key: 'STUDENT_SYSTEM_PROMPT', label: 'AI Tutor Behavior Prompt' }
     ];
 
+    // Fast Boot with Local Cache + Live Sync
     window.addEventListener('DOMContentLoaded', async () => {
+      const cached = localStorage.getItem('JESH_UI_CFG');
+      if (cached) applyThemeConfig(JSON.parse(cached));
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
         if (data.status === 'ONLINE' && data.config) {
-          document.title = data.config.brandName;
-          document.getElementById('uiBrandName').textContent = data.config.brandName;
-          document.getElementById('uiLearnerLabel').textContent = data.config.studentLabel;
-          document.getElementById('uiHeroHeading').textContent = data.config.heroHeading;
-          document.documentElement.style.setProperty('--accent', data.config.themeAccent);
+          localStorage.setItem('JESH_UI_CFG', JSON.stringify(data.config));
+          applyThemeConfig(data.config);
         }
       } catch (e) {}
     });
+
+    function applyThemeConfig(c) {
+      document.title = c.brandName || 'Jesh AI Ecosystem';
+      document.getElementById('uiBrandName').textContent = c.brandName || 'Jesh AI Ecosystem';
+      document.getElementById('uiLearnerLabel').textContent = c.studentLabel || 'Learner';
+      document.getElementById('uiHeroHeading').textContent = c.heroHeading || 'Learn, Build & Evolve with Personal AI';
+      if (c.themeAccent) document.documentElement.style.setProperty('--primary', c.themeAccent);
+    }
 
     function switchView(view) {
       document.getElementById('viewLearner').classList.toggle('hidden', view !== 'learner');
@@ -299,14 +349,14 @@
       document.querySelectorAll('.l-panel').forEach(p => p.classList.add('hidden'));
       document.getElementById('ltab-' + tab).classList.remove('hidden');
       document.querySelectorAll('.l-tab').forEach(b => {
-        const active = b.dataset.ltab === tab;
-        b.className = active ? 'l-tab px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white' : 'l-tab px-4 py-2 rounded-xl text-xs font-bold bg-white border text-slate-700';
+        b.className = (b.dataset.ltab === tab) ? 'l-tab btn-tab-active' : 'l-tab btn-outline';
       });
     }
 
     function openAdminModal() {
       if (ADMIN_PASS) { switchView('admin'); return; }
       document.getElementById('adminLoginModal').classList.remove('hidden');
+      document.getElementById('adminPassInput').focus();
     }
     function closeAdminModal() { document.getElementById('adminLoginModal').classList.add('hidden'); }
 
@@ -330,19 +380,17 @@
       document.querySelectorAll('.admin-tab-panel').forEach(el => el.classList.add('hidden'));
       document.getElementById('tab-' + tabName).classList.remove('hidden');
       document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-        const active = btn.dataset.tab === tabName;
-        btn.className = active ? 'admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white' : 'admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border';
+        btn.className = (btn.dataset.tab === tabName) ? 'admin-tab-btn btn-tab-active' : 'admin-tab-btn btn-outline';
       });
     }
 
-    // LEARNER AI CHAT
     async function askLearnerAI() {
       const prompt = document.getElementById('learnerPrompt').value.trim();
       if (!prompt) return;
       const box = document.getElementById('learnerResponseBox');
       const btn = document.getElementById('learnerAskBtn');
       box.classList.remove('hidden');
-      box.textContent = "Thinking...";
+      box.textContent = "⚡ Thinking...";
       btn.disabled = true;
       const useWeb = document.getElementById('learnerWebToggle').checked;
       const res = await postBackend({ action: 'CHAT', role: 'student', prompt, useWebSearch: useWeb });
@@ -350,36 +398,24 @@
       btn.disabled = false;
     }
 
-    // CHATGPT-STYLE AI SPEAKING PRACTICE (MIC + SPEECH SYNTHESIS)
-    let recognition = null;
-    let isRecording = false;
+    // VOICE SPEAKING STUDIO
+    let recognition = null, isRecording = false;
     function toggleVoiceMic() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return alert("Voice recognition is supported in Chrome or Edge browser.");
+      if (!SpeechRec) return alert("Use Chrome or Edge for Voice Mic.");
       const btn = document.getElementById('micRecordBtn');
       const status = document.getElementById('micStatusText');
-      if (isRecording && recognition) {
-        recognition.stop();
-        return;
-      }
+      if (isRecording && recognition) { recognition.stop(); return; }
       recognition = new SpeechRec();
       recognition.lang = 'en-IN';
       recognition.interimResults = true;
-      recognition.onstart = () => {
-        isRecording = true;
-        btn.classList.add('mic-recording');
-        status.textContent = "🔴 Listening... Speak now!";
-      };
+      recognition.onstart = () => { isRecording = true; btn.classList.add('mic-active'); status.textContent = "🔴 Listening... Speak now!"; };
       recognition.onresult = (e) => {
-        let transcript = '';
-        for (let i = 0; i < e.results.length; i++) transcript += e.results[i][0].transcript;
-        document.getElementById('speakingTranscriptInput').value = transcript;
+        let t = '';
+        for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+        document.getElementById('speakingTranscriptInput').value = t;
       };
-      recognition.onend = () => {
-        isRecording = false;
-        btn.classList.remove('mic-recording');
-        status.textContent = "Mic Ready • Click Send 🔊 to get AI Voice Reply";
-      };
+      recognition.onend = () => { isRecording = false; btn.classList.remove('mic-active'); status.textContent = "Mic Ready • Press Send 🔊"; };
       recognition.start();
     }
 
@@ -389,52 +425,49 @@
       if (!userText) return;
       const mode = document.getElementById('speakingMode').value;
       const history = document.getElementById('speakingChatHistory');
-
-      history.innerHTML += `<div class="p-3 rounded-xl bg-indigo-600 text-white ml-auto max-w-[85%]">🗣️ ${userText}</div>`;
+      history.innerHTML += `<div class="msg-user">🗣️ ${userText}</div>`;
       inputEl.value = "";
       history.scrollTop = history.scrollHeight;
 
-      const coachPrompt = `Mode: ${mode}. The student just spoke: "${userText}". Reply naturally in 2 short conversational sentences to continue the dialogue, and on a new line add "Tip:" with 1 quick grammar or vocabulary improvement.`;
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: coachPrompt });
-      const aiText = res.reply || "Good try! Keep practicing.";
-
-      history.innerHTML += `<div class="p-3 rounded-xl bg-slate-800 text-slate-100 max-w-[85%] whitespace-pre-line">🤖 ${aiText}</div>`;
+      const res = await postBackend({
+        action: 'CHAT', role: 'student',
+        prompt: `Mode: ${mode}. Student said: "${userText}". Reply naturally in 2 short sentences to keep the conversation going, then on a new line write "Tip:" with 1 grammar/fluency tip.`
+      });
+      const aiText = res.reply || "Great effort! Keep speaking.";
+      history.innerHTML += `<div class="msg-ai">🤖 ${aiText}</div>`;
       history.scrollTop = history.scrollHeight;
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(aiText.split('Tip:')[0]);
-        utter.lang = 'en-US';
-        window.speechSynthesis.speak(utter);
+        const u = new SpeechSynthesisUtterance(aiText.split('Tip:')[0]);
+        u.lang = 'en-US';
+        window.speechSynthesis.speak(u);
       }
     }
 
-    // JESHLINGO & COURSES
     async function startLingoLesson() {
       const lang = document.getElementById('lingoLangSelect').value;
       const out = document.getElementById('lingoOutputBox');
-      out.textContent = "Generating interactive lesson for " + lang + "...";
-      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Create a quick beginner interactive lesson for ${lang}: 5 essential daily phrases with pronunciation guide and 1 short reading paragraph.` });
+      out.textContent = "⚡ Creating lesson for " + lang + "...";
+      const res = await postBackend({ action: 'CHAT', role: 'student', prompt: `Give 5 essential daily phrases in ${lang} with pronunciation and 1 short practice dialogue.` });
       out.textContent = res.reply;
     }
 
-    function launchCourse(courseName) {
+    function launchCourse(name) {
       switchLearnerTab('chat');
-      document.getElementById('learnerPrompt').value = `Start Lesson 1 of ${courseName} with a practical example and 1 practice question.`;
+      document.getElementById('learnerPrompt').value = `Teach me Lesson 1 of ${name} with a clear example and 1 quiz question.`;
       askLearnerAI();
     }
 
-    // VAULT RENDERER
     function renderVaultFields(cfg) {
-      const grid = document.getElementById('configVaultGrid');
-      grid.innerHTML = VAULT_FIELDS.map(f => `
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-          <label class="block text-xs font-bold text-slate-700">${f.label}</label>
-          <div class="flex gap-2">
-            <input id="cfg_${f.key}" type="${f.secret ? 'password' : 'text'}" placeholder="${cfg[f.key] || 'Not set'}" class="flex-1 px-3 py-2 rounded-lg border bg-white text-xs" />
-            <button onclick="saveVaultKey('${f.key}')" class="px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold">Save</button>
+      document.getElementById('configVaultGrid').innerHTML = VAULT_FIELDS.map(f => `
+        <div class="mini-card">
+          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">${f.label}</label>
+          <div style="display:flex;gap:6px;">
+            <input id="cfg_${f.key}" type="${f.secret ? 'password' : 'text'}" placeholder="${cfg[f.key] || 'Not set'}" />
+            <button class="btn-primary" onclick="saveVaultKey('${f.key}')">Save</button>
           </div>
-          <button onclick="restoreVaultKey('${f.key}')" class="text-[11px] text-slate-500 hover:text-indigo-600 font-medium">↩️ Restore Last Input</button>
+          <button style="background:none;color:#64748b;font-size:11px;padding:6px 0 0 0;" onclick="restoreVaultKey('${f.key}')">↩️ Restore Last Input</button>
         </div>
       `).join('');
     }
@@ -451,7 +484,6 @@
       alert(res.success ? 'Restored previous input!' : res.message);
     }
 
-    // CONNECTORS
     async function saveConnector() {
       const name = document.getElementById('connName').value.trim();
       const type = document.getElementById('connType').value;
@@ -466,11 +498,9 @@
 
     function renderConnectors(list) {
       const box = document.getElementById('connectorsList');
-      if (!list.length) { box.innerHTML = '<p class="text-xs text-slate-400">No external MCP/APIs connected yet.</p>'; return; }
-      box.innerHTML = list.map(c => `<div class="p-3 rounded-xl border bg-white flex justify-between text-xs"><div><b>${c.name}</b> (${c.type}) - ${c.description}</div><span class="text-emerald-600 font-bold">● ACTIVE</span></div>`).join('');
+      box.innerHTML = list.length ? list.map(c => `<div class="mini-card" style="margin-bottom:8px;"><b>${c.name}</b> (${c.type}) — ${c.description}</div>`).join('') : '<p style="font-size:12px;color:#64748b;">No connectors yet.</p>';
     }
 
-    // ALERTS & R&D
     async function triggerAutonomousRD() {
       const res = await postBackend({ action: 'RUN_RESEARCH', adminPass: ADMIN_PASS });
       alert(res.message);
@@ -478,25 +508,20 @@
     }
 
     function renderAlerts(alerts) {
-      const pending = alerts.filter(a => a.status === 'PENDING');
-      document.getElementById('alertCount').textContent = pending.length;
+      document.getElementById('alertCount').textContent = alerts.filter(a => a.status === 'PENDING').length;
       const box = document.getElementById('alertsContainer');
-      if (!alerts.length) { box.innerHTML = '<p class="text-xs text-slate-400">No alerts yet.</p>'; return; }
-      box.innerHTML = alerts.map(a => `
-        <div class="p-4 rounded-xl border bg-white space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-bold text-indigo-700">${a.type} • ${a.title}</span>
-            <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 font-semibold">${a.status}</span>
+      box.innerHTML = alerts.length ? alerts.map(a => `
+        <div class="mini-card" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--primary);">
+            <span>${a.type} • ${a.title}</span><span>${a.status}</span>
           </div>
-          <p class="text-xs text-slate-700">${a.details}</p>
-          ${a.status === 'PENDING' ? `
-            <div class="flex gap-2 pt-1">
-              <button onclick='useProposalInArchitect(${JSON.stringify(a.details)}, ${a.row})' class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold">✅ Send to Self-Architect</button>
-              <button onclick="markAlert(${a.row}, 'DISMISSED')" class="px-3 py-1.5 rounded-lg bg-slate-200 text-slate-700 text-xs font-bold">Dismiss</button>
-            </div>
-          ` : ''}
+          <p style="font-size:13px;margin:8px 0;">${a.details}</p>
+          ${a.status === 'PENDING' ? `<div style="display:flex;gap:8px;">
+            <button class="btn-emerald" onclick='useProposalInArchitect(${JSON.stringify(a.details)}, ${a.row})'>✅ Send to Self-Architect</button>
+            <button class="btn-outline" onclick="markAlert(${a.row}, 'DISMISSED')">Dismiss</button>
+          </div>` : ''}
         </div>
-      `).join('');
+      `).join('') : '<p style="font-size:12px;color:#64748b;">No alerts yet.</p>';
     }
 
     async function markAlert(row, status) {
@@ -507,10 +532,9 @@
     function useProposalInArchitect(details, row) {
       markAlert(row, 'APPROVED');
       showAdminTab('architect');
-      document.getElementById('architectPrompt').value = "Build a self-contained HTML+JS widget card for: " + details;
+      document.getElementById('architectPrompt').value = "Build a clean HTML+JS feature card for: " + details;
     }
 
-    // SELF-HEALING SELF-ARCHITECT (SUPPORTS FULL HTML OR SMART WIDGET INJECTION)
     async function generateArchitectPlan() {
       const reqText = document.getElementById('architectPrompt').value.trim();
       if (!reqText) return;
@@ -518,46 +542,26 @@
       const btn = document.getElementById('analyzeArchBtn');
       out.classList.remove('hidden');
       btn.disabled = true;
-      out.textContent = "1. Fetching live index.html from GitHub...\n2. Designing feature & calculating impact...";
+      out.textContent = "1. Fetching live index.html...\n2. Designing widget & impact summary...";
 
       const fileRes = await postBackend({ action: 'GET_GITHUB_FILE', adminPass: ADMIN_PASS, filePath: 'index.html' });
-      if (!fileRes.success) {
-        out.textContent = "GitHub Read Error: " + fileRes.message;
-        btn.disabled = false;
-        return;
-      }
-      CURRENT_GITHUB_HTML = fileRes.content;
+      if (!fileRes.success) { out.textContent = "GitHub Error: " + fileRes.message; btn.disabled = false; return; }
 
-      const aiPrompt = `Create a self-contained Tailwind CSS + Vanilla JS interactive widget card for the Jesh AI Learner Hub based on this request: "${reqText}".
-First write 2 lines starting with "IMPACT SUMMARY:" explaining what is being added.
-Then output ONLY the HTML/JS widget snippet inside <widget> ... </widget> tags (no markdown backticks needed). Make it clean, interactive, and mobile-friendly.`;
-
-      const aiRes = await postBackend({ action: 'CHAT', role: 'admin', prompt: aiPrompt });
+      const aiRes = await postBackend({
+        action: 'CHAT', role: 'admin',
+        prompt: `Create a clean, self-contained HTML+JS card widget using classes "card" and "btn-primary" for this request: "${reqText}". First write 2 lines starting with "IMPACT SUMMARY:". Then put ONLY the HTML/JS snippet inside <widget> ... </widget>.`
+      });
       btn.disabled = false;
       if (!aiRes.success) { out.textContent = aiRes.reply; return; }
 
-      let widgetHtml = "";
       const wMatch = aiRes.reply.match(/<widget>([\s\S]*?)<\/widget>/i);
-      const codeMatch = aiRes.reply.match(/```html([\s\S]*?)```/i);
+      const widgetHtml = (wMatch && wMatch[1]) ? wMatch[1].trim() : `<div class="card"><h3>✨ AI Upgrade</h3><p>${aiRes.reply}</p></div>`;
+      const marker = '<div id="dynamicExtensionsZone">';
+      GENERATED_CODE_BUFFER = fileRes.content.includes(marker)
+        ? fileRes.content.replace(marker, marker + '\n' + widgetHtml)
+        : fileRes.content.replace('</body>', widgetHtml + '\n</body>');
 
-      if (wMatch && wMatch[1]) {
-        widgetHtml = wMatch[1].trim();
-      } else if (codeMatch && codeMatch[1]) {
-        widgetHtml = codeMatch[1].trim();
-      } else {
-        widgetHtml = `<div class="glass-card p-5 rounded-2xl border-l-4 border-emerald-500"><h3 class="font-bold text-base">✨ New AI Upgrade</h3><p class="text-xs text-slate-600 mt-1">${aiRes.reply}</p></div>`;
-      }
-
-      // Safely inject widget into dynamicExtensionsZone of live index.html
-      const marker = '<div id="dynamicExtensionsZone" class="space-y-4">';
-      if (CURRENT_GITHUB_HTML.includes(marker)) {
-        GENERATED_CODE_BUFFER = CURRENT_GITHUB_HTML.replace(marker, marker + '\n' + widgetHtml);
-      } else {
-        GENERATED_CODE_BUFFER = CURRENT_GITHUB_HTML.replace('</body>', widgetHtml + '\n</body>');
-      }
-
-      const summary = aiRes.reply.split('<widget>')[0].trim();
-      out.textContent = `${summary}\n\n✅ Feature Code Built & Validated!\nClick the green "2️⃣ Approve & Push Live to GitHub 🚀" button above to deploy immediately.`;
+      out.textContent = `${aiRes.reply.split('<widget>')[0].trim()}\n\n✅ Ready! Click the green "2️⃣ Approve & Push Live to GitHub 🚀" button above.`;
       document.getElementById('approvePushBtn').classList.remove('hidden');
     }
 
@@ -566,14 +570,12 @@ Then output ONLY the HTML/JS widget snippet inside <widget> ... </widget> tags (
       const out = document.getElementById('architectOutput');
       const pushBtn = document.getElementById('approvePushBtn');
       pushBtn.disabled = true;
-      out.textContent += "\n\nBacking up previous version & pushing live to GitHub...";
-
-      const msg = document.getElementById('architectPrompt').value.slice(0, 55);
+      out.textContent += "\n\nPushing live to GitHub with 5-version backup...";
       const res = await postBackend({
         action: 'GITHUB_PUSH', adminPass: ADMIN_PASS, filePath: 'index.html',
-        content: GENERATED_CODE_BUFFER, message: 'Self-Architect: ' + msg
+        content: GENERATED_CODE_BUFFER, message: 'Self-Architect: ' + document.getElementById('architectPrompt').value.slice(0, 50)
       });
-      out.textContent += "\n🎉 " + res.message + "\nRefresh your browser in 30 seconds to use the new feature!";
+      out.textContent += "\n🎉 " + res.message + "\nRefresh page in 30 seconds to see it live!";
       pushBtn.classList.add('hidden');
       pushBtn.disabled = false;
     }
