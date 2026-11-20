@@ -447,6 +447,211 @@
 
         <!-- ISOLATED AUTONOMOUS SELF-ARCHITECT MOUNT POINT -->
         <div id="dynamicExtensionsZone">
+<!-- AUTO-DEPLOYED: Upgrade the JeshLingo module (`#mod-ling -->
+<!-- ==================== HTML ==================== -->
+  <div id="mod-lingo" style="max-width:480px;margin:auto;padding:1rem;font-family:Arial,Helvetica,sans-serif;">
+    <h2 style="margin-top:0;">JeshLingo Challenge</h2>
+    <div id="lingoStatus" style="margin-bottom:0.5rem;">
+      <span>XP: <span id="lingoXP">0</span></span> |
+      <span>Hearts: <span id="lingoHearts">❤️❤️❤️</span></span>
+    </div>
+
+    <div id="lingoPrompt" style="font-size:1.2rem;margin:1rem 0;"></div>
+
+    <input id="lingoAnswer" type="text" placeholder="Type your sentence…" style="width:100%;padding:0.5rem;font-size:1rem;" autocomplete="off"/>
+    <button id="lingoSubmit" style="margin-top:0.5rem;padding:0.5rem 1rem;font-size:1rem;">Submit</button>
+
+    <div id="lingoFeedback" style="margin-top:1rem;height:2rem;display:flex;align-items:center;justify-content:center;"></div>
+
+    <div id="lingoSuggestionBar" style="margin-top:1.5rem;padding:0.5rem;background:#f0f8ff;border-radius:0.5rem;display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- ==================== CSS ==================== -->
+  <style>
+    #lingoFeedback {font-weight:bold; font-size:1.1rem; color:#006400;}
+    .lingo-chip {
+      background:#e0f7fa; color:#006064; padding:0.4rem 0.8rem; border-radius:0.4rem;
+      cursor:pointer; user-select:none; transition:background .2s;
+    }
+    .lingo-chip:hover {background:#b2ebf2;}
+    .celebration-banner {
+      position:fixed; top:20%; left:50%; transform:translateX(-50%);
+      background:#ffeb3b; color:#000; padding:1rem 2rem; border-radius:0.5rem;
+      font-size:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,.2);
+      animation:fadeOut 1.2s forwards;
+    }
+    @keyframes fadeOut {0%{opacity:1;}100%{opacity:0;}}
+  </style>
+
+  <!-- ==================== JS ==================== -->
+  <script>
+    (function(){
+      // ---------- Mock Data ----------
+      const LEVELS = ['A1','A2','B1'];
+      const USER = { level:'A1', age:12 };
+      let LINGO_DECK = [
+        { prompt:"Translate: I have a red apple.", target:"I have a red apple." },
+        { prompt:"Translate: She likes to read books.", target:"She likes to read books." },
+        { prompt:"Translate: They are playing soccer.", target:"They are playing soccer." }
+      ];
+      const JESH_WEAK_WORDS = [];
+
+      // ---------- State ----------
+      let currentItem = null;
+      let xp = 0;
+      let hearts = 3;
+
+      // ---------- UI References ----------
+      const $prompt = document.getElementById('lingoPrompt');
+      const $answer = document.getElementById('lingoAnswer');
+      const $submit = document.getElementById('lingoSubmit');
+      const $feedback = document.getElementById('lingoFeedback');
+      const $xp = document.getElementById('lingoXP');
+      const $hearts = document.getElementById('lingoHearts');
+      const $suggestBar = document.getElementById('lingoSuggestionBar');
+
+      // ---------- Helper Functions ----------
+      function updateUI(){
+        $xp.textContent = xp;
+        $hearts.innerHTML = '❤️'.repeat(hearts);
+      }
+      function speakText(txt){
+        if('speechSynthesis' in window){
+          const utter = new SpeechSynthesisUtterance(txt);
+          utter.lang = 'en-US';
+          speechSynthesis.speak(utter);
+        }
+      }
+      function playChime(){
+        // simple beep using Web Audio API
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type='sine'; osc.frequency.value=880;
+        osc.connect(gain); gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.001,ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.2,ctx.currentTime+0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);
+        osc.start();
+        osc.stop(ctx.currentTime+0.2);
+      }
+      function showCelebration(){
+        const banner = document.createElement('div');
+        banner.className='celebration-banner';
+        banner.textContent='Awesome!';
+        document.body.appendChild(banner);
+        setTimeout(()=>banner.remove(),1200);
+      }
+      function renderSuggestionChips(){
+        const suggestions = [
+          "🗣️ Speak This Sentence in Video Call",
+          "📖 Read a Story with These Words",
+          "🎯 Take 60-Second Speed Challenge"
+        ];
+        $suggestBar.innerHTML='';
+        suggestions.forEach(text=>{
+          const chip=document.createElement('div');
+          chip.className='lingo-chip';
+          chip.textContent=text;
+          chip.onclick=()=>alert('Action: '+text);
+          $suggestBar.appendChild(chip);
+        });
+      }
+
+      // ---------- Core Functions ----------
+      function loadLingoChallenge(){
+        if(LINGO_DECK.length===0){
+          fetchAIChallenges(5).then(newItems=>{
+            LINGO_DECK = newItems;
+            loadLingoChallenge();
+          });
+          return;
+        }
+        currentItem = LINGO_DECK.shift();
+        $prompt.textContent = currentItem.prompt;
+        $answer.value='';
+        $feedback.textContent='';
+        renderSuggestionChips();
+      }
+
+      function checkLingoSentence(){
+        const userAns = $answer.value.trim();
+        const correct = userAns===currentItem.target;
+        if(correct){
+          // Correct flow
+          xp+=15;
+          playChime();
+          showCelebration();
+          $feedback.style.color='#006400';
+          $feedback.textContent='Correct! +15 XP';
+          updateUI();
+          setTimeout(loadLingoChallenge,1200);
+        }else{
+          // Wrong flow
+          hearts = Math.max(0, hearts-1);
+          JESH_WEAK_WORDS.push(currentItem.target);
+          speakText(currentItem.target);
+          $feedback.style.color='#B22222';
+          $feedback.textContent='Correct: '+currentItem.target;
+          updateUI();
+          const delay = 2200;
+          setTimeout(()=>{
+            if(hearts===0){
+              showHeartRefill();
+            }else{
+              loadLingoChallenge();
+            }
+          },delay);
+        }
+      }
+
+      function showHeartRefill(){
+        $feedback.innerHTML='';
+        const btn=document.createElement('button');
+        btn.textContent='❤️ Refill Hearts & Continue';
+        btn.style.padding='0.5rem 1rem';
+        btn.style.marginTop='0.5rem';
+        btn.onclick=()=>{
+          hearts=3;
+          updateUI();
+          btn.remove();
+          loadLingoChallenge();
+        };
+        $feedback.appendChild(btn);
+      }
+
+      // ---------- Mock AI Backend ----------
+      function fetchAIChallenges(count){
+        // Simulate async fetch – in real app replace with actual fetch()
+        return new Promise(resolve=>{
+          setTimeout(()=>{
+            const generated = [];
+            for(let i=0;i<count;i++){
+              const sentence = `AI generated sentence ${i+1} for level ${USER.level}`;
+              generated.push({
+                prompt:`Translate: ${sentence}`,
+                target:sentence
+              });
+            }
+            resolve(generated);
+          },800);
+        });
+      }
+
+      // ---------- Event Listeners ----------
+      $submit.addEventListener('click',checkLingoSentence);
+      $answer.addEventListener('keypress',e=>{
+        if(e.key==='Enter'){
+          e.preventDefault();
+          checkLingoSentence();
+        }
+      });
+
+      // ---------- Init ----------
+      updateUI();
+      loadLingoChallenge();
+    })();
+  </script>
 <!-- AUTO-DEPLOYED: Fix the Face & Lip Alignment on #preview -->
 <style>
     /* ---------- Avatar Widget Styles ---------- */
