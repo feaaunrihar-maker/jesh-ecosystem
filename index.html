@@ -301,7 +301,323 @@
         </div>
 
         <!-- DYNAMIC EXTENSIONS SLOT (RESERVED FOR FUTURE ADMIN PROMPTS) -->
-        <div id="dynamicExtensionsZone"></div>
+        <div id="dynamicExtensionsZone">
+<style>
+    .card {
+      max-width: 420px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .card h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: #2c3e50;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 10px 16px;
+      margin: 6px 0;
+      font-size: 0.95rem;
+      color: #fff;
+      background: #3f51b5;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-primary:disabled {
+      background: #9fa8da;
+      cursor: not-allowed;
+    }
+    .toggle-btn {
+      background: #e0e0e0;
+      color: #333;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+    .toggle-btn.active {
+      background: #ffeb3b;
+    }
+    #avatar-stage {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    #avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #mouth-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #upload-btn {
+      display: block;
+      width: 100%;
+      height: 48px;
+      line-height: 48px;
+      background: #fff;
+      border: 2px solid #3f51b5;
+      color: #3f51b5;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+    #calibration-text {
+      font-size: 0.9rem;
+      margin: 8px 0;
+      color: #555;
+    }
+  </style>
+
+  <div class="card">
+    <h3>🛠️ Upgrade JeshLive 2‑Way Call & Avatar Studio</h3>
+
+    <!-- Avatar Stage -->
+    <div id="avatar-stage">
+      <img id="avatar-img" src="https://via.placeholder.com/400x240?text=Your+Avatar" alt="Avatar">
+      <canvas id="mouth-canvas"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <button id="start-call" class="btn-primary">▶️ Start Call</button>
+    <button id="end-call" class="btn-primary" disabled>⏹️ End Call</button>
+
+    <!-- Upload Button -->
+    <div id="upload-btn">📤 अपनी फोटो लगाएं</div>
+
+    <!-- Calibration -->
+    <div id="calibration-text">
+      कृपया नीचे दिया गया वाक्य दो बार पढ़ें ताकि आपका आवाज़ प्रोफ़ाइल तैयार हो सके:
+      <em>"मैं आज नई तकनीक सीख रहा हूँ। यह बहुत रोमांचक है!"</em>
+    </div>
+    <button id="calibrate" class="btn-primary">🔧 Calibrate Voice (10 s)</button>
+
+    <!-- Toggles -->
+    <div style="margin-top:10px;">
+      <span id="default-toggle" class="toggle-btn">⭐ Set as My Default</span>
+      <span id="public-toggle" class="toggle-btn">🌐 Share Publicly</span>
+    </div>
+  </div>
+
+  <script>
+    // ==== Speech Recognition (Hands‑Free) ====
+    const startBtn = document.getElementById('start-call');
+    const endBtn   = document.getElementById('end-call');
+    const avatarImg = document.getElementById('avatar-img');
+    const canvas   = document.getElementById('mouth-canvas');
+    const ctx      = canvas.getContext('2d');
+
+    let recognizing = false;
+    let recognition;
+    let micStream;
+    let isCalling = false;
+    let speechQueue = [];
+
+    // Setup SpeechRecognition (browser‑native)
+    function initRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Your browser does not support Speech Recognition.');
+        return;
+      }
+      recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+
+      recognition.onresult = e => {
+        const transcript = e.results[0][0].transcript.trim();
+        console.log('You said:', transcript);
+        // Simulate sending to AI and getting a response
+        mockAIResponse(transcript);
+      };
+
+      recognition.onend = () => {
+        if (isCalling) {
+          // restart listening after short pause
+          setTimeout(() => recognition.start(), 700);
+        }
+      };
+    }
+
+    // ==== Mock AI (replace with real API) ====
+    function mockAIResponse(userText) {
+      // Simple echo + delay
+      const reply = `मैं समझ गया: "${userText}"`;
+      speechQueue.push(reply);
+      if (speechQueue.length === 1) playNextReply();
+    }
+
+    function playNextReply() {
+      if (speechQueue.length === 0) return;
+      const utter = new SpeechSynthesisUtterance(speechQueue[0]);
+      utter.lang = 'hi-IN';
+      // Bind animation to speech events
+      utter.onstart = startMouthAnim;
+      utter.onend   = () => {
+        stopMouthAnim();
+        speechQueue.shift(); // remove spoken reply
+        setTimeout(() => {
+          if (speechQueue.length) playNextReply();
+          else if (isCalling) recognition.start(); // back to listening
+        }, 700);
+      };
+      speechSynthesis.speak(utter);
+    }
+
+    // ==== Mouth Animation ====
+    let mouthAnimId;
+    function startMouthAnim() {
+      const w = canvas.width = avatarImg.clientWidth;
+      const h = canvas.height = avatarImg.clientHeight;
+      let open = false;
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+        // Simple oval mouth in the lower‑center area
+        const mouthW = w * 0.4;
+        const mouthH = open ? h * 0.12 : h * 0.04;
+        ctx.fillStyle = '#e53935';
+        ctx.beginPath();
+        ctx.ellipse(w/2, h*0.75, mouthW/2, mouthH, 0, 0, Math.PI*2);
+        ctx.fill();
+        // Simple blink every 2‑3 sec
+        if (Math.random() < 0.02) drawBlink();
+        open = !open;
+        mouthAnimId = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+    function stopMouthAnim() {
+      cancelAnimationFrame(mouthAnimId);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+    function drawBlink() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(w*0.4, h*0.3, w*0.2, h*0.02);
+    }
+
+    // ==== Call Controls ====
+    startBtn.onclick = () => {
+      if (isCalling) return;
+      isCalling = true;
+      startBtn.disabled = true;
+      endBtn.disabled = false;
+      initRecognition();
+      recognition.start();
+    };
+    endBtn.onclick = () => {
+      isCalling = false;
+      startBtn.disabled = false;
+      endBtn.disabled = true;
+      if (recognition) recognition.stop();
+      speechSynthesis.cancel();
+      stopMouthAnim();
+    };
+
+    // ==== Avatar Upload (styled button) ====
+    const uploadBtn = document.getElementById('upload-btn');
+    uploadBtn.onclick = () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        avatarImg.src = url;
+      };
+      input.click();
+    };
+
+    // ==== Voice Calibration ====
+    const calibrateBtn = document.getElementById('calibrate');
+    calibrateBtn.onclick = async () => {
+      calibrateBtn.disabled = true;
+      calibrateBtn.textContent = '🔧 Calibrating...';
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        // Record 10 seconds (simple placeholder, no processing)
+        const recorder = new MediaRecorder(stream);
+        recorder.start();
+        setTimeout(() => {
+          recorder.stop();
+          stream.getTracks().forEach(t=>t.stop());
+          alert('Calibration complete! (Profile stored locally)');
+          calibrateBtn.disabled = false;
+          calibrateBtn.textContent = '🔧 Calibrate Voice (10 s)';
+        }, 10000);
+      } catch (err) {
+        alert('Microphone access denied.');
+        calibrateBtn.disabled = false;
+        calibrateBtn.textContent = '🔧 Calibrate Voice (10 s)';
+      }
+    };
+
+    // ==== Toggles ====
+    const defaultToggle = document.getElementById('default-toggle');
+    const publicToggle  = document.getElementById('public-toggle');
+
+    defaultToggle.onclick = () => {
+      defaultToggle.classList.toggle('active');
+      if (defaultToggle.classList.contains('active')) {
+        localStorage.setItem('defaultAvatar', avatarImg.src);
+        alert('Saved as your default avatar.');
+      } else {
+        localStorage.removeItem('defaultAvatar');
+      }
+    };
+
+    publicToggle.onclick = async () => {
+      publicToggle.classList.toggle('active');
+      if (publicToggle.classList.contains('active')) {
+        // Simulated push to Google Sheet (replace with real API)
+        const payload = {
+          name: 'User_' + Math.floor(Math.random()*1000),
+          avatarUrl: avatarImg.src,
+          timestamp: new Date().toISOString()
+        };
+        // Fake fetch – in production replace with actual endpoint
+        try {
+          await fetch('https://example.com/push-avatar', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          alert('Avatar shared publicly!');
+        } catch (e) {
+          alert('Failed to share avatar.');
+          publicToggle.classList.remove('active');
+        }
+      } else {
+        // Optionally remove from public list – omitted for brevity
+      }
+    };
+
+    // Load saved default on page load
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('defaultAvatar');
+      if (saved) avatarImg.src = saved;
+    });
+  </script></div>
       </section>
 
       <!-- JESHLINGO SCREEN -->
